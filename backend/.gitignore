@@ -1,0 +1,6 @@
+venv/
+.env/
+venv_fresh_empty_20260305/
+*.pyc
+
+

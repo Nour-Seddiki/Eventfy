@@ -9,6 +9,13 @@ from app.services.auth_service import user_dependency
 router = APIRouter(prefix="/admin", tags=["admin"])
 
 
+
+@router.get("view_all_users",status_code=status.HTTP_200_OK)
+async def view_all_users(user:user_dependency , db:db_dependency):
+    return Admin().view_all_users(user,db)
+
+
+
 @router.put("/deactivate_user/{user_id}", status_code=status.HTTP_202_ACCEPTED)
 async def deactivate_user(user: user_dependency, db: db_dependency, user_id: int = Path(gt=0)):
     return Admin().deactivate_user(user, db, user_id)
@@ -23,6 +30,7 @@ async def ban_user(user: user_dependency, db: db_dependency, user_id: int = Path
 async def delete_user(user: user_dependency, db: db_dependency, user_id: int = Path(gt=0)):
     return Admin().delete_user(user, db, user_id)
 
-@router.put("/reactive_user",status_code=status.HTTP_202_ACCEPTED)
-async def reactive_user(user:user_dependency , db:db_dependency , user_id:int = Path(gt=0)):
-    return Admin().reactive_user(user , db , user_id)
+
+@router.put("/reactive_user/{user_id}", status_code=status.HTTP_202_ACCEPTED)
+async def reactive_user(user: user_dependency, db: db_dependency, user_id: int = Path(gt=0)):
+    return Admin().reactive_user(user, db, user_id)
