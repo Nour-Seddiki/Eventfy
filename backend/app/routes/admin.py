@@ -10,9 +10,13 @@ router = APIRouter(prefix="/admin", tags=["admin"])
 
 
 
-@router.get("view_all_users",status_code=status.HTTP_200_OK)
+@router.get("/view_all_users",status_code=status.HTTP_200_OK)
 async def view_all_users(user:user_dependency , db:db_dependency):
     return Admin().view_all_users(user,db)
+
+@router.get("/dashboard", status_code=status.HTTP_200_OK)
+async def dashboard(user: user_dependency, db: db_dependency):
+    return Admin().DashBoard(user, db)
 
 
 
