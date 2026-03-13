@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 from app.models.event import Event
 from app.models.ticket import Ticket
+from app.schemas.ticket import TicketStatus
 from fastapi import HTTPException, status
 from app.models.user import User
 from sqlalchemy import func
@@ -119,9 +120,9 @@ class Admin :
 
         total_events = db.query(Event).count()
         total_tickets = db.query(Ticket).count()
-        active_tickets = db.query(Ticket).filter(Ticket.status == "active").count()
-        used_tickets = db.query(Ticket).filter(Ticket.status == "used").count()
-        cancelled_tickets = db.query(Ticket).filter(Ticket.status == "cancelled").count()
+        active_tickets = db.query(Ticket).filter(Ticket.status == TicketStatus.active).count()
+        used_tickets = db.query(Ticket).filter(Ticket.status == TicketStatus.used).count()
+        cancelled_tickets = db.query(Ticket).filter(Ticket.status == TicketStatus.cancelled).count()
 
         total_revenue = (
             db.query(func.coalesce(func.sum(Event.price), 0.0))
@@ -145,4 +146,3 @@ class Admin :
             },
             "revenue": float(total_revenue or 0.0),
         }
-

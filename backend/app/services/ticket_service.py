@@ -7,6 +7,7 @@ from app.models.user import User
 from fastapi import HTTPException, status, BackgroundTasks
 import uuid
 import qrcode
+from app.schemas.ticket import TicketStatus
 from app.utils.email_sender import send_ticket_email
 from app.utils.qr_generator import generate_qr_code
 
@@ -59,7 +60,7 @@ class TickectService:
         and_(
             Ticket.user_id == user_model.id,
             Ticket.event_id == event_id,
-            Ticket.status == "active"
+            Ticket.status == TicketStatus.active
         )
     ).first()
 
@@ -76,7 +77,7 @@ class TickectService:
         event_id=event_id,
         qr_code=unique_id,
         qr_image=qr_bytes,   
-        status="active",
+        status=TicketStatus.active,
         purchased_at=current_time
     )
 
@@ -125,7 +126,7 @@ class TickectService:
         and_(
             Ticket.user_id == user.get("user_id"),
             Ticket.event_id == event_id,
-            Ticket.status == "active"
+            Ticket.status == TicketStatus.active
         )
     ).first()
 
@@ -136,7 +137,7 @@ class TickectService:
         )
 
     #  Cancel ticket
-    ticket_model.status = "cancelled"
+    ticket_model.status = TicketStatus.cancelled
 
     #  Increase available tickets
     event_model.available_tickets += 1
@@ -155,11 +156,11 @@ class TickectService:
       if ticket_model is None:
          raise HTTPException(status_code=404 , detail="invalid ticket ")
       
-      if ticket_model.status == "cancelled":
+      if ticket_model.status == TicketStatus.cancelled:
          raise HTTPException(status_code=404 , detail="invalid ticket")
-      if ticket_model.status == "used":
+      if ticket_model.status == TicketStatus.used:
          raise HTTPException(status_code=404 , detail="invalid ticket")
-      if ticket_model.status != "active":
+      if ticket_model.status != TicketStatus.active:
          raise HTTPException(status_code=404 , detail="invalid ticket")
       
       event = db.query(Event).filter(Event.id == ticket_model.event_id).first()
@@ -181,7 +182,7 @@ class TickectService:
         )
 
         # Mark as used
-      ticket_model.status = "used"
+      ticket_model.status = TicketStatus.used
 
       db.commit()
 
