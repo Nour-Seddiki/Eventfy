@@ -38,6 +38,7 @@ class EventService:
             price = event_data.price,
             available_tickets = event_data.available_tickets,
             date = event_data.date,
+            image = event_data.image,
             organizer_id=user.get("user_id"),
         )
 
@@ -67,11 +68,12 @@ class EventService:
         if event_model is None : 
             raise HTTPException(status_code=404 , detail="event not found")
         
+        updates = updated_event.dict(exclude_unset=True)
         # Prevent duplicate title collisions
-        if updated_event.title != event_model.title:
+        if "title" in updates and updates["title"] != event_model.title:
             existing_title = (
                 db.query(Event)
-                .filter(Event.title == updated_event.title, Event.id != event_id)
+                .filter(Event.title == updates["title"], Event.id != event_id)
                 .first()
             )
             if existing_title:
@@ -79,13 +81,9 @@ class EventService:
                     status_code=status.HTTP_409_CONFLICT,
                     detail="Event title already exists",
                 )
-        event_model.title = updated_event.title
-        event_model.description = updated_event.description
-        event_model.category = updated_event.category
-        event_model.location = updated_event.location
-        event_model.price = updated_event.price
-        event_model.available_tickets = updated_event.available_tickets
-        event_model.date = updated_event.date
+
+        for field, value in updates.items():
+            setattr(event_model, field, value)
         
         db.add(event_model)
         db.commit()
@@ -125,6 +123,7 @@ class EventService:
             "price":event_model.price,
             "date":event_model.date,
             "available_tickets":event_model.available_tickets,
+            "image": event_model.image,
         }
     ]
         return event_for_user
@@ -146,6 +145,7 @@ class EventService:
                 "price": event_model.price,
                 "date":event_model.date,
                 "available_tickets": event_model.available_tickets,
+                "image": event_model.image,
             }
             for event_model in event_models
         ]
@@ -167,6 +167,7 @@ class EventService:
             "price": event_model.price,
             "date":event_model.date,
             "available_tickets": event_model.available_tickets,
+            "image": event_model.image,
         }
         for event_model in event_models
        ]
@@ -188,6 +189,7 @@ class EventService:
             "price": event_model.price,
             "date":event_model.date,
             "available_tickets": event_model.available_tickets,
+            "image": event_model.image,
         }
         for event_model in event_models
        ]
@@ -210,6 +212,7 @@ class EventService:
             "price": event_model.price,
             "date":event_model.date,
             "available_tickets": event_model.available_tickets,
+            "image": event_model.image,
         }
         for event_model in event_models
        ]
@@ -250,6 +253,7 @@ class EventService:
             "price": event.price,
             "date": event.date,
             "available_tickets": event.available_tickets,
+            "image": event.image,
             "tickets_sold": tickets_sold,
         }
         for event, tickets_sold in trending_rows
@@ -287,9 +291,27 @@ class EventService:
             "price": event_model.price,
             "date": event_model.date,
             "available_tickets": event_model.available_tickets,
+            "image": event_model.image,
         }
         for event_model in similar_event_models
        ]
+
+    def upload_event_image(self, user, db, event_id: int, image_path: str):
+        if user is None:
+            raise HTTPException(status_code=401, detail="Authentification failed")
+
+        if user.get("user_role") != "organizer":
+            raise Exception("Only organizers can create events")
+
+        event_model = db.query(Event).filter(Event.id == event_id).first()
+        if event_model is None:
+            raise HTTPException(status_code=404, detail="event not found")
+
+        event_model.image = image_path
+        db.add(event_model)
+        db.commit()
+        db.refresh(event_model)
+        return {"message": "event image has been updated", "image": image_path}
 
 
        
@@ -298,5 +320,3 @@ class EventService:
 
 
         
-
-

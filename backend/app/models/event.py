@@ -13,5 +13,6 @@ class Event(Base):
     price = Column(FLOAT)
     available_tickets = Column(Integer)
     date = Column(DateTime)
+    image = Column(String)
     organizer_id = Column(Integer, ForeignKey("users.id"))
     created_at = Column(DateTime, default=datetime.now(timezone.utc))
