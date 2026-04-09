@@ -2,10 +2,12 @@ import importlib
 import os
 import sys
 
-from fastapi.testclient import TestClient
+import httpx
+import pytest
 
 
-def test_app_smoke(tmp_path):
+@pytest.mark.anyio
+async def test_app_smoke(tmp_path):
     db_path = tmp_path / "smoke.db"
     os.environ["DATABASE_URL"] = f"sqlite:///{db_path}"
 
@@ -14,9 +16,9 @@ def test_app_smoke(tmp_path):
             del sys.modules[module]
 
     app_module = importlib.import_module("app.main")
-    client = TestClient(app_module.app)
-
-    response = client.get("/openapi.json")
-    assert response.status_code == 200
-    payload = response.json()
-    assert "paths" in payload
+    transport = httpx.ASGITransport(app=app_module.app)
+    async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
+        response = await client.get("/openapi.json")
+        assert response.status_code == 200
+        payload = response.json()
+        assert "paths" in payload
