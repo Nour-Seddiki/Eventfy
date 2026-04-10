@@ -4,8 +4,7 @@ import logging
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from email.mime.base import MIMEBase
-from email import encoders
+from email.mime.image import MIMEImage
 from app.config import settings
 
 logger = logging.getLogger(__name__)
@@ -62,7 +61,6 @@ def send_ticket_email(user_email: str, event_name: str, event_date: str, qr_imag
 
         # Attach QR code image
         if qr_image:
-            from email.mime.image import MIMEImage
             img = MIMEImage(qr_image, 'png')
             img.add_header('Content-ID', '<ticket_qr>')
             img.add_header('Content-Disposition', 'attachment', filename='ticket_qr.png')
