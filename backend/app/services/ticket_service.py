@@ -8,6 +8,7 @@ from fastapi import HTTPException, status, BackgroundTasks
 import uuid
 import qrcode
 from app.schemas.ticket import TicketStatus
+from app.schemas.notification import CreateNotification, NotificationType
 from app.utils.email_sender import send_ticket_email
 from app.utils.qr_generator import generate_qr_code
 
@@ -88,6 +89,18 @@ class TickectService:
     
     db.commit()
     db.refresh(new_ticket)
+    
+    # Create notification for booking confirmation
+    from app.services.notification_service import NotificationService
+    notification_data = CreateNotification(
+        user_id=user_model.id,
+        type=NotificationType.BOOKING_CONFIRMED,
+        title="Booking Confirmed",
+        message=f"Your ticket for '{event_model.title}' has been confirmed. Event date: {event_model.date.strftime('%B %d, %Y at %I:%M %p')}",
+        related_object_id=new_ticket.id,
+        related_object_type="ticket"
+    )
+    NotificationService.create_notification(db, notification_data)
     
     background_tasks.add_task(
         send_ticket_email,
