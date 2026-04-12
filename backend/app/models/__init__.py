@@ -4,5 +4,6 @@ from app.models.ticket import Ticket
 from app.models.user import User
 from app.models.review import Review
 from app.models.notification import Notification
+from app.models.saving_event import SavingEvent
 
-__all__ = ["User", "Event", "Ticket", "Recommendation", "Review", "Notification"]
+__all__ = ["User", "Event", "Ticket", "Recommendation", "Review", "Notification", "SavingEvent"]
