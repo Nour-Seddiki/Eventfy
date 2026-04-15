@@ -18,7 +18,7 @@ class CreateNotification(BaseModel):
     type: NotificationType
     title: str = Field(min_length=1, max_length=200)
     message: str = Field(min_length=1, max_length=1000)
-    related_object_id: Optional[int] = None
+    related_object_id: Optional[str] = None
     related_object_type: Optional[str] = None
 
 
@@ -35,7 +35,7 @@ class NotificationResponse(BaseModel):
     title: str
     message: str
     read: bool
-    related_object_id: Optional[int]
+    related_object_id: Optional[str]
     related_object_type: Optional[str]
     created_at: datetime
     updated_at: datetime

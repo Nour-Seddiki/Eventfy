@@ -117,7 +117,7 @@ class TestAllEndpoints:
             title="Booking Confirmed",
             message="Your ticket is confirmed",
             read=False,
-            related_object_id=ticket.id,
+            related_object_id=str(ticket.id),
             related_object_type="ticket",
             created_at=datetime.now(timezone.utc),
             updated_at=datetime.now(timezone.utc)
@@ -257,7 +257,7 @@ class TestAllEndpoints:
                 title=title,
                 message=f"You have a {notif_type}",
                 read=False,
-                related_object_id=event.id,
+                related_object_id=str(event.id),
                 related_object_type="event",
                 created_at=datetime.now(timezone.utc),
                 updated_at=datetime.now(timezone.utc)
@@ -358,7 +358,7 @@ class TestAllEndpoints:
             title="Booking",
             message="Your booking",
             read=False,
-            related_object_id=ticket.id,
+            related_object_id=str(ticket.id),
             related_object_type="ticket",
             created_at=datetime.now(timezone.utc),
             updated_at=datetime.now(timezone.utc)

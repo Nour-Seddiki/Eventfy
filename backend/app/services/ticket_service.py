@@ -97,7 +97,7 @@ class TickectService:
         type=NotificationType.BOOKING_CONFIRMED,
         title="Booking Confirmed",
         message=f"Your ticket for '{event_model.title}' has been confirmed. Event date: {event_model.date.strftime('%B %d, %Y at %I:%M %p')}",
-        related_object_id=new_ticket.id,
+        related_object_id=str(new_ticket.id),
         related_object_type="ticket"
     )
     NotificationService.create_notification(db, notification_data)

@@ -11,7 +11,7 @@ class Notification(Base):
     title = Column(String)
     message = Column(Text)
     read = Column(Boolean, default=False)
-    related_object_id = Column(Integer, nullable=True)  # Reference to event/ticket/review
+    related_object_id = Column(String, nullable=True)  # Reference to event/ticket/review (UUID or int as string)
     related_object_type = Column(String, nullable=True)  # Type: "event", "ticket", "review"
     created_at = Column(DateTime, default=datetime.now(timezone.utc))
     updated_at = Column(DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
