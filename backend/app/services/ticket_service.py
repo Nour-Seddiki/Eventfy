@@ -158,6 +158,19 @@ class TickectService:
     #  Commit changes
     db.commit()
 
+    # Create notification for booking cancellation
+    user_model = db.query(User).filter(User.id == user.get("user_id")).first()
+    from app.services.notification_service import NotificationService
+    notification_data = CreateNotification(
+        user_id=user_model.id,
+        type=NotificationType.BOOKING_CANCELLED,
+        title="Booking Cancelled",
+        message=f"Your ticket for '{event_model.title}' has been cancelled. Event date: {event_model.date.strftime('%B %d, %Y at %I:%M %p')}",
+        related_object_id=str(ticket_model.id),
+        related_object_type="ticket"
+    )
+    NotificationService.create_notification(db, notification_data)
+
     return {"message": "Ticket successfully cancelled"}
    
 
