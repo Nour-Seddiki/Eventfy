@@ -22,6 +22,9 @@ class Settings:
     smtp_from: str | None
     smtp_use_tls: bool
     google_client_id: str | None
+    chargily_key: str | None
+    chargily_secret: str | None
+    chargily_url: str
 
 
 settings = Settings(
@@ -36,4 +39,7 @@ settings = Settings(
     smtp_from=os.getenv("SMTP_FROM"),
     smtp_use_tls=os.getenv("SMTP_USE_TLS", "true").lower() in {"1", "true", "yes"},
     google_client_id=os.getenv("GOOGLE_CLIENT_ID"),
+    chargily_key=os.getenv("CHARGILY_KEY"),
+    chargily_secret=os.getenv("CHARGILY_SECRET"),
+    chargily_url=os.getenv("CHARGILY_URL", "https://pay.chargily.net/test/api/v2/"),
 )
