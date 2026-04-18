@@ -100,6 +100,12 @@ function addMarker(ev) {
 
 function addEventFromAPI(evObj) { EVENTS.push(evObj); addMarker(evObj); renderList(); fitAll(); }
 
+/* month filter: key → monthIndex (0=Jan … 11=Dec) */
+const MONTH_MAP = {
+  jan:0, feb:1, mar:2, apr:3, may:4,  jun:5,
+  jul:6, aug:7, sep:8, oct:9, nov:10, dec:11
+};
+
 function getFiltered() {
   const q = document.getElementById('searchInput').value.toLowerCase();
   return EVENTS.filter(ev => {
@@ -109,13 +115,10 @@ function getFiltered() {
     if (filters.location !== 'all' && ev.city !== filters.location) return false;
     if (filters.category !== 'all' && ev.catKey !== filters.category) return false;
     if (activeCat !== 'all' && filters.category === 'all' && ev.catKey !== activeCat) return false;
-    const m = ev.month;
-    if (filters.date === 'oct' && m !== 9)  return false;
-    if (filters.date === 'nov' && m !== 10) return false;
-    if (filters.date === 'dec' && m !== 11) return false;
-    if (filters.date === 'jan' && m !== 0)  return false;
-    if (filters.date === 'feb' && m !== 1)  return false;
-    if (filters.date === 'mar' && m !== 2)  return false;
+    if (filters.date !== 'all') {
+      const mi = MONTH_MAP[filters.date];
+      if (mi !== undefined && ev.month !== mi) return false;
+    }
     return true;
   });
 }
@@ -162,15 +165,99 @@ function activateCard(id, fromCard = false) {
 function applyFilters() { renderList(); }
 
 function openDD(type, btn) {
+  const wasOpen = document.getElementById('dd-' + type)?.classList.contains('open');
   closeAllDD();
+  if (wasOpen) { btn.classList.remove('open'); return; }
   const dd = document.getElementById('dd-' + type); if (!dd) return;
   const r = btn.getBoundingClientRect();
   dd.style.top  = (r.bottom + 6) + 'px';
   dd.style.left = r.left + 'px';
   dd.classList.add('open');
-  btn.classList.add('active');
+  btn.classList.add('open');
 }
-function closeAllDD() { document.querySelectorAll('.dd-menu').forEach(d => d.classList.remove('open')); }
+function closeAllDD() {
+  document.querySelectorAll('.dd-menu').forEach(d => d.classList.remove('open'));
+  document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('open'));
+}
+
+let userMarker = null;
+let cachedPosition = null;
+let geoWatchId    = null;   /* watchPosition ID so we can clear it */
+
+function geoMe() {
+  if (!navigator.geolocation) return;
+
+  const btn = document.querySelector('.map-ctrl-geo');
+  if (btn) btn.classList.add('locating');
+
+  /* stop any previous watch */
+  if (geoWatchId !== null) { navigator.geolocation.clearWatch(geoWatchId); geoWatchId = null; }
+
+  /* Step 1 – ask for a quick (possibly coarse) fix first so the map moves fast */
+  navigator.geolocation.getCurrentPosition(
+    p => {
+      /* only accept if accuracy ≤ 5 000 m, otherwise wait for watch */
+      if (p.coords.accuracy <= 5000) {
+        if (btn) btn.classList.remove('locating');
+        cachedPosition = p;
+        flyToUser(p);
+      }
+    },
+    () => {},   /* ignore quick-fix error, watch below will retry */
+    { enableHighAccuracy: false, timeout: 3000, maximumAge: 10000 }
+  );
+
+  /* Step 2 – start a high-accuracy watch; update marker as GPS locks in */
+  geoWatchId = navigator.geolocation.watchPosition(
+    p => {
+      cachedPosition = p;
+      flyToUser(p);
+      /* once we have a good GPS fix (≤ 100 m) stop watching */
+      if (p.coords.accuracy <= 100) {
+        navigator.geolocation.clearWatch(geoWatchId);
+        geoWatchId = null;
+        if (btn) btn.classList.remove('locating');
+      }
+    },
+    () => { if (btn) btn.classList.remove('locating'); },
+    { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+  );
+}
+
+function flyToUser(p) {
+  const latlng = [p.coords.latitude, p.coords.longitude];
+  const acc    = Math.round(p.coords.accuracy);
+
+  map.flyTo(latlng, 15, { duration: 1.2 });
+
+  /* clean up previous marker + accuracy circle */
+  if (userMarker) {
+    if (userMarker._accCircle) map.removeLayer(userMarker._accCircle);
+    userMarker.remove();
+    userMarker = null;
+  }
+
+  const pulseIcon = L.divIcon({
+    className: '',
+    html: `<div class="user-loc-marker"><div class="user-loc-pulse"></div><div class="user-loc-dot"></div></div>`,
+    iconSize: [40, 40], iconAnchor: [20, 20], popupAnchor: [0, -22]
+  });
+
+  userMarker = L.marker(latlng, { icon: pulseIcon, zIndexOffset: 1000 }).addTo(map);
+  userMarker.bindPopup(
+    `<div style="font-family:Inter,sans-serif;padding:6px 4px;text-align:center">
+       <div style="font-size:13px;font-weight:700;margin-bottom:3px">📍 You are here</div>
+       <div style="font-size:11px;color:#6b7280">Accuracy: ±${acc} m</div>
+     </div>`,
+    { maxWidth: 170, minWidth: 130, closeButton: false }
+  ).openPopup();
+
+  /* accuracy circle */
+  userMarker._accCircle = L.circle(latlng, {
+    radius: acc, color: '#7c3aed', fillColor: '#7c3aed',
+    fillOpacity: 0.08, weight: 1.5, opacity: 0.4
+  }).addTo(map);
+}
 
 function pickFilter(type, value, el) {
   if (type === 'category') { filters.category = value; activeCat = 'all'; syncCatPills('all'); }
@@ -181,7 +268,11 @@ function pickFilter(type, value, el) {
   const pill = document.getElementById(pillId);
   if (pill) {
     const icons = { date: '📅', category: '🏷', location: '📍', price: '💰' };
-    pill.textContent = icons[type] + ' ' + el.textContent.trim() + ' ▾';
+    const labelEl = pill.querySelector('.fp-label');
+    const iconEl  = pill.querySelector('.fp-icon');
+    const rawText = el.textContent.trim().replace(/^🗓\s*/,'').replace(/^[^\w\s]+\s*/,'');
+    if (labelEl) labelEl.textContent = value === 'all' ? { date:'Any Date', category:'Category', location:'Location', price:'Price' }[type] : rawText;
+    if (iconEl)  iconEl.textContent  = icons[type];
     pill.classList.toggle('active', value !== 'all');
   }
   closeAllDD();
@@ -193,7 +284,6 @@ function syncCatPills(cat){ document.querySelectorAll('.cat-pill').forEach(p => 
 function mapIn()  { map.zoomIn(); }
 function mapOut() { map.zoomOut(); }
 function fitAll() { const f = getFiltered(); if (!f.length) return; map.fitBounds(L.latLngBounds(f.map(e => [e.lat, e.lng])), { padding: [60, 60] }); }
-function geoMe()  { if (!navigator.geolocation) return; navigator.geolocation.getCurrentPosition(p => map.flyTo([p.coords.latitude, p.coords.longitude], 13), () => {}); }
 
 /* ── MOBILE TAB SWITCHER ── */
 let currentMobileTab = 'list';

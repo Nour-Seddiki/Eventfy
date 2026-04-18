@@ -187,19 +187,37 @@
       <input class="search-input" id="searchInput" placeholder="Search events, venues, cities…" oninput="applyFilters()"/>
     </div>
     <div class="filter-row">
-      <button class="filter-pill" id="fp-date"  onclick="openDD('date',this)">📅 Any Date ▾</button>
-      <button class="filter-pill" id="fp-cat"   onclick="openDD('category',this)">🏷 Category ▾</button>
-      <button class="filter-pill" id="fp-loc"   onclick="openDD('location',this)">📍 Location ▾</button>
-      <button class="filter-pill" id="fp-price" onclick="openDD('price',this)">💰 Price ▾</button>
+      <button class="filter-pill" id="fp-date"  onclick="openDD('date',this)">
+        <span class="fp-icon">📅</span><span class="fp-label">Any Date</span>
+        <svg class="fp-arrow" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button class="filter-pill" id="fp-cat"   onclick="openDD('category',this)">
+        <span class="fp-icon">🏷</span><span class="fp-label">Category</span>
+        <svg class="fp-arrow" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button class="filter-pill" id="fp-loc"   onclick="openDD('location',this)">
+        <span class="fp-icon">📍</span><span class="fp-label">Location</span>
+        <svg class="fp-arrow" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button class="filter-pill" id="fp-price" onclick="openDD('price',this)">
+        <span class="fp-icon">💰</span><span class="fp-label">Price</span>
+        <svg class="fp-arrow" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
     </div>
     <div class="dd-menu" id="dd-date">
       <div class="dd-item selected" onclick="pickFilter('date','all',this)">📅 All dates</div>
-      <div class="dd-item" onclick="pickFilter('date','oct',this)">October 2025</div>
-      <div class="dd-item" onclick="pickFilter('date','nov',this)">November 2025</div>
-      <div class="dd-item" onclick="pickFilter('date','dec',this)">December 2025</div>
-      <div class="dd-item" onclick="pickFilter('date','jan',this)">January 2026</div>
-      <div class="dd-item" onclick="pickFilter('date','feb',this)">February 2026</div>
-      <div class="dd-item" onclick="pickFilter('date','mar',this)">March 2026</div>
+      <div class="dd-item" onclick="pickFilter('date','jan',this)">🗓 January</div>
+      <div class="dd-item" onclick="pickFilter('date','feb',this)">🗓 February</div>
+      <div class="dd-item" onclick="pickFilter('date','mar',this)">🗓 March</div>
+      <div class="dd-item" onclick="pickFilter('date','apr',this)">🗓 April</div>
+      <div class="dd-item" onclick="pickFilter('date','may',this)">🗓 May</div>
+      <div class="dd-item" onclick="pickFilter('date','jun',this)">🗓 June</div>
+      <div class="dd-item" onclick="pickFilter('date','jul',this)">🗓 July</div>
+      <div class="dd-item" onclick="pickFilter('date','aug',this)">🗓 August</div>
+      <div class="dd-item" onclick="pickFilter('date','sep',this)">🗓 September</div>
+      <div class="dd-item" onclick="pickFilter('date','oct',this)">🗓 October</div>
+      <div class="dd-item" onclick="pickFilter('date','nov',this)">🗓 November</div>
+      <div class="dd-item" onclick="pickFilter('date','dec',this)">🗓 December</div>
     </div>
     <div class="dd-menu" id="dd-category">
       <div class="dd-item selected" onclick="pickFilter('category','all',this)">🌐 All Categories</div>
@@ -249,7 +267,12 @@
     <div class="map-ctrls">
       <button class="map-ctrl" title="Zoom in"     onclick="mapIn()">+</button>
       <button class="map-ctrl" title="Zoom out"    onclick="mapOut()">−</button>
-      <button class="map-ctrl" title="My location" onclick="geoMe()">◎</button>
+      <button class="map-ctrl map-ctrl-geo" title="My location" onclick="geoMe()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="12" cy="9" r="2.5" stroke="currentColor" stroke-width="2"/>
+        </svg>
+      </button>
       <button class="map-ctrl" title="Fit all"     onclick="fitAll()">⊞</button>
     </div>
   </div>
