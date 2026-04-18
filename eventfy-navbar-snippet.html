@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Eventfy — Navbar Snippet</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+  /* ══════════════════════════════════════════
+     EVENTFY NAVBAR — Desktop + Mobile + Drawer
+     Popups: User profile + Notifications
+     Always logged-in
+  ══════════════════════════════════════════ */
+
+  :root {
+    --purple:   #7c3aed;
+    --purple-l: #ede9fe;
+    --orange:   #f97316;
+    --text:     #111827;
+    --muted:    #6b7280;
+    --faint:    #9ca3af;
+    --border:   #e5e7eb;
+    --bg:       #f8f9fa;
+    --ease:     .2s cubic-bezier(.4,0,.2,1);
+    --spring:   .36s cubic-bezier(.34,1.56,.64,1);
+    --nav-h:    64px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Manrope', 'Inter', sans-serif; background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; }
+  button { cursor: pointer; border: none; background: none; font-family: inherit; }
+  a { text-decoration: none; color: inherit; }
+
+  /* ── HEADER ── */
+  .site-header {
+    position: sticky; top: 0; z-index: 600;
+    background: rgba(255,255,255,.97);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid rgba(0,0,0,.05);
+    height: var(--nav-h); padding: 0 32px;
+    transition: box-shadow var(--ease);
+  }
+  .site-header.scrolled { box-shadow: 0 1px 18px rgba(0,0,0,.08); }
+  .header-inner {
+    max-width: 1440px; margin: 0 auto; height: 100%;
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  /* ── LOGO ── */
+  .logo { display: flex; align-items: center; gap: 9px; flex-shrink: 0; }
+  .logo-svg-icon {
+    width: 36px; height: 36px; border-radius: 12px;
+    background: rgba(127,13,242,.12);
+    display: flex; align-items: center; justify-content: center;
+    transition: transform var(--spring);
+  }
+  .logo:hover .logo-svg-icon { transform: rotate(-8deg) scale(1.1); }
+  .logo-text { font-size: 18px; font-weight: 700; letter-spacing: -.3px; color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif; }
+
+  /* ── DESKTOP NAV LINKS ── */
+  .header-nav { display: flex; align-items: center; gap: 4px; margin-left: auto; }
+  .nav-link {
+    display: flex; align-items: center; gap: 5px;
+    padding: 7px 13px; border-radius: 99px;
+    font-size: 13.5px; font-weight: 500; color: var(--muted);
+    transition: background var(--ease), color var(--ease);
+  }
+  .nav-link:hover  { color: #7f0df2; background: rgba(127,13,242,.08); }
+  .nav-link.active { color: #7f0df2; background: rgba(127,13,242,.08); }
+  .nav-link svg { width: 15px; height: 15px; }
+
+  /* ── LOGGED-IN SECTION ── */
+  .nav-loggedin {
+    display: flex; align-items: center; gap: 6px;
+    margin-left: 12px; padding-left: 14px;
+    border-left: 1px solid var(--border);
+  }
+
+  /* ── NOTIFICATION BUTTON ── */
+  .nav-notif-btn {
+    position: relative; width: 38px; height: 38px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--muted);
+    transition: background var(--ease), color var(--ease);
+  }
+  .nav-notif-btn:hover { background: #f3f4f6; color: var(--text); }
+  .nav-notif-btn svg { width: 20px; height: 20px; }
+  .notif-dot {
+    position: absolute; top: 7px; right: 7px;
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--orange); border: 2px solid #fff;
+  }
+
+  /* ── USER AVATAR BUTTON ── */
+  .nav-user-avatar-btn {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--purple);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 800; color: #fff; letter-spacing: .5px;
+    flex-shrink: 0; transition: box-shadow .2s, transform .2s;
+  }
+  .nav-user-avatar-btn:hover { box-shadow: 0 0 0 3px rgba(124,58,237,.3); transform: scale(1.06); }
+
+  /* ── LOGOUT BUTTON ── */
+  .btn-nav-logout {
+    height: 36px; padding: 0 16px; border-radius: 99px;
+    font-size: 13px; font-weight: 700;
+    display: flex; align-items: center; gap: 5px;
+    border: 1.5px solid #fee2e2; color: #ef4444; background: #fff5f5;
+    transition: background var(--ease), transform .2s;
+  }
+  .btn-nav-logout svg { width: 15px; height: 15px; }
+  .btn-nav-logout:hover { background: #fee2e2; transform: translateY(-1px); }
+
+  /* ══════════════════════════════════════════
+     USER POPUP
+  ══════════════════════════════════════════ */
+  .user-popup-wrap { position: relative; }
+  .user-popup {
+    position: absolute; top: calc(100% + 10px); right: 0;
+    width: 220px; background: #fff;
+    border: 1.5px solid #e2e8f0; border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0,0,0,.13);
+    padding: 6px; z-index: 2000;
+    opacity: 0; pointer-events: none;
+    transform: translateY(-6px) scale(.97);
+    transition: opacity .18s, transform .18s;
+  }
+  .user-popup.open { opacity: 1; pointer-events: auto; transform: translateY(0) scale(1); }
+  .popup-header { padding: 10px 12px 8px; border-bottom: 1px solid #f1f5f9; margin-bottom: 4px; }
+  .popup-user-row { display: flex; align-items: center; gap: 10px; }
+  .popup-avatar {
+    width: 36px; height: 36px; border-radius: 50%; background: var(--purple);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 800; color: #fff; flex-shrink: 0;
+  }
+  .popup-user-name { font-size: 13.5px; font-weight: 700; color: var(--text); }
+  .popup-user-role { font-size: 11.5px; color: #94a3b8; margin-top: 1px; }
+  .popup-item {
+    display: flex; align-items: center; gap: 9px;
+    padding: 9px 12px; border-radius: 10px;
+    font-size: 13.5px; font-weight: 500; color: #374151;
+    transition: background .15s, color .15s;
+  }
+  .popup-item svg { width: 16px; height: 16px; flex-shrink: 0; color: #9ca3af; }
+  .popup-item:hover { background: var(--purple-l); color: var(--purple); }
+  .popup-item:hover svg { color: var(--purple); }
+  .popup-item.active { background: var(--purple-l); color: var(--purple); }
+  .popup-item.active svg { color: var(--purple); }
+  .popup-item.danger { color: #ef4444; }
+  .popup-item.danger svg { color: #fca5a5; }
+  .popup-item.danger:hover { background: #fff5f5; }
+  .popup-sep { height: 1px; background: #f1f5f9; margin: 4px 6px; }
+
+  /* ══════════════════════════════════════════
+     NOTIFICATION POPUP
+  ══════════════════════════════════════════ */
+  .notif-popup-wrap { position: relative; }
+  .notif-popup {
+    position: absolute; top: calc(100% + 10px); right: 0;
+    width: 280px; background: #fff;
+    border: 1.5px solid #e2e8f0; border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0,0,0,.13);
+    z-index: 2100; overflow: hidden;
+    opacity: 0; pointer-events: none;
+    transform: translateY(-6px) scale(.97);
+    transition: opacity .18s, transform .18s;
+  }
+  .notif-popup.open { opacity: 1; pointer-events: auto; transform: translateY(0) scale(1); }
+  .notif-popup-header { padding: 14px 16px 10px; border-bottom: 1px solid #f1f5f9; }
+  .notif-popup-title { font-size: 14px; font-weight: 700; color: var(--text); }
+  .notif-empty {
+    display: flex; flex-direction: column; align-items: center;
+    padding: 32px 16px; gap: 8px;
+  }
+  .notif-empty-icon { font-size: 36px; opacity: .5; }
+  .notif-empty-msg  { font-size: 13.5px; font-weight: 700; color: var(--text); }
+  .notif-empty-sub  { font-size: 12px; color: var(--faint); text-align: center; line-height: 1.5; }
+
+  /* ══════════════════════════════════════════
+     HAMBURGER BUTTON
+  ══════════════════════════════════════════ */
+  .hamburger-btn {
+    display: none; flex-direction: column; justify-content: center; align-items: center;
+    gap: 5px; width: 40px; height: 40px; border-radius: 10px;
+    flex-shrink: 0; margin-left: 8px; transition: background var(--ease);
+  }
+  .hamburger-btn:hover { background: #f3f4f6; }
+  .ham-line {
+    display: block; width: 22px; height: 2px;
+    background: var(--text); border-radius: 2px;
+    transition: transform .3s cubic-bezier(.4,0,.2,1), opacity .2s, width .2s;
+    transform-origin: center;
+  }
+  .hamburger-btn.open .ham-line:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .hamburger-btn.open .ham-line:nth-child(2) { opacity: 0; width: 0; }
+  .hamburger-btn.open .ham-line:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  /* ══════════════════════════════════════════
+     MOBILE HEADER ICONS
+  ══════════════════════════════════════════ */
+  .mob-header-loggedin { display: none; align-items: center; gap: 2px; }
+  .mob-notif-btn  { width: 36px; height: 36px; flex-shrink: 0; }
+  .mob-avatar-btn { width: 34px; height: 34px; font-size: 12px; flex-shrink: 0; }
+  .mob-header-loggedin .notif-popup-wrap,
+  .mob-header-loggedin .user-popup-wrap { position: relative; }
+  .mob-user-popup, .mob-notif-popup {
+    position: absolute; right: 0; left: auto; top: calc(100% + 8px); z-index: 2100;
+  }
+  .mob-user-popup  { width: 230px; }
+  .mob-notif-popup { width: 280px; }
+
+  /* ══════════════════════════════════════════
+     DRAWER OVERLAY
+  ══════════════════════════════════════════ */
+  .drawer-overlay {
+    position: fixed; inset: 0; z-index: 700;
+    background: rgba(0,0,0,.38); backdrop-filter: blur(2px);
+    opacity: 0; pointer-events: none; transition: opacity .28s ease;
+  }
+  .drawer-overlay.open { opacity: 1; pointer-events: auto; }
+
+  /* ══════════════════════════════════════════
+     DRAWER
+  ══════════════════════════════════════════ */
+  .nav-drawer {
+    position: fixed; top: 0; right: 0; bottom: 0;
+    width: 290px; z-index: 800; background: #fff;
+    box-shadow: -4px 0 32px rgba(0,0,0,.12);
+    transform: translateX(100%);
+    transition: transform .32s cubic-bezier(.4,0,.2,1);
+    display: flex; flex-direction: column;
+  }
+  .nav-drawer.open { transform: translateX(0); }
+  .drawer-inner { display: flex; flex-direction: column; height: 100%; padding: 20px; }
+  .drawer-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+  .drawer-close-btn {
+    width: 36px; height: 36px; border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--muted); font-size: 17px; font-weight: 700;
+    transition: background var(--ease), color var(--ease), transform .3s;
+  }
+  .drawer-close-btn:hover { background: #fee2e2; color: #ef4444; transform: rotate(90deg) scale(1.1); }
+  .drawer-user-card {
+    background: var(--purple-l); border-radius: 12px;
+    padding: 12px; margin-bottom: 16px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .drawer-user-avatar {
+    width: 40px; height: 40px; border-radius: 50%; background: var(--purple);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 800; color: #fff; flex-shrink: 0;
+  }
+  .drawer-user-name { font-size: 14px; font-weight: 700; color: var(--text); }
+  .drawer-user-role { font-size: 12px; color: var(--muted); margin-top: 1px; }
+  .drawer-nav { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+  .drawer-link {
+    display: flex; align-items: center; gap: 10px;
+    padding: 11px 14px; border-radius: 10px;
+    font-size: 14px; font-weight: 500; color: var(--muted);
+    transition: background var(--ease), color var(--ease);
+  }
+  .drawer-link svg { width: 18px; height: 18px; flex-shrink: 0; }
+  .drawer-link:hover  { background: #f3f4f6; color: var(--text); }
+  .drawer-link.active { background: var(--purple-l); color: var(--purple); font-weight: 700; }
+  .drawer-notif-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 11px 14px; border-radius: 10px;
+    font-size: 14px; font-weight: 500; color: var(--muted); cursor: pointer;
+    transition: background var(--ease);
+  }
+  .drawer-notif-row svg { width: 18px; height: 18px; flex-shrink: 0; }
+  .drawer-notif-row:hover { background: #f3f4f6; color: var(--text); }
+  .drawer-notif-badge { width: 8px; height: 8px; border-radius: 50%; background: var(--orange); margin-left: auto; }
+  .drawer-footer { border-top: 1px solid var(--border); padding-top: 16px; }
+  .btn-drawer-logout {
+    width: 100%; height: 44px; border-radius: 12px;
+    font-size: 14px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    border: 1.5px solid #fee2e2; color: #ef4444; background: #fff5f5;
+    transition: background var(--ease);
+  }
+  .btn-drawer-logout svg { width: 18px; height: 18px; flex-shrink: 0; }
+  .btn-drawer-logout:hover { background: #fee2e2; }
+
+  /* ══════════════════════════════════════════
+     RESPONSIVE BREAKPOINTS
+  ══════════════════════════════════════════ */
+  @media (min-width: 901px) {
+    .hamburger-btn       { display: none !important; }
+    .mob-header-loggedin { display: none !important; }
+    .nav-drawer, .drawer-overlay { display: none !important; }
+  }
+  @media (max-width: 900px) {
+    .header-nav          { display: none !important; }
+    .site-header         { padding: 0 16px; }
+    .header-inner        { gap: 0; }
+    .logo                { margin-right: auto; }
+    .mob-header-loggedin { display: flex; }
+    .hamburger-btn       { display: flex !important; }
+    .mob-notif-popup, .mob-user-popup { max-width: calc(100vw - 16px); }
+  }
+
+  /* ── Demo page padding ── */
+  .demo-body { padding: 40px 32px; font-family: 'Manrope', sans-serif; color: #6b7280; font-size: 14px; text-align: center; margin-top: 80px; }
+  </style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════
+     HEADER  — copy everything below into your project
+════════════════════════════════════════ -->
+<header class="site-header" id="siteHeader">
+  <div class="header-inner">
+
+    <!-- LOGO -->
+    <a href="#" class="logo">
+      <div class="logo-svg-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <rect x="3" y="4" width="18" height="18" rx="4" fill="#7f0df2" opacity="0.15"/>
+          <path d="M8 2v4M16 2v4M3 10h18" stroke="#7f0df2" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="8" cy="15" r="1.5" fill="#7f0df2"/>
+          <circle cx="12" cy="15" r="1.5" fill="#7f0df2"/>
+          <circle cx="16" cy="15" r="1.5" fill="#7f0df2"/>
+        </svg>
+      </div>
+      <span class="logo-text">Eventfy</span>
+    </a>
+
+    <!-- DESKTOP NAV -->
+    <nav class="header-nav">
+      <a href="#" class="nav-link">
+        <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+        Home
+      </a>
+      <a href="#" class="nav-link active">
+        <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+        Browse
+      </a>
+      <a href="#" class="nav-link">
+        <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path d="M12 16v-4M12 8h.01" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+        About
+      </a>
+      <a href="#" class="nav-link">
+        <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+        How it Works
+      </a>
+
+      <!-- DESKTOP: Notification + Avatar + Logout -->
+      <div class="nav-loggedin">
+
+        <!-- Notification -->
+        <div class="notif-popup-wrap">
+          <button class="nav-notif-btn" id="desktopNotifBtn" title="Notifications">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 00-9.33-4.997M13.73 21a2 2 0 01-3.46 0M6 11a6 6 0 016-6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+            <span class="notif-dot"></span>
+          </button>
+          <div class="notif-popup" id="notifPopupDesktop">
+            <div class="notif-popup-header"><span class="notif-popup-title">Notifications</span></div>
+            <div class="notif-empty">
+              <div class="notif-empty-icon">🔔</div>
+              <div class="notif-empty-msg">No notifications yet</div>
+              <div class="notif-empty-sub">We'll let you know when something arrives</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- User avatar -->
+        <div class="user-popup-wrap">
+          <button class="nav-user-avatar-btn" id="desktopAvatarBtn" title="My profile">
+            <span class="user-initials-text">YS</span>
+          </button>
+          <div class="user-popup" id="userPopup">
+            <div class="popup-header">
+              <div class="popup-user-row">
+                <div class="popup-avatar"><span class="user-initials-text">YS</span></div>
+                <div>
+                  <div class="popup-user-name user-name-text">Yacine Salhi</div>
+                  <div class="popup-user-role user-role-text">Member</div>
+                </div>
+              </div>
+            </div>
+            <a href="#" class="popup-item">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+              Profile Settings
+            </a>
+            <a href="#" class="popup-item">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+              My Events
+            </a>
+            <a href="#" class="popup-item active">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+              Saved Events
+            </a>
+            <a href="#" class="popup-item">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+              Settings
+            </a>
+            <div class="popup-sep"></div>
+            <a href="#" class="popup-item danger btn-do-logout">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+              Log out
+            </a>
+          </div>
+        </div>
+
+        <!-- Inline logout -->
+        <button class="btn-nav-logout btn-do-logout">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+          Log out
+        </button>
+      </div>
+    </nav>
+
+    <!-- MOBILE: Notif + Avatar icons -->
+    <div class="mob-header-loggedin">
+      <div class="notif-popup-wrap">
+        <button class="nav-notif-btn mob-notif-btn" id="mobNotifBtn" title="Notifications">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 00-9.33-4.997M13.73 21a2 2 0 01-3.46 0M6 11a6 6 0 016-6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+          <span class="notif-dot"></span>
+        </button>
+        <div class="notif-popup mob-notif-popup" id="notifPopupMob">
+          <div class="notif-popup-header"><span class="notif-popup-title">Notifications</span></div>
+          <div class="notif-empty">
+            <div class="notif-empty-icon">🔔</div>
+            <div class="notif-empty-msg">No notifications yet</div>
+            <div class="notif-empty-sub">We'll let you know when something arrives</div>
+          </div>
+        </div>
+      </div>
+      <div class="user-popup-wrap">
+        <button class="nav-user-avatar-btn mob-avatar-btn" id="mobAvatarBtn" title="My profile">
+          <span class="user-initials-text">YS</span>
+        </button>
+        <div class="user-popup mob-user-popup" id="userPopupMob">
+          <div class="popup-header">
+            <div class="popup-user-row">
+              <div class="popup-avatar"><span class="user-initials-text">YS</span></div>
+              <div>
+                <div class="popup-user-name user-name-text">Yacine Salhi</div>
+                <div class="popup-user-role user-role-text">Member</div>
+              </div>
+            </div>
+          </div>
+          <a href="#" class="popup-item"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>Profile Settings</a>
+          <a href="#" class="popup-item"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>My Events</a>
+          <a href="#" class="popup-item"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>Saved Events</a>
+          <a href="#" class="popup-item"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>Settings</a>
+          <div class="popup-sep"></div>
+          <a href="#" class="popup-item danger btn-do-logout"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>Log out</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- HAMBURGER -->
+    <button class="hamburger-btn" id="hamburgerBtn" aria-label="Open menu" aria-expanded="false">
+      <span class="ham-line"></span>
+      <span class="ham-line"></span>
+      <span class="ham-line"></span>
+    </button>
+
+  </div>
+</header>
+<!-- ════════════════════════════════════════
+     END HEADER
+════════════════════════════════════════ -->
+
+<!-- DRAWER OVERLAY -->
+<div class="drawer-overlay" id="drawerOverlay"></div>
+
+<!-- ════════════════════════════════════════
+     MOBILE DRAWER  — copy alongside the header
+════════════════════════════════════════ -->
+<div class="nav-drawer" id="navDrawer" aria-hidden="true">
+  <div class="drawer-inner">
+    <div class="drawer-top">
+      <a href="#" class="logo">
+        <div class="logo-svg-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+            <rect x="3" y="4" width="18" height="18" rx="4" fill="#7f0df2" opacity="0.15"/>
+            <path d="M8 2v4M16 2v4M3 10h18" stroke="#7f0df2" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="8" cy="15" r="1.5" fill="#7f0df2"/>
+            <circle cx="12" cy="15" r="1.5" fill="#7f0df2"/>
+            <circle cx="16" cy="15" r="1.5" fill="#7f0df2"/>
+          </svg>
+        </div>
+        <span class="logo-text">Eventfy</span>
+      </a>
+      <button class="drawer-close-btn" id="drawerCloseBtn" aria-label="Close menu">✕</button>
+    </div>
+
+    <div class="drawer-user-card">
+      <div class="drawer-user-avatar"><span class="user-initials-text">YS</span></div>
+      <div>
+        <div class="drawer-user-name user-name-text">Yacine Salhi</div>
+        <div class="drawer-user-role user-role-text">Member</div>
+      </div>
+    </div>
+
+    <nav class="drawer-nav">
+      <a href="#" class="drawer-link">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+        Home
+      </a>
+      <a href="#" class="drawer-link active">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+        Browse
+      </a>
+      <a href="#" class="drawer-link">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path d="M12 16v-4M12 8h.01" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+        About
+      </a>
+      <a href="#" class="drawer-link">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+        How it Works
+      </a>
+      <a href="#" class="drawer-link">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+        Saved Events
+      </a>
+    </nav>
+
+    <div class="drawer-notif-row">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+      Notifications
+      <span class="drawer-notif-badge"></span>
+    </div>
+
+    <div class="drawer-footer">
+      <button class="btn-drawer-logout btn-do-logout">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+        Log out
+      </button>
+    </div>
+  </div>
+</div>
+<!-- ════════════════════════════════════════
+     END DRAWER
+════════════════════════════════════════ -->
+
+<!-- Demo placeholder body -->
+<div class="demo-body">
+  ↑ Eventfy Navbar Snippet — paste the &lt;header&gt;, drawer, CSS and JS into your project.
+</div>
+
+<script>
+'use strict';
+/* ══════════════════════════════════════════
+   EVENTFY NAVBAR JS
+   Paste this into your project's JS file
+══════════════════════════════════════════ */
+
+const USER = { name: 'Yacine Salhi', initials: 'YS', role: 'Member' };
+
+document.addEventListener('DOMContentLoaded', () => {
+
+  /* ── Scroll shadow ── */
+  const header = document.getElementById('siteHeader');
+  window.addEventListener('scroll', () =>
+    header.classList.toggle('scrolled', window.scrollY > 10), { passive: true });
+
+  /* ── DRAWER ── */
+  const hamburgerBtn   = document.getElementById('hamburgerBtn');
+  const navDrawer      = document.getElementById('navDrawer');
+  const drawerOverlay  = document.getElementById('drawerOverlay');
+  const drawerCloseBtn = document.getElementById('drawerCloseBtn');
+
+  function openDrawer() {
+    navDrawer.classList.add('open');
+    drawerOverlay.classList.add('open');
+    navDrawer.setAttribute('aria-hidden', 'false');
+    hamburgerBtn.setAttribute('aria-expanded', 'true');
+    hamburgerBtn.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeDrawer() {
+    navDrawer.classList.remove('open');
+    drawerOverlay.classList.remove('open');
+    navDrawer.setAttribute('aria-hidden', 'true');
+    hamburgerBtn.setAttribute('aria-expanded', 'false');
+    hamburgerBtn.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  hamburgerBtn.addEventListener('click', () =>
+    navDrawer.classList.contains('open') ? closeDrawer() : openDrawer());
+  drawerCloseBtn.addEventListener('click', closeDrawer);
+  drawerOverlay.addEventListener('click', closeDrawer);
+  document.querySelectorAll('.drawer-link').forEach(l => l.addEventListener('click', closeDrawer));
+
+  /* ── USER POPUP ── */
+  document.getElementById('desktopAvatarBtn')?.addEventListener('click', e => {
+    e.stopPropagation(); closeAllNotifPopups(); togglePopup('userPopup');
+  });
+  document.getElementById('mobAvatarBtn')?.addEventListener('click', e => {
+    e.stopPropagation(); closeAllNotifPopups(); togglePopup('userPopupMob');
+  });
+
+  /* ── NOTIFICATION POPUP ── */
+  document.getElementById('desktopNotifBtn')?.addEventListener('click', e => {
+    e.stopPropagation(); closeAllUserPopups(); togglePopup('notifPopupDesktop');
+  });
+  document.getElementById('mobNotifBtn')?.addEventListener('click', e => {
+    e.stopPropagation(); closeAllUserPopups(); togglePopup('notifPopupMob');
+  });
+
+  /* ── Close on outside click ── */
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.user-popup')  && !e.target.closest('.nav-user-avatar-btn') &&
+        !e.target.closest('.notif-popup') && !e.target.closest('.nav-notif-btn')) {
+      closeAllUserPopups(); closeAllNotifPopups();
+    }
+  });
+
+  /* ── ESC closes everything ── */
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { closeDrawer(); closeAllUserPopups(); closeAllNotifPopups(); }
+  });
+
+  /* ── Logout ── */
+  document.querySelectorAll('.btn-do-logout').forEach(b =>
+    b.addEventListener('click', () => { closeAllUserPopups(); closeAllNotifPopups(); }));
+
+  /* ── Fill user info ── */
+  document.querySelectorAll('.user-initials-text').forEach(el => el.textContent = USER.initials);
+  document.querySelectorAll('.user-name-text').forEach(el => el.textContent = USER.name);
+  document.querySelectorAll('.user-role-text').forEach(el => el.textContent = USER.role);
+});
+
+/* ── Popup helpers ── */
+function togglePopup(id) { document.getElementById(id)?.classList.toggle('open'); }
+function closeAllUserPopups() {
+  document.getElementById('userPopup')    ?.classList.remove('open');
+  document.getElementById('userPopupMob') ?.classList.remove('open');
+}
+function closeAllNotifPopups() {
+  document.getElementById('notifPopupDesktop') ?.classList.remove('open');
+  document.getElementById('notifPopupMob')     ?.classList.remove('open');
+}
+</script>
+</body>
+</html>

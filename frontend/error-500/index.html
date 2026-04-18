@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error 500 - Eventify</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">📅</div>
+                <span>Eventify</span>
+            </a>
+
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="browse.html">Browse</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="how-it-works.html">How it Works</a></li>
+            </ul>
+
+            <div class="nav-actions">
+                <a href="login.html" class="btn btn-ghost">Login</a>
+                <a href="register.html" class="btn btn-primary">Register</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Background Glows -->
+        <div class="glow glow-1"></div>
+        <div class="glow glow-2"></div>
+
+        <div class="error-container">
+            <!-- Error Icon -->
+            <div class="error-icon-wrapper">
+                <div class="dot dot-1"></div>
+                <div class="dot dot-2"></div>
+                <div class="dot dot-3"></div>
+                <div class="error-icon">
+                    <div class="error-icon-inner">⚠️</div>
+                </div>
+            </div>
+
+            <!-- Error Badge -->
+            <div class="error-badge">
+                System Error 500
+            </div>
+
+            <!-- Error Title -->
+            <h1 class="error-title">Something Went<br>Wrong</h1>
+
+            <!-- Error Description -->
+            <p class="error-description">
+                We're experiencing a temporary issue. Our team is working to fix it.
+            </p>
+
+            <!-- Action Buttons -->
+            <div class="error-actions">
+                <button class="btn btn-accent" onclick="tryAgain(this)">
+                    <span class="refresh-icon">↻</span>
+                    Try Again
+                </button>
+                <a href="index.html" class="btn btn-outline">
+                    <span>🏠</span>
+                    Go to Homepage
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="#" onclick="showSupport(event)">
+                    <span>💬</span>
+                    Contact Support
+                </a>
+            </div>
+            <div class="footer-copy">© 2026 Eventify. All rights reserved.</div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Eventfy — Create Event</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" type="image/png" href="/Home/img_logo/Evenitfylogo.png">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><rect x='3' y='4' width='18' height='18' rx='4' fill='%237f0df2' opacity='.15'/><path d='M8 2v4M16 2v4M3 10h18' stroke='%237f0df2' stroke-width='2' stroke-linecap='round'/><circle cx='8' cy='15' r='1.5' fill='%237f0df2'/><circle cx='12' cy='15' r='1.5' fill='%237f0df2'/><circle cx='16' cy='15' r='1.5' fill='%237f0df2'/></svg>">
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="site-header" id="siteHeader">
+    <div class="header-inner">
+
+      <a href="index.html" class="logo">
+        <div class="logo-svg-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+            <rect x="3" y="4" width="18" height="18" rx="4" fill="#7f0df2" opacity="0.15"/>
+            <path d="M8 2v4M16 2v4M3 10h18" stroke="#7f0df2" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="8" cy="15" r="1.5" fill="#7f0df2"/>
+            <circle cx="12" cy="15" r="1.5" fill="#7f0df2"/>
+            <circle cx="16" cy="15" r="1.5" fill="#7f0df2"/>
+          </svg>
+        </div>
+        <span class="logo-text">Eventfy</span>
+      </a>
+
+      <nav class="header-nav" id="desktopNav">
+        <a href="/Home/Home.Html" class="nav-link">
+          <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+          Home
+        </a>
+        <a href="/Events/index.html" class="nav-link">
+          <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+          Browse
+        </a>
+        <a href="/About/Index.html" class="nav-link">
+          <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path d="M12 16v-4M12 8h.01" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+          About
+        </a>
+        <a href="#" class="nav-link active">
+          <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+          Create Event
+        </a>
+
+        <div class="nav-loggedin">
+          <div class="notif-popup-wrap">
+            <button class="nav-notif-btn" id="desktopNotifBtn" title="Notifications">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 00-9.33-4.997M13.73 21a2 2 0 01-3.46 0M6 11a6 6 0 016-6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+              <span class="notif-dot"></span>
+            </button>
+            <div class="notif-popup" id="notifPopupDesktop">
+              <div class="notif-popup-header"><span class="notif-popup-title">Notifications</span></div>
+              <div class="notif-empty">
+                <div class="notif-empty-icon">🔔</div>
+                <div class="notif-empty-msg">No notifications yet</div>
+                <div class="notif-empty-sub">We'll let you know when something arrives</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="user-popup-wrap">
+            <button class="nav-user-avatar-btn" id="desktopAvatarBtn" title="My profile">
+              <span class="user-initials-text">YS</span>
+            </button>
+            <div class="user-popup" id="userPopup">
+              <div class="popup-header">
+                <div class="popup-user-row">
+                  <div class="popup-avatar"><span class="user-initials-text">YS</span></div>
+                  <div>
+                    <div class="popup-user-name user-name-text">Yacine Salhi</div>
+                    <div class="popup-user-role user-role-text">Member</div>
+                  </div>
+                </div>
+              </div>
+              <a href="#" class="popup-item"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>Profile Settings</a>
+              <a href="#" class="popup-item"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>My Events</a>
+              <a href="#" class="popup-item"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>Saved Events</a>
+              <a href="#" class="popup-item"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>Settings</a>
+              <div class="popup-sep"></div>
+              <a href="#" class="popup-item danger btn-do-logout"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>Log out</a>
+            </div>
+          </div>
+
+          <button class="btn-nav-logout btn-do-logout">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+            Log out
+          </button>
+        </div>
+      </nav>
+
+      <!-- Mobile: notif + avatar before hamburger -->
+      <div class="mob-header-loggedin">
+        <div class="notif-popup-wrap">
+          <button class="nav-notif-btn mob-notif-btn" id="mobNotifBtn" title="Notifications">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 00-9.33-4.997M13.73 21a2 2 0 01-3.46 0M6 11a6 6 0 016-6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+            <span class="notif-dot"></span>
+          </button>
+          <div class="notif-popup mob-notif-popup" id="notifPopupMob">
+            <div class="notif-popup-header"><span class="notif-popup-title">Notifications</span></div>
+            <div class="notif-empty">
+              <div class="notif-empty-icon">🔔</div>
+              <div class="notif-empty-msg">No notifications yet</div>
+              <div class="notif-empty-sub">We'll let you know when something arrives</div>
+            </div>
+          </div>
+        </div>
+        <div class="user-popup-wrap">
+          <button class="nav-user-avatar-btn mob-avatar-btn" id="mobAvatarBtn" title="My profile">
+            <span class="user-initials-text">YS</span>
+          </button>
+          <div class="user-popup mob-user-popup" id="userPopupMob">
+            <div class="popup-header">
+              <div class="popup-user-row">
+                <div class="popup-avatar"><span class="user-initials-text">YS</span></div>
+                <div>
+                  <div class="popup-user-name user-name-text">Yacine Salhi</div>
+                  <div class="popup-user-role user-role-text">Member</div>
+                </div>
+              </div>
+            </div>
+            <a href="#" class="popup-item"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>Profile Settings</a>
+            <a href="#" class="popup-item"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>My Events</a>
+            <a href="#" class="popup-item"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>Saved Events</a>
+            <a href="#" class="popup-item"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>Settings</a>
+            <div class="popup-sep"></div>
+            <a href="#" class="popup-item danger btn-do-logout"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>Log out</a>
+          </div>
+        </div>
+      </div>
+
+      <button class="hamburger-btn" id="hamburgerBtn" aria-label="Open menu" aria-expanded="false">
+        <span class="ham-line"></span>
+        <span class="ham-line"></span>
+        <span class="ham-line"></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- MOBILE DRAWER OVERLAY -->
+  <div class="drawer-overlay" id="drawerOverlay"></div>
+
+  <!-- DRAWER MENU -->
+  <div class="nav-drawer" id="navDrawer" aria-hidden="true">
+    <div class="drawer-inner">
+      <div class="drawer-top">
+        <a href="index.html" class="logo">
+          <div class="logo-svg-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+              <rect x="3" y="4" width="18" height="18" rx="4" fill="#7f0df2" opacity="0.15"/>
+              <path d="M8 2v4M16 2v4M3 10h18" stroke="#7f0df2" stroke-width="2" stroke-linecap="round"/>
+              <circle cx="8" cy="15" r="1.5" fill="#7f0df2"/>
+              <circle cx="12" cy="15" r="1.5" fill="#7f0df2"/>
+              <circle cx="16" cy="15" r="1.5" fill="#7f0df2"/>
+            </svg>
+          </div>
+          <span class="logo-text">Eventfy</span>
+        </a>
+        <button class="drawer-close-btn" id="drawerCloseBtn" aria-label="Close menu">✕</button>
+      </div>
+
+      <div class="drawer-user-card">
+        <div class="drawer-user-avatar"><span class="user-initials-text">YS</span></div>
+        <div>
+          <div class="drawer-user-name user-name-text">Yacine Salhi</div>
+          <div class="drawer-user-role user-role-text">Member</div>
+        </div>
+      </div>
+
+      <nav class="drawer-nav">
+        <a href="index.html" class="drawer-link">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+          Home
+        </a>
+        <a href="browse.html" class="drawer-link">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+          Browse
+        </a>
+        <a href="#" class="drawer-link">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path d="M12 16v-4M12 8h.01" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+          About
+        </a>
+        <a href="#" class="drawer-link active">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+          Create Event
+        </a>
+      </nav>
+
+      <div class="drawer-notif-row">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+        Notifications
+        <span class="drawer-notif-badge"></span>
+      </div>
+
+      <div class="drawer-footer">
+        <button class="btn-drawer-logout btn-do-logout">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+          Log out
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <main class="main-content">
+
+    <!-- HERO -->
+    <section class="hero-section" id="heroSection">
+      <div class="hero-text">
+        <div class="hero-badge">
+          <span class="badge-dot"></span>
+          <span>ORGANIZER MODE</span>
+        </div>
+        <h1 class="hero-title">
+          <span class="line" style="--i:0">Create</span>
+          <span class="line purple" style="--i:1">Extraordinary</span>
+          <span class="line" style="--i:2">Events</span>
+        </h1>
+        <p class="hero-sub">Design an unforgettable experience. Fill in the details below to launch your next big gathering.</p>
+      </div>
+      <div class="hero-visual">
+        <div class="hero-rocket-wrap">
+          <div class="hero-rocket-card">
+            <svg class="hero-rocket-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4.5 16.5c-1.5 1.3-2 5-2 5s3.7-.5 5-2l7-7-3-3-7 7z"/>
+              <path d="M12 15L9 12l9-9a3 3 0 014 4l-10 8z"/>
+              <path d="M14.5 17.5L17 15"/>
+              <circle cx="6" cy="18" r="1" fill="currentColor" stroke="none"/>
+            </svg>
+          </div>
+          <div class="hero-star-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROGRESS NAV -->
+    <div class="progress-track" id="progressTrack">
+      <div class="progress-steps">
+        <button class="progress-step active" data-target="section-media"><span class="step-num">1</span><span class="step-label">Media</span></button>
+        <div class="progress-line"></div>
+        <button class="progress-step" data-target="section-info"><span class="step-num">2</span><span class="step-label">Info</span></button>
+        <div class="progress-line"></div>
+        <button class="progress-step" data-target="section-datetime"><span class="step-num">3</span><span class="step-label">Date</span></button>
+        <div class="progress-line"></div>
+        <button class="progress-step" data-target="section-desc"><span class="step-num">4</span><span class="step-label">About</span></button>
+        <div class="progress-line"></div>
+        <button class="progress-step" data-target="section-location"><span class="step-num">5</span><span class="step-label">Location</span></button>
+        <div class="progress-line"></div>
+        <button class="progress-step" data-target="section-capacity"><span class="step-num">6</span><span class="step-label">Capacity</span></button>
+        <div class="progress-line"></div>
+        <button class="progress-step" data-target="section-price"><span class="step-num">7</span><span class="step-label">Price</span></button>
+      </div>
+    </div>
+
+    <form id="eventForm" novalidate>
+
+      <!-- 1. MEDIA -->
+      <section class="form-card card-blue" id="section-media" data-reveal>
+        <div class="card-header">
+          <div class="card-icon ci-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
+          <span class="card-section-label">Image</span>
+        </div>
+        <div class="upload-zone" id="uploadZone" tabindex="0" role="button">
+          <input type="file" id="fileInput" accept="image/png,image/jpeg,image/webp" hidden />
+          <div class="upload-idle" id="uploadIdle">
+            <div class="upload-ico-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="16 16 12 12 8 16"/>
+                <line x1="12" y1="12" x2="12" y2="21"/>
+                <path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3"/>
+              </svg>
+            </div>
+            <p class="upload-title">Click to upload or drag and drop</p>
+            <p class="upload-sub">PNG, JPG or WebP (max. 5MB)</p>
+            <p class="upload-dim">RECOMMENDED: 1200 × 630 PX</p>
+          </div>
+          <div class="upload-preview hidden" id="uploadPreview">
+            <img id="previewImg" src="" alt="Cover" />
+            <div class="preview-overlay">
+              <button type="button" class="btn-remove-img" id="previewRemove">
+                <span class="material-symbols-outlined">delete</span> Remove
+              </button>
+            </div>
+            <div class="preview-badge"><span class="material-symbols-outlined">check_circle</span> Ready</div>
+          </div>
+        </div>
+        <p class="field-error" id="errMedia"></p>
+      </section>
+
+      <!-- 2. BASIC INFO -->
+      <section class="form-card card-purple" id="section-info" data-reveal>
+        <div class="card-header">
+          <div class="card-icon ci-purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
+          <span class="card-section-label">Info</span>
+        </div>
+        <div class="fgrid">
+          <div class="fg span2">
+            <label for="eventTitle">EVENT TITLE</label>
+            <div class="iw">
+              <input type="text" id="eventTitle" placeholder="e.g. Annual Tech Summit 2024" autocomplete="off" />
+            </div>
+            <p class="field-error" id="errTitle"></p>
+          </div>
+          <div class="fg">
+            <label for="eventCategory">CATEGORY</label>
+            <div class="iw sel-iw">
+              <select id="eventCategory">
+                <option value="">Select a category</option>
+                <option value="conference">Conference</option>
+                <option value="concert">Concert</option>
+                <option value="festival">Festival</option>
+                <option value="sports">Sports</option>
+                <option value="workshop">Workshop</option>
+                <option value="networking">Networking</option>
+                <option value="exhibition">Exhibition</option>
+                <option value="charity">Charity</option>
+                <option value="other">Other</option>
+              </select>
+              
+            </div>
+            <p class="field-error" id="errCategory"></p>
+          </div>
+          <div class="fg">
+            <label for="eventCity">CITY</label>
+            <div class="iw city-iw">
+              <input type="text" id="eventCity" placeholder="Select City" autocomplete="off" />
+              
+              <div class="city-dropdown hidden" id="cityDropdown"></div>
+            </div>
+            <div class="detect-row">
+              <button type="button" class="detect-btn" id="detectCityBtn">
+                 Auto-detect
+              </button>
+              <span class="detect-status" id="detectStatus"></span>
+            </div>
+            <p class="field-error" id="errCity"></p>
+          </div>
+          <div class="fg span2">
+            <label for="venueName">VENUE NAME</label>
+            <div class="iw">
+              <input type="text" id="venueName" placeholder="e.g. Grand Convention Center" autocomplete="off" />
+            </div>
+            <p class="field-error" id="errVenue"></p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. DATE & TIME -->
+      <section class="form-card card-orange" id="section-datetime" data-reveal>
+        <div class="card-header">
+          <div class="card-icon ci-orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><circle cx="8" cy="15" r="1"/><circle cx="12" cy="15" r="1"/><circle cx="16" cy="15" r="1"/></svg></div>
+          <span class="card-section-label">Date & Time</span>
+        </div>
+        <div class="fgrid three-col">
+          <div class="fg">
+            <label for="eventDate">EVENT DATE</label>
+            <div class="iw">
+              <input type="date" id="eventDate" />
+            </div>
+            <p class="field-error" id="errDate"></p>
+          </div>
+          <div class="fg">
+            <label for="startTime">START TIME</label>
+            <div class="iw">
+              <input type="time" id="startTime" />
+            </div>
+            <p class="field-error" id="errStart"></p>
+          </div>
+          <div class="fg">
+            <label for="endTime">END TIME</label>
+            <div class="iw">
+              <input type="time" id="endTime" />
+            </div>
+          </div>
+        </div>
+        <div class="duration-pill hidden" id="durationDisplay">
+          <span class="material-symbols-outlined">timelapse</span>
+          <span id="durationText"></span>
+        </div>
+      </section>
+
+      <!-- 4. DESCRIPTION -->
+      <section class="form-card card-green" id="section-desc" data-reveal>
+        <div class="card-header">
+          <div class="card-icon ci-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="17" y1="10" x2="3" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="17" y1="18" x2="3" y2="18"/></svg></div>
+          <span class="card-section-label">Description</span>
+        </div>
+        <div class="fg full-w">
+          <label for="eventDesc">ABOUT THE EVENT</label>
+          <div class="ta-wrap">
+            <textarea id="eventDesc" placeholder="Write a brief description about your event…" maxlength="500" rows="5"></textarea>
+            <span class="char-badge" id="charBadge">0/500 characters</span>
+          </div>
+          <div class="char-bar"><div class="char-fill" id="charBarFill"></div></div>
+          <p class="field-error" id="errDesc"></p>
+        </div>
+      </section>
+
+      <!-- 5. LOCATION -->
+      <section class="form-card card-blue2" id="section-location" data-reveal>
+        <div class="card-header">
+          <div class="card-icon ci-blue2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+          <span class="card-section-label">Location</span>
+        </div>
+        <div class="fg full-w">
+          <label for="fullAddress">FULL ADDRESS</label>
+          <div class="addr-wrap">
+            
+            <input type="text" id="fullAddress" placeholder="Search for a location" autocomplete="off" class="addr-input" />
+            <button type="button" class="gps-btn" id="gpsBtn" title="Use my location">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+            </button>
+          </div>
+          <div class="addr-sug hidden" id="addressSuggestions"></div>
+          <p class="field-error" id="errLocation"></p>
+        </div>
+        <!-- Map area: leaflet blurred until pinned + overlay -->
+        <div class="map-box" id="mapContainer">
+          <div id="leafletMap" class="lmap"></div>
+          <div class="map-veil" id="mapVeil">
+            <div class="map-veil-inner">
+              <div class="map-pin-pulse"></div>
+            </div>
+          </div>
+          <div class="map-bar-row">
+            <div class="map-status-pill" id="mapStatus">
+              <span class="status-dot" id="statusDot"></span>
+              <span id="mapStatusText">No Location Selected</span>
+            </div>
+            <button type="button" class="btn-map-view" id="mapViewBtn">Open Map View</button>
+          </div>
+        </div>
+        <div class="loc-strip hidden" id="locationConfirmed">
+          <svg class="ls-check-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          <div class="ls-info">
+            <p class="ls-addr" id="lcAddr">—</p>
+            <div class="ls-tags">
+              <span class="ls-tag t-city" id="lcCityChip"></span>
+              <span class="ls-tag t-map">Map ✓</span>
+              <span class="ls-tag t-dist hidden" id="lcDistChip"></span>
+            </div>
+          </div>
+          <button type="button" class="btn-ls-clear" id="btnClearLocation" title="Clear location">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+      </section>
+
+      <!-- 6. CAPACITY -->
+      <section class="form-card card-red" id="section-capacity" data-reveal>
+        <div class="card-header">
+          <div class="card-icon ci-red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></div>
+          <span class="card-section-label">Capacity</span>
+        </div>
+        <div class="cap-row">
+          <div class="fg">
+            <label for="availableSeats">AVAILABLE SEATS</label>
+            <div class="iw seats-iw">
+              <input type="number" id="availableSeats" placeholder="0" min="1" />
+              <span class="seats-sfx">attendees</span>
+            </div>
+          </div>
+          <div class="cap-callout">
+            <span class="material-symbols-outlined">info</span>
+            <p>Leave blank for unlimited capacity. You can change this later in event settings.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 7. PRICE -->
+      <section class="form-card card-amber" id="section-price" data-reveal>
+        <div class="card-header">
+          <div class="card-icon ci-amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 010-6h20a3 3 0 010 6"/><path d="M2 15a3 3 0 000 6h20a3 3 0 000-6"/><line x1="2" y1="12" x2="22" y2="12"/></svg></div>
+          <span class="card-section-label">Price</span>
+        </div>
+        <div class="fgrid">
+          <div class="fg">
+            <label for="ticketPrice">TICKET PRICE</label>
+            <div class="iw price-iw">
+              <input type="number" id="ticketPrice" placeholder="0.00" min="0" step="0.01" />
+              <span class="price-cur">DZD</span>
+            </div>
+          </div>
+          <div class="free-card" id="freeToggleCard">
+            <div>
+              <p class="free-ttl">Free Event</p>
+              <p class="free-sub">Checking this will make the event free for everyone.</p>
+            </div>
+            <label class="tog">
+              <input type="checkbox" id="freeEventToggle" />
+              <span class="tog-track"><span class="tog-thumb"></span></span>
+            </label>
+          </div>
+        </div>
+        <div class="price-sum hidden" id="priceSummary">
+          <div class="sum-row"><span>Ticket price</span><span id="summaryPrice">—</span></div>
+          <div class="sum-row"><span>Platform fee (5%)</span><span id="summaryFee">—</span></div>
+          <div class="sum-row sum-total"><span>You receive</span><span id="summaryTotal">—</span></div>
+        </div>
+      </section>
+
+    </form>
+  </main>
+
+  <!-- STICKY FOOTER -->
+  <footer class="sticky-footer">
+    <div class="footer-inner">
+      <button type="button" class="btn-discard" id="discardBtn">Discard Changes</button>
+      <div class="footer-right">
+        <button type="button" class="btn-draft" id="saveDraftBtn">
+          <span class="material-symbols-outlined">save</span> Save Draft
+        </button>
+        <button type="button" class="btn-publish" id="publishBtn">
+          Publish Event <span class="material-symbols-outlined">send</span>
+        </button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- MODAL -->
+  <div class="modal-back hidden" id="modalBackdrop">
+    <div class="modal-box">
+      <div class="modal-confetti" id="modalConfetti"></div>
+      <div class="modal-emoji" id="modalEmoji">🎉</div>
+      <h3 id="modalTitle">Event Published!</h3>
+      <p id="modalMsg">Your event is now live.</p>
+      <div class="modal-actions">
+        <button class="mbtn mbtn-sec" id="modalClose">Back to Edit</button>
+        <button class="mbtn mbtn-pri" id="modalShare">
+          <span class="material-symbols-outlined">share</span> Share
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

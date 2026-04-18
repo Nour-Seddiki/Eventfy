@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About Eventfy – Connecting People Through Events</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Noto+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@400,0&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/png" href="/Home/img_logo/Evenitfylogo.png">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><rect x='3' y='4' width='18' height='18' rx='4' fill='%237f0df2' opacity='.15'/><path d='M8 2v4M16 2v4M3 10h18' stroke='%237f0df2' stroke-width='2' stroke-linecap='round'/><circle cx='8' cy='15' r='1.5' fill='%237f0df2'/><circle cx='12' cy='15' r='1.5' fill='%237f0df2'/><circle cx='16' cy='15' r='1.5' fill='%237f0df2'/></svg>">
+</head>
+<body>
+<div class="page-wrapper">
+
+  <script src="app.js" defer></script>
+
+  <!-- ══ DRAWER BACKDROP ══ -->
+  <div class="overlay" id="overlay"></div>
+
+  <!-- ══ NAV — exactly like Home ══ -->
+  <nav id="mainNav">
+
+    <a href="#" class="nav-logo">
+       <div class="nav-logo-icon">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+        <rect x="3" y="4" width="18" height="18" rx="4" fill="#7f0df2" opacity="0.15"/>
+        <path d="M8 2v4M16 2v4M3 10h18" stroke="#7f0df2" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="8" cy="15" r="1.5" fill="#7f0df2"/>
+        <circle cx="12" cy="15" r="1.5" fill="#7f0df2"/>
+        <circle cx="16" cy="15" r="1.5" fill="#7f0df2"/>
+      </svg>
+    </div>
+      <span>Eventfy</span>
+    </a>
+
+    <ul class="nav-links">
+      <li class="nav-item"><a href="#">Home</a></li>
+      <li class="nav-item"><a href="#">Browse</a></li>
+      <li class="nav-item active"><a href="#">About</a></li>
+      <li class="nav-item"><a href="#">How it Works</a></li>
+    </ul>
+
+    <div class="nav-actions">
+      <button class="btn-login" data-action="login">Login</button>
+      <button class="btn-register" data-action="register">Register</button>
+    </div>
+
+    <button class="hamburger" id="hamburgerBtn" aria-label="Open menu" aria-expanded="false">
+      <span class="ham-bar"></span>
+      <span class="ham-bar"></span>
+      <span class="ham-bar"></span>
+    </button>
+
+  </nav>
+
+  <!-- ══ SLIDE-IN DRAWER — exactly like Home ══ -->
+  <div class="nav-drawer" id="navDrawer" aria-hidden="true">
+    <div class="drawer-head">
+      <a href="#" class="nav-logo">
+        <div class="nav-logo-icon">
+          <span class="material-symbols-outlined">event</span>
+        </div>
+        <span>Eventfy</span>
+      </a>
+      <button class="drawer-close" id="drawerCloseBtn" aria-label="Close menu">✕</button>
+    </div>
+    <ul class="drawer-links">
+      <li><a href="/Home/Home.Html">Home</a></li>
+      <li><a href="/Events/index.html">Browse</a></li>
+      <li class="active"><a href="/Home/Home.Html">About</a></li>
+      <li><a href="#">How it Works</a></li>
+    </ul>
+    <div class="drawer-actions">
+      <button class="btn-login" data-action="login">Login</button>
+      <button class="btn-register" data-action="register">Register</button>
+    </div>
+  </div>
+
+  <!-- ===== EVERYTHING BELOW IS 100% ORIGINAL ===== -->
+
+  <!-- ===== HERO SECTION ===== -->
+  <section class="hero">
+    <div class="hero-bg-gradient" aria-hidden="true"></div>
+    <div class="hero-bg-dots" aria-hidden="true"></div>
+    <div class="hero-content">
+      <span class="badge">
+        <span class="material-symbols-outlined" style="font-size:18px;">bolt</span>
+        Revolutionizing Discovery
+      </span>
+      <h1>
+        Connecting People <br />
+        <span class="gradient-text">Through Events</span>
+      </h1>
+      <p>
+        We are building the bridge between scattered information and meaningful
+        experiences. Discover where you belong.
+      </p>
+    </div>
+  </section>
+
+  <!-- ===== PROBLEM SECTION ===== -->
+  <section class="problem-section">
+    <div class="container problem-grid">
+      <div class="problem-text animate-in">
+        <h2>
+          The Problem: <br />
+          <span>Noise &amp; Missed Opportunities</span>
+        </h2>
+        <p>
+          In a world of scattered events, finding where you belong shouldn't be
+          hard. Traditional platforms are cluttered, outdated, and impersonal.
+        </p>
+        <div class="problem-cards">
+          <div class="problem-card animate-in animate-in-delay-1">
+            <div class="problem-card-icon icon-red">
+              <span class="material-symbols-outlined">layers_clear</span>
+            </div>
+            <div>
+              <h3>Scattered Information</h3>
+              <p>Events are listed everywhere—social media, flyers, niche sites—but organized nowhere.</p>
+            </div>
+          </div>
+          <div class="problem-card animate-in animate-in-delay-2">
+            <div class="problem-card-icon icon-orange">
+              <span class="material-symbols-outlined">sentiment_dissatisfied</span>
+            </div>
+            <div>
+              <h3>Fear of Missing Out</h3>
+              <p>You miss the best experiences simply because you didn't know they were happening.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="problem-visual animate-in animate-in-delay-1">
+        <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuDfKkmvv39MWfoTmBmJZhboQqlQzfWLKNWMmvYpEHef4LUAbO8yeIS0dcQit30xZrY8LW0M7d6SJ2jI_wFxo3mHmbB0r2y2s9vn2usKysMXY8KFuj8mYg0vIJjiGRXvY2EJSXiYbvvHZa4Aoe45ukfX5AznnrGygCgbldBthc86AG-9LY9T9ClVeXLCJZgOnhZyZZ251Q5by4ticXXNi4C7eJ-DV1ChqYYZxvToRzQLCTjCkpQ6XeT3s1N4aBgEHNx2FstW28iOwQ0t" alt="Abstract chaotic neon lights organizing into a structure" />
+        <div class="problem-visual-overlay">
+          <div class="chaos-card">
+            <span class="material-symbols-outlined">auto_awesome</span>
+            <h3>Chaos into Clarity</h3>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== SOLUTION SECTION ===== -->
+  <section class="solution-section">
+    <div class="blob-tr" aria-hidden="true"></div>
+    <div class="blob-bl" aria-hidden="true"></div>
+    <div class="container" style="position:relative;z-index:1;">
+      <div class="section-header animate-in">
+        <span class="section-label">Our Solution</span>
+        <h3>Bringing Order to Chaos</h3>
+      </div>
+      <div class="solution-grid">
+        <div class="solution-card animate-in animate-in-delay-1">
+          <div class="solution-card-icon"><span class="material-symbols-outlined">tune</span></div>
+          <h4>Smart Filters</h4>
+          <p>Find exactly what matches your vibe with precision filtering technology.</p>
+        </div>
+        <div class="solution-card animate-in animate-in-delay-2">
+          <div class="solution-card-icon"><span class="material-symbols-outlined">calendar_month</span></div>
+          <h4>Smart Calendar</h4>
+          <p>Sync seamlessly with your life. Never double-book or forget a plan again.</p>
+        </div>
+        <div class="solution-card animate-in animate-in-delay-3">
+          <div class="solution-card-icon"><span class="material-symbols-outlined">notifications_active</span></div>
+          <h4>Real-Time Alerts</h4>
+          <p>Stay in the loop with instant notifications for your favorite interests.</p>
+        </div>
+        <div class="solution-card animate-in animate-in-delay-4">
+          <div class="solution-card-icon"><span class="material-symbols-outlined">explore</span></div>
+          <h4>Location Discovery</h4>
+          <p>Explore your local scene with interactive maps and venue insights.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== WHO IT'S FOR ===== -->
+  <section class="personas-section">
+    <div class="container">
+      <div class="personas-header animate-in">
+        <div style="max-width:36rem;">
+          <h2>Built for Everyone</h2>
+          <p>Whether you're looking to learn, network, party, or organize, Eventfy adapts to your needs.</p>
+        </div>
+      </div>
+      <div class="personas-grid">
+        <div class="persona-card persona-purple animate-in animate-in-delay-1">
+          <div class="persona-blob" aria-hidden="true"></div>
+          <div class="persona-icon"><span class="material-symbols-outlined">school</span></div>
+          <div class="persona-text"><h3>Students</h3><p>Discover campus events, parties, and workshops.</p></div>
+        </div>
+        <div class="persona-card persona-blue animate-in animate-in-delay-2">
+          <div class="persona-blob" aria-hidden="true"></div>
+          <div class="persona-icon"><span class="material-symbols-outlined">work</span></div>
+          <div class="persona-text"><h3>Professionals</h3><p>Find networking mixers, conferences, and seminars.</p></div>
+        </div>
+        <div class="persona-card persona-pink animate-in animate-in-delay-3">
+          <div class="persona-blob" aria-hidden="true"></div>
+          <div class="persona-icon"><span class="material-symbols-outlined">campaign</span></div>
+          <div class="persona-text"><h3>Organizers</h3><p>Reach the right audience and manage RSVPs effortlessly.</p></div>
+        </div>
+        <div class="persona-card persona-teal animate-in animate-in-delay-4">
+          <div class="persona-blob" aria-hidden="true"></div>
+          <div class="persona-icon"><span class="material-symbols-outlined">diversity_3</span></div>
+          <div class="persona-text"><h3>Communities</h3><p>Grow your tribe and keep members engaged.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== VISION SECTION ===== -->
+  <section class="vision-section">
+    <div class="vision-bg" aria-hidden="true"></div>
+    <div class="vision-glow" aria-hidden="true"></div>
+    <div class="vision-content animate-in">
+      <span class="vision-badge">Our Vision</span>
+      <h2>The Central Hub for <br /><span class="vision-gradient-text">Human Connection</span></h2>
+      <p>We envision a world where no one ever has to ask "What are we doing tonight?" again. We are building the operating system for social life.</p>
+    </div>
+  </section>
+
+  <!-- ===== CTA SECTION ===== -->
+  <section class="cta-section">
+    <div class="cta-card animate-in">
+      <div class="cta-inner">
+        <div class="cta-text">
+          <h2>Be Part of the Event Movement</h2>
+          <p>Join thousands of users discovering their next passion today.</p>
+          <div class="cta-buttons">
+            <button class="btn-cta-primary" data-action="register">Create an Account</button>
+            <button class="btn-cta-secondary" data-action="browse">Browse Events</button>
+          </div>
+        </div>
+        <div class="cta-image">
+          <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuAWnfwI2TgVQ65QuNirdnrAKJgQOsa4T4hk4GKx5RzxmEfOrtzwRRWd1QvtYVFV0VICBcIAwKJFlOMP0FNjtVNkHF_FnOQVmhwpO_oQ_qfnMVPI8w_WiiYs73pDxBVjUO4LMFNI_UVfqFCinLkrYTw-rDzEXySF581I0aYe1UrGyYTkdEIJLy6rOg_4UFZh327ipWi4JhAnojLjgS6y5La1zyX8cWOtBskOAT0U3t7WOAEOPbDVbJBPyy9b43LTY5vt-YlvZy2mQxFP" alt="Excited crowd at a concert event" />
+          <div class="cta-image-overlay" aria-hidden="true"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer>
+    <div class="container footer-inner">
+      <div class="footer-logo">
+        <div class="footer-logo-icon"><span class="material-symbols-outlined" style="font-size:14px;">event</span></div>
+        <span class="name">Eventfy</span>
+      </div>
+      <p class="footer-copyright">© 2026 Eventfy Inc.</p>
+    </div>
+  </footer>
+
+</div>
+</body>
+</html>
