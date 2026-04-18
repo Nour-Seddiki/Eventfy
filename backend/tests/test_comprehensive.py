@@ -4,7 +4,10 @@ Tests: Auth, User, Event, Ticket, Review, Notification, Admin, Recommendation
 """
 import pytest
 from datetime import datetime, timedelta, timezone
-from app.db.session import SessionLocal
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import StaticPool
+from app.db.base import Base
 from app.models.user import User
 from app.models.event import Event
 from app.models.ticket import Ticket
@@ -18,30 +21,21 @@ class TestAllEndpoints:
     
     @pytest.fixture(autouse=True)
     def setup(self):
-        """Setup fresh database before each test"""
-        db = SessionLocal()
-        # Clean up
-        db.query(Notification).delete()
-        db.query(Review).delete()
-        db.query(Ticket).delete()
-        db.query(Event).delete()
-        db.query(User).delete()
-        db.commit()
-        db.close()
+        """Setup fresh in-memory database before each test"""
+        engine = create_engine(
+            "sqlite://",
+            connect_args={"check_same_thread": False},
+            poolclass=StaticPool,
+        )
+        Base.metadata.create_all(bind=engine)
+        self._SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
         yield
-        # Teardown
-        db = SessionLocal()
-        db.query(Notification).delete()
-        db.query(Review).delete()
-        db.query(Ticket).delete()
-        db.query(Event).delete()
-        db.query(User).delete()
-        db.commit()
-        db.close()
+        Base.metadata.drop_all(bind=engine)
+        engine.dispose()
     
     def create_test_user(self, username="testuser", email="test@test.com", role="attendee"):
         """Helper to create test user"""
-        db = SessionLocal()
+        db = self._SessionLocal()
         user = User(
             username=username,
             email=email,
@@ -57,7 +51,7 @@ class TestAllEndpoints:
     
     def create_test_event(self, organizer_id, title="Test Event"):
         """Helper to create test event"""
-        db = SessionLocal()
+        db = self._SessionLocal()
         event = Event(
             title=title,
             description="Test description",
@@ -80,7 +74,7 @@ class TestAllEndpoints:
         organizer = self.create_test_user("org1", "org@test.com", "organizer")
         attendee = self.create_test_user("att1", "att@test.com", "attendee")
         
-        db = SessionLocal()
+        db = self._SessionLocal()
         
         # Verify users
         assert db.query(User).count() == 2
@@ -138,7 +132,7 @@ class TestAllEndpoints:
         """Test user relationships"""
         organizer = self.create_test_user("org", "org@test.com", "organizer")
         
-        db = SessionLocal()
+        db = self._SessionLocal()
         
         # Create events for organizer
         for i in range(3):
@@ -171,7 +165,7 @@ class TestAllEndpoints:
         
         event = self.create_test_event(organizer.id, "Concert")
         
-        db = SessionLocal()
+        db = self._SessionLocal()
         
         # Purchase tickets for each attendee
         for attendee in attendees:
@@ -206,7 +200,7 @@ class TestAllEndpoints:
         
         event = self.create_test_event(organizer.id)
         
-        db = SessionLocal()
+        db = self._SessionLocal()
         
         # Create reviews from both attendees
         reviews_data = [
@@ -241,7 +235,7 @@ class TestAllEndpoints:
         attendee = self.create_test_user("att", "att@test.com", "attendee")
         event = self.create_test_event(organizer.id)
         
-        db = SessionLocal()
+        db = self._SessionLocal()
         
         # Create multiple notifications
         notifications_data = [
@@ -289,7 +283,7 @@ class TestAllEndpoints:
     
     def test_data_constraints(self):
         """Test database constraints"""
-        db = SessionLocal()
+        db = self._SessionLocal()
         
         # Create user with unique email
         user1 = User(
@@ -329,7 +323,7 @@ class TestAllEndpoints:
         attendee = self.create_test_user("att", "att@test.com", "attendee")
         event = self.create_test_event(organizer.id)
         
-        db = SessionLocal()
+        db = self._SessionLocal()
         
         # Create related data
         ticket = Ticket(
@@ -382,7 +376,7 @@ class TestAllEndpoints:
     
     def test_all_models_exist(self):
         """Verify all expected models exist and can be queried"""
-        db = SessionLocal()
+        db = self._SessionLocal()
         
         # Create at least one of each model
         organizer = self.create_test_user("org", "org@test.com", "organizer")
