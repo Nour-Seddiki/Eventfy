@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Eventfy | Organizer Dashboard</title>
+  <meta name="description" content="Manage your events and track registrations on the Eventfy Organizer Dashboard."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <!-- Shared design system -->
+  <link rel="stylesheet" href="/common-items/common.css"/>
+  <!-- Page-specific styles -->
+  <link rel="stylesheet" href="organizer-dashboard.css"/>
+</head>
+<body>
+
+<!-- ============================================================
+     NAVBAR
+     ============================================================ -->
+<header class="site-header" id="siteHeader">
+  <div class="header-inner">
+    <a href="#" class="logo" aria-label="Eventfy home">
+      <div class="logo-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <rect x="3" y="4" width="18" height="18" rx="4" fill="#7c3aed" opacity=".15"/>
+          <path d="M8 2v4M16 2v4M3 10h18" stroke="#7c3aed" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="8" cy="16" r="1.5" fill="#7c3aed"/>
+          <circle cx="12" cy="16" r="1.5" fill="#7c3aed"/>
+          <circle cx="16" cy="16" r="1.5" fill="#7c3aed"/>
+        </svg>
+      </div>
+      <span class="logo-text">Eventfy</span>
+    </a>
+
+        <nav class="header-nav" aria-label="Main navigation">
+      <a href="#" class="nav-link">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+        Home
+      </a>
+      <a href="#" class="nav-link active">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        Browse
+      </a>
+      <a href="#" class="nav-link">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+        About
+      </a>
+      <a href="#" class="nav-link">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+        How it Works
+      </a>
+      <div class="nav-loggedin">
+        <div class="notif-popup-wrap">
+          <button class="nav-notif-btn" id="desktopNotifBtn" aria-label="Notifications">
+            <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+              <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/>
+            </svg>
+            <span class="notif-dot"></span>
+          </button>
+          <div class="notif-popup" id="notifPopupDesktop">
+            <div class="notif-popup-header">Notifications</div>
+            <div class="notif-empty">
+              <div class="notif-empty-icon">🔔</div>
+              <div class="notif-empty-title">No notifications yet</div>
+              <div class="notif-empty-desc">We'll let you know when something arrives</div>
+            </div>
+          </div>
+        </div>
+        <div class="user-popup-wrap">
+          <button class="nav-user-avatar-btn" id="desktopAvatarBtn" aria-label="User menu">
+            <span class="user-initials-text">YS</span>
+          </button>
+          <div class="user-popup" id="userPopup"></div>
+        </div>
+        <button class="btn-nav-logout btn-do-logout">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/>
+            <polyline points="16 17 21 12 16 7"/>
+            <line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
+          Log out
+        </button>
+      </div>
+    </nav>
+
+    <div class="mob-header-loggedin">
+      <div class="notif-popup-wrap">
+        <button class="nav-notif-btn" id="mobNotifBtn" aria-label="Notifications">
+          <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+            <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/>
+          </svg>
+          <span class="notif-dot"></span>
+        </button>
+        <div class="notif-popup" id="notifPopupMob">
+          <div class="notif-popup-header">Notifications</div>
+          <div class="notif-empty">
+            <div class="notif-empty-icon">🔔</div>
+            <div class="notif-empty-title">No notifications yet</div>
+            <div class="notif-empty-desc">We'll let you know when something arrives</div>
+          </div>
+        </div>
+      </div>
+      <div class="user-popup-wrap">
+        <button class="nav-user-avatar-btn" id="mobAvatarBtn" aria-label="User menu">
+          <span class="user-initials-text">YS</span>
+        </button>
+        <div class="user-popup" id="userPopupMob"></div>
+      </div>
+    </div>
+
+    <button class="hamburger-btn" id="hamburgerBtn" aria-label="Open menu">
+      <span class="ham-line"></span><span class="ham-line"></span><span class="ham-line"></span>
+    </button>
+  </div>
+</header>
+
+<div class="drawer-overlay" id="drawerOverlay"></div>
+<nav class="nav-drawer" id="navDrawer">
+  <div class="drawer-inner">
+    <button class="drawer-close-btn" id="drawerCloseBtn">✕</button>
+    <div class="drawer-user-card">
+      <div class="drawer-user-avatar"><span class="drawer-avatar-text">YS</span></div>
+      <div>
+        <div class="drawer-user-name">Yacine Salhi</div>
+        <div class="drawer-user-role">Member</div>
+      </div>
+    </div>
+        <div class="drawer-nav">
+      <a href="#" class="drawer-link">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+        Home
+      </a>
+      <a href="#" class="drawer-link active">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        Browse
+      </a>
+      <a href="#" class="drawer-link">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+        About
+      </a>
+      <a href="#" class="drawer-link">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+        How it Works
+      </a>
+    </div>
+    <div class="drawer-bottom-menu">
+      <div class="drawer-notif">
+        <div class="drawer-notif-left">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+          Notifications
+        </div>
+        <span class="drawer-notif-dot"></span>
+      </div>
+      <button class="btn-drawer-logout btn-do-logout">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Log out
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- ============================================================
+     PAGE CONTENT
+     ============================================================ -->
+<main>
+  <div class="page-container">
+    <div class="org-dash-header">
+      <div>
+        <h1 class="page-title">Organizer Dashboard</h1>
+        <p class="page-subtitle">Manage your events and track registrations</p>
+      </div>
+      <button class="btn-create-event" id="createEventBtn">+ Create Event</button>
+    </div>
+
+    <h2 class="my-events-heading">
+      <svg class="icon-calendar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="4" width="18" height="18" rx="3"/>
+        <path d="M16 2v4M8 2v4M3 10h18"/>
+      </svg>
+      My Events
+    </h2>
+
+    <div class="org-events-list" id="orgEventsList" aria-live="polite"></div>
+  </div>
+</main>
+
+<script>
+  window.EVENTFY_USER = { name: 'Yacine Salhi', initials: 'YS', role: 'Member' };
+  window.EVENTFY_LINKS = {
+    profile:     '../organizer-profile/index.html',
+    myEvents:    'index.html',
+    savedEvents: '../my-dashboard/index.html'
+  };
+</script>
+<script src="organizer-dashboard.js"></script>
+<script src="/common-items/navbar.js"></script>
+</body>
+</html>
