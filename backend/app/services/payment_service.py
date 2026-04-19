@@ -1,8 +1,8 @@
 import json
 import hmac
 import hashlib
-from chargily_pay import ChargilyClient
-from chargily_pay.entity import Checkout
+import logging
+
 from fastapi import HTTPException, BackgroundTasks
 from sqlalchemy.orm import Session
 from app.models.payment import Payment
@@ -12,11 +12,27 @@ from app.schemas.payment import PaymentStatus
 from app.services.ticket_service import TickectService
 from app.config import settings
 
-chargily_client = ChargilyClient(
-    key=settings.chargily_key or "",
-    secret=settings.chargily_secret or "",
-    url=settings.chargily_url,
-)
+logger = logging.getLogger(__name__)
+
+# Guard chargily import — optional dependency
+try:
+    from chargily_pay import ChargilyClient
+    from chargily_pay.entity import Checkout
+
+    chargily_client = ChargilyClient(
+        key=settings.chargily_key or "",
+        secret=settings.chargily_secret or "",
+        url=settings.chargily_url,
+    )
+    CHARGILY_AVAILABLE = True
+except ImportError:
+    logger.warning("chargily_pay not installed — payment endpoints will return 501")
+    chargily_client = None
+    CHARGILY_AVAILABLE = False
+except Exception as e:
+    logger.warning(f"chargily_pay init failed: {e} — payment endpoints will return 501")
+    chargily_client = None
+    CHARGILY_AVAILABLE = False
 
 
 def _payment_to_dict(p: Payment) -> dict:
@@ -39,6 +55,9 @@ class PaymentService:
     @staticmethod
     def create_checkout_session(user: dict, db: Session, event_id: int, payment_method: str = "edahabia") -> dict:
         """Create a Chargily checkout and a pending Payment record."""
+        if not CHARGILY_AVAILABLE:
+            raise HTTPException(status_code=501, detail="Payment gateway not configured")
+
         if user is None:
             raise HTTPException(status_code=401, detail="Authentication failed")
 
@@ -100,6 +119,9 @@ class PaymentService:
     @staticmethod
     def handle_webhook(db: Session, payload: str, signature: str, background_tasks: BackgroundTasks) -> dict:
         """Verify and process Chargily webhook events."""
+        if not CHARGILY_AVAILABLE:
+            raise HTTPException(status_code=501, detail="Payment gateway not configured")
+
         # Validate signature using HMAC-SHA256
         if not chargily_client.validate_signature(signature, payload):
             raise HTTPException(status_code=403, detail="Invalid signature")

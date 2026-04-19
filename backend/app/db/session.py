@@ -1,20 +1,31 @@
 from fastapi import Depends
 from sqlalchemy.orm import Session
 from sqlalchemy import create_engine
+from sqlalchemy.engine import URL
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy import text
+from sqlalchemy.pool import NullPool
 from typing import Annotated
 from app.config import settings
 
-SQLALCHEMY_DATABASE_URL = settings.database_url
-is_sqlite = SQLALCHEMY_DATABASE_URL.startswith("sqlite")
+# Build the connection URL using SQLAlchemy's URL.create() to properly
+# handle special characters in the password without manual URL-encoding.
+SQLALCHEMY_DATABASE_URL = URL.create(
+    drivername="postgresql+psycopg2",
+    username=settings.db_user,
+    password=settings.db_password,
+    host=settings.db_host,
+    port=settings.db_port,
+    database=settings.db_name,
+)
 
+# NullPool delegates connection pooling to Supabase's PgBouncer.
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL,
-    connect_args={"check_same_thread": False} if is_sqlite else {},
+    poolclass=NullPool,
 )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
 
 def get_db():
     db = SessionLocal()
@@ -23,21 +34,5 @@ def get_db():
     finally:
         db.close()
 
-db_dependency = Annotated[Session,Depends(get_db)]
 
-
-def ensure_user_soft_delete_columns():
-    """SQLite-safe schema patch for existing databases without migrations."""
-    with engine.begin() as connection:
-        columns = {
-            row[1] for row in connection.execute(text("PRAGMA table_info(users)")).fetchall()
-        }
-
-        if "is_deleted" not in columns:
-            connection.execute(
-                text("ALTER TABLE users ADD COLUMN is_deleted BOOLEAN DEFAULT 0")
-            )
-        if "deleted_at" not in columns:
-            connection.execute(
-                text("ALTER TABLE users ADD COLUMN deleted_at DATETIME")
-            )
+db_dependency = Annotated[Session, Depends(get_db)]

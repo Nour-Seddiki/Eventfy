@@ -45,6 +45,19 @@ function setCachedUser(user) {
   localStorage.setItem('eventfy_user', JSON.stringify(user));
 }
 
+/**
+ * Get the relative path to the login page from the current page.
+ * Works from any directory depth (dashboard/, org-profile/, etc.)
+ */
+function getLoginPath() {
+  // Detect how deep we are relative to the frontend root
+  const path = window.location.pathname;
+  // Check if we're already on the login page
+  if (path.includes('/login/')) return 'index.html';
+  // Standard sub-directory: dashboard/, signup/, org-profile/, etc.
+  return '../login/index.html';
+}
+
 /* ── API Fetch Helper ────────────────────── */
 
 /**
@@ -79,10 +92,9 @@ async function apiFetch(path, options = {}) {
   // Auto-logout on 401
   if (response.status === 401) {
     clearToken();
-    // Don't redirect if already on login/signup page
     const loc = window.location.pathname;
     if (!loc.includes('/login') && !loc.includes('/signup')) {
-      window.location.href = '/login/index.html';
+      window.location.href = getLoginPath();
     }
   }
 
@@ -94,9 +106,6 @@ async function apiFetch(path, options = {}) {
 /**
  * Login with email + password.
  * FastAPI OAuth2 expects x-www-form-urlencoded with 'username' field.
- * @param {string} email
- * @param {string} password
- * @returns {Promise<{access_token: string, token_type: string}>}
  */
 async function apiLogin(email, password) {
   const body = new URLSearchParams();
@@ -129,7 +138,6 @@ async function apiLogin(email, password) {
 /**
  * Register a new user.
  * @param {object} userData - { user_name, email, password, role }
- * @returns {Promise<object>}
  */
 async function apiSignup(userData) {
   const res = await fetch(`${API_BASE}/auth/sign_up`, {
@@ -162,6 +170,19 @@ async function fetchMyActivity() {
   return await res.json();
 }
 
+/** Update user profile */
+async function updateMyProfile(data) {
+  const res = await apiFetch('/users/update_me', {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || 'Failed to update profile');
+  }
+  return await res.json();
+}
+
 /* ── Event API Calls ─────────────────────── */
 
 /** Fetch public events (no login needed) */
@@ -190,6 +211,35 @@ async function searchEvents(q = '', category = '', location = '') {
   return await res.json();
 }
 
+/** Fetch organizer's events (requires auth) */
+async function fetchMyEvents() {
+  const res = await apiFetch('/Event/event_list');
+  if (!res.ok) throw new Error('Failed to fetch my events');
+  return await res.json();
+}
+
+/** Create a new event (requires auth, organizer role) */
+async function createEvent(eventData) {
+  const res = await apiFetch('/Event/create_event', {
+    method: 'POST',
+    body: JSON.stringify(eventData),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || 'Failed to create event');
+  }
+  return await res.json();
+}
+
+/** Delete an event (requires auth, organizer role) */
+async function deleteEvent(eventId) {
+  const res = await apiFetch(`/Event/delete_event/${eventId}`, {
+    method: 'DELETE',
+  });
+  if (!res.ok) throw new Error('Failed to delete event');
+  return await res.json();
+}
+
 /* ── Ticket API Calls ────────────────────── */
 
 /** Fetch user's tickets */
@@ -199,11 +249,39 @@ async function fetchMyTickets() {
   return await res.json();
 }
 
+/* ── Saved Events API Calls ──────────────── */
+
+/** Fetch user's saved events */
+async function fetchSavedEvents() {
+  const res = await apiFetch('/saving-events/my-saved-events');
+  if (!res.ok) throw new Error('Failed to fetch saved events');
+  return await res.json();
+}
+
+/** Save an event */
+async function saveEvent(eventId) {
+  const res = await apiFetch('/saving-events/save', {
+    method: 'POST',
+    body: JSON.stringify({ event_id: eventId }),
+  });
+  if (!res.ok) throw new Error('Failed to save event');
+  return await res.json();
+}
+
+/** Unsave an event */
+async function unsaveEvent(savingId) {
+  const res = await apiFetch(`/saving-events/remove/${savingId}`, {
+    method: 'DELETE',
+  });
+  if (!res.ok) throw new Error('Failed to unsave event');
+  return await res.json();
+}
+
 /* ── Notification API Calls ──────────────── */
 
 /** Fetch user's notifications */
 async function fetchNotifications() {
-  const res = await apiFetch('/notification/');
+  const res = await apiFetch('/notifications');
   if (!res.ok) throw new Error('Failed to fetch notifications');
   return await res.json();
 }
@@ -212,5 +290,5 @@ async function fetchNotifications() {
 
 function apiLogout() {
   clearToken();
-  window.location.href = '../login/index.html';
+  window.location.href = getLoginPath();
 }

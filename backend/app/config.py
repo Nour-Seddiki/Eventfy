@@ -12,22 +12,17 @@ load_dotenv(dotenv_path=Path(__file__).resolve().parents[1] / ".env")
 BASE_DIR = Path(__file__).resolve().parents[1]  # …/backend/
 
 
-def _resolve_database_url(raw: str) -> str:
-    """Turn a relative SQLite path into an absolute one so the DB file is
-    always created inside the project directory regardless of cwd."""
-    if raw.startswith("sqlite:///./") or raw.startswith("sqlite:///Eventfy"):
-        # Strip the SQLite prefix, resolve relative to BASE_DIR
-        rel = raw.replace("sqlite:///./", "").replace("sqlite:///", "")
-        return f"sqlite:///{BASE_DIR / rel}"
-    return raw
-
-
 @dataclass(frozen=True)
 class Settings:
     secret_key: str
     algorithm: str
     access_token_expire_minutes: int
-    database_url: str
+    # Supabase PostgreSQL connection fields
+    db_host: str
+    db_port: int
+    db_user: str
+    db_password: str
+    db_name: str
     smtp_host: str
     smtp_port: int
     smtp_user: str | None
@@ -43,8 +38,12 @@ class Settings:
 settings = Settings(
     secret_key=os.getenv("SECRET_KEY", "dev-insecure-secret-change-me"),
     algorithm=os.getenv("ALGORITHM", "HS256"),
-    access_token_expire_minutes=int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "20")),
-    database_url=_resolve_database_url(os.getenv("DATABASE_URL", "sqlite:///./Eventfy.db")),
+    access_token_expire_minutes=int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "60")),
+    db_host=os.getenv("DB_HOST", ""),
+    db_port=int(os.getenv("DB_PORT", "6543")),
+    db_user=os.getenv("DB_USER", "postgres"),
+    db_password=os.getenv("DB_PASSWORD", ""),
+    db_name=os.getenv("DB_NAME", "postgres"),
     smtp_host=os.getenv("SMTP_HOST", "smtp.gmail.com"),
     smtp_port=int(os.getenv("SMTP_PORT", "587")),
     smtp_user=os.getenv("SMTP_USER"),

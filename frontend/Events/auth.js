@@ -1,27 +1,31 @@
 /* ============================================================
-   auth.js  —  Shared auth state for Eventfy (index + browse)
+   auth.js  —  Shared auth state for Eventfy (Events page)
+   Uses api.js functions for actual authentication
    ============================================================ */
 'use strict';
-
-/* ── user data (replace with real API later) ── */
-const USER = { name: 'Yacine Salhi', initials: 'YS', role: 'Member' };
-
-/* ── state ── */
-let isLoggedIn = false;
 
 /* ============================================================
    PUBLIC: call after DOM ready
    ============================================================ */
 function authInit() {
+  const loggedIn = typeof isLoggedIn === 'function' ? isLoggedIn() : false;
+
   /* wire login / register buttons */
   document.querySelectorAll('.btn-do-login, .btn-drawer-login-do, .btn-nav-login-do')
-    .forEach(b => b.addEventListener('click', login));
+    .forEach(b => b.addEventListener('click', () => {
+      window.location.href = '../login/index.html';
+    }));
   document.querySelectorAll('.btn-do-register, .btn-drawer-register-do, .btn-nav-register-do')
-    .forEach(b => b.addEventListener('click', login));
+    .forEach(b => b.addEventListener('click', () => {
+      window.location.href = '../signup/index.html';
+    }));
 
   /* wire logout buttons */
   document.querySelectorAll('.btn-do-logout')
-    .forEach(b => b.addEventListener('click', logout));
+    .forEach(b => b.addEventListener('click', () => {
+      if (typeof clearToken === 'function') clearToken();
+      window.location.href = '../login/index.html';
+    }));
 
   /* wire user avatar popup toggle — desktop and mobile */
   const desktopAvatarBtn = document.getElementById('desktopAvatarBtn') ||
@@ -67,30 +71,34 @@ function authInit() {
     if (e.key === 'Escape') { closeAllUserPopups(); closeAllNotifPopups(); }
   });
 
-  renderNav();
+  renderNav(loggedIn);
 }
-
-/* ============================================================
-   AUTH ACTIONS
-   ============================================================ */
-function login()  { isLoggedIn = true;  renderNav(); }
-function logout() { isLoggedIn = false; closeAllUserPopups(); closeAllNotifPopups(); renderNav(); }
 
 /* ============================================================
    NAV RENDER
    ============================================================ */
-function renderNav() {
+function renderNav(loggedIn) {
   document.querySelectorAll('.nav-logged-out').forEach(el =>
-    el.style.display = isLoggedIn ? 'none' : '');
+    el.style.display = loggedIn ? 'none' : '');
   document.querySelectorAll('.nav-logged-in').forEach(el =>
-    el.style.display = isLoggedIn ? 'flex' : 'none');
+    el.style.display = loggedIn ? 'flex' : 'none');
   document.querySelectorAll('.drawer-logged-out').forEach(el =>
-    el.style.display = isLoggedIn ? 'none' : 'flex');
+    el.style.display = loggedIn ? 'none' : 'flex');
   document.querySelectorAll('.drawer-logged-in').forEach(el =>
-    el.style.display = isLoggedIn ? 'flex' : 'none');
-  document.querySelectorAll('.user-initials-text').forEach(el => el.textContent = USER.initials);
-  document.querySelectorAll('.user-name-text').forEach(el => el.textContent = USER.name);
-  document.querySelectorAll('.user-role-text').forEach(el => el.textContent = USER.role);
+    el.style.display = loggedIn ? 'flex' : 'none');
+
+  // Populate user data from cached profile
+  if (loggedIn && typeof getCachedUser === 'function') {
+    const user = getCachedUser();
+    if (user) {
+      const initials = user.username
+        ? user.username.substring(0, 2).toUpperCase()
+        : 'U';
+      document.querySelectorAll('.user-initials-text').forEach(el => el.textContent = initials);
+      document.querySelectorAll('.user-name-text').forEach(el => el.textContent = user.username || 'User');
+      document.querySelectorAll('.user-role-text').forEach(el => el.textContent = user.role || 'attendee');
+    }
+  }
 }
 
 /* ============================================================

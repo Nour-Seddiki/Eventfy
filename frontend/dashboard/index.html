@@ -11,9 +11,6 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700&display=swap"
     rel="stylesheet" />
-  <!-- Shared design system -->
-  <link rel="stylesheet" href="../common.css" />
-  <!-- Page-specific styles -->
   <link rel="stylesheet" href="my-dashboard.css" />
 </head>
 
@@ -24,7 +21,7 @@
      ============================================================ -->
   <header class="site-header" id="siteHeader">
     <div class="header-inner">
-      <a href="#" class="logo" aria-label="Eventfy home">
+      <a href="../Home/index.html" class="logo" aria-label="Eventfy home">
         <div class="logo-icon">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
             <rect x="3" y="4" width="18" height="18" rx="4" fill="#7c3aed" opacity=".15" />
@@ -38,35 +35,27 @@
       </a>
 
       <nav class="header-nav" aria-label="Main navigation">
-        <a href="#" class="nav-link">
+        <a href="../Home/index.html" class="nav-link">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
             <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
             <polyline points="9 22 9 12 15 12 15 22"></polyline>
           </svg>
           Home
         </a>
-        <a href="#" class="nav-link active">
+        <a href="../Events/index.html" class="nav-link">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
             <circle cx="11" cy="11" r="8"></circle>
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
           </svg>
           Browse
         </a>
-        <a href="#" class="nav-link">
+        <a href="../About/index.html" class="nav-link">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
             <circle cx="12" cy="12" r="10"></circle>
             <line x1="12" y1="16" x2="12" y2="12"></line>
             <line x1="12" y1="8" x2="12.01" y2="8"></line>
           </svg>
           About
-        </a>
-        <a href="#" class="nav-link">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-            <circle cx="12" cy="12" r="10"></circle>
-            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-            <line x1="12" y1="17" x2="12.01" y2="17"></line>
-          </svg>
-          How it Works
         </a>
         <div class="nav-loggedin">
           <div class="notif-popup-wrap">
@@ -87,9 +76,18 @@
           </div>
           <div class="user-popup-wrap">
             <button class="nav-user-avatar-btn" id="desktopAvatarBtn" aria-label="User menu">
-              <span class="user-initials-text">YS</span>
+              <span class="user-initials-text" id="navInitials">U</span>
             </button>
-            <div class="user-popup" id="userPopup"></div>
+            <div class="user-popup" id="userPopup">
+              <div class="user-popup-info">
+                <div class="user-popup-name" id="popupName">User</div>
+                <div class="user-popup-role" id="popupRole">attendee</div>
+              </div>
+              <a href="../org-profile/index.html" class="user-popup-link">Profile Settings</a>
+              <a href="../org-dashboard/index.html" class="user-popup-link">My Events</a>
+              <a href="../saved-events/index.html" class="user-popup-link">Saved Events</a>
+              <button class="user-popup-link btn-do-logout" style="color:#ef4444;">Log out</button>
+            </div>
           </div>
           <button class="btn-nav-logout btn-do-logout">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
@@ -110,20 +108,11 @@
             </svg>
             <span class="notif-dot"></span>
           </button>
-          <div class="notif-popup" id="notifPopupMob">
-            <div class="notif-popup-header">Notifications</div>
-            <div class="notif-empty">
-              <div class="notif-empty-icon">🔔</div>
-              <div class="notif-empty-title">No notifications yet</div>
-              <div class="notif-empty-desc">We'll let you know when something arrives</div>
-            </div>
-          </div>
         </div>
         <div class="user-popup-wrap">
           <button class="nav-user-avatar-btn" id="mobAvatarBtn" aria-label="User menu">
-            <span class="user-initials-text">YS</span>
+            <span class="user-initials-text" id="navInitialsMob">U</span>
           </button>
-          <div class="user-popup" id="userPopupMob"></div>
         </div>
       </div>
 
@@ -138,28 +127,28 @@
     <div class="drawer-inner">
       <button class="drawer-close-btn" id="drawerCloseBtn">✕</button>
       <div class="drawer-user-card">
-        <div class="drawer-user-avatar"><span class="drawer-avatar-text">YS</span></div>
+        <div class="drawer-user-avatar"><span class="drawer-avatar-text" id="drawerInitials">U</span></div>
         <div>
-          <div class="drawer-user-name">Yacine Salhi</div>
-          <div class="drawer-user-role">Member</div>
+          <div class="drawer-user-name" id="drawerUserName">User</div>
+          <div class="drawer-user-role" id="drawerUserRole">Member</div>
         </div>
       </div>
       <div class="drawer-nav">
-        <a href="#" class="drawer-link">
+        <a href="../Home/index.html" class="drawer-link">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
             <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
             <polyline points="9 22 9 12 15 12 15 22"></polyline>
           </svg>
           Home
         </a>
-        <a href="#" class="drawer-link active">
+        <a href="../Events/index.html" class="drawer-link">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
             <circle cx="11" cy="11" r="8"></circle>
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
           </svg>
           Browse
         </a>
-        <a href="#" class="drawer-link">
+        <a href="../About/index.html" class="drawer-link">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
             <circle cx="12" cy="12" r="10"></circle>
             <line x1="12" y1="16" x2="12" y2="12"></line>
@@ -167,29 +156,30 @@
           </svg>
           About
         </a>
-        <a href="#" class="drawer-link">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-            <circle cx="12" cy="12" r="10"></circle>
-            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-            <line x1="12" y1="17" x2="12.01" y2="17"></line>
-          </svg>
-          How it Works
-        </a>
-        <a href="../organizer-profile/index.html" class="drawer-link">
+        <a href="../org-profile/index.html" class="drawer-link">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
             <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
             <circle cx="12" cy="7" r="4" />
           </svg>
           Profile Settings
         </a>
-        <a href="../organizer-dashboard/index.html" class="drawer-link">
+        <a href="../org-dashboard/index.html" class="drawer-link">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
             <rect x="3" y="4" width="18" height="18" rx="3" />
             <path d="M16 2v4M8 2v4M3 10h18" />
           </svg>
           My Events
         </a>
-        <a href="../my-dashboard/index.html" class="drawer-link active">
+        <a href="index.html" class="drawer-link active">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <rect x="3" y="3" width="7" height="7" rx="1" />
+            <rect x="14" y="3" width="7" height="7" rx="1" />
+            <rect x="3" y="14" width="7" height="7" rx="1" />
+            <rect x="14" y="14" width="7" height="7" rx="1" />
+          </svg>
+          Dashboard
+        </a>
+        <a href="../saved-events/index.html" class="drawer-link">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
             <path
               d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" />
@@ -198,15 +188,6 @@
         </a>
       </div>
       <div class="drawer-bottom-menu">
-        <div class="drawer-notif">
-          <div class="drawer-notif-left">
-            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
-              <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0" />
-            </svg>
-            Notifications
-          </div>
-          <span class="drawer-notif-dot"></span>
-        </div>
         <button class="btn-drawer-logout btn-do-logout">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
             <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
@@ -240,7 +221,7 @@
 
       <div class="section-row">
         <h2 class="section-title">Upcoming Events</h2>
-        <span class="registered-badge" id="registeredBadge">2 Registered</span>
+        <span class="registered-badge" id="registeredBadge">0 Registered</span>
       </div>
 
       <div class="events-list" id="eventsList" aria-live="polite"></div>
@@ -253,23 +234,8 @@
     if (!isLoggedIn()) {
       window.location.href = '../login/index.html';
     }
-    const _cachedUser = getCachedUser();
-    const _initials = _cachedUser
-      ? _cachedUser.username.substring(0, 2).toUpperCase()
-      : 'U';
-    window.EVENTFY_USER = {
-      name: _cachedUser ? _cachedUser.username : 'User',
-      initials: _initials,
-      role: _cachedUser ? _cachedUser.role : 'attendee'
-    };
-    window.EVENTFY_LINKS = {
-      profile: '../organizer-profile/index.html',
-      myEvents: '../organizer-dashboard/index.html',
-      savedEvents: 'index.html'
-    };
   </script>
   <script src="my-dashboard.js"></script>
-  <script src="../shared/navbar.js"></script>
 </body>
 
 </html>
