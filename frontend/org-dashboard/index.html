@@ -208,16 +208,24 @@
     </div>
   </main>
 
+  <script src="../api.js"></script>
   <script>
-    window.EVENTFY_USER = { name: 'Yacine Salhi', initials: 'YS', role: 'Member' };
-    window.EVENTFY_LINKS = {
-      profile: '../organizer-profile/index.html',
-      myEvents: 'index.html',
-      savedEvents: '../my-dashboard/index.html'
-    };
+    // Auth guard 1: must be logged in
+    if (!isLoggedIn()) {
+      window.location.href = '../login/index.html';
+    }
+    // Auth guard 2: must be an organizer (or admin)
+    (function() {
+      const user = getCachedUser();
+      const role = (user && user.role) ? user.role.toLowerCase() : '';
+      if (role && role !== 'organizer' && role !== 'admin') {
+        // Attendee trying to access org dashboard → redirect to their profile
+        window.location.href = '../org-profile/index.html';
+      }
+      // If no cached role yet, the organizer-dashboard.js will verify after API call
+    })();
   </script>
   <script src="organizer-dashboard.js"></script>
-    <script src="../api.js"></script>
   <script src="../navbar.js"></script>
 </body>
 

@@ -34,21 +34,20 @@
    * so this function builds paths relative to the CURRENT FILE.
    */
   function relPath(target) {
-    // target is relative to /frontend/  (e.g. 'Home/index.html')
-    const loc = window.location.pathname.toLowerCase();
+    // Live Server serves from d:\Eventfy-Pro\frontend\ as root.
+    // So URL paths are like:  /saved-events/saved-events.html  (depth 1)
+    //                          /Home/index.html                 (depth 1)
+    //                          /                               (depth 0)
+    // We need to build a relative path from current dir to /target.
+    const loc = window.location.pathname;
 
-    // Detect depth: how many levels inside /frontend/?
-    // /frontend/Home/    → depth 1  → prefix = '../'
-    // /frontend/Events/  → depth 1
-    // /frontend/org-dashboard/ → depth 1
-    // /frontend/          → depth 0  → prefix = './'  (shouldn't happen)
-    const frontendIdx = loc.indexOf('/frontend/');
-    if (frontendIdx === -1) {
-      // We're at root or elsewhere – just prepend /frontend/
-      return '/frontend/' + target;
-    }
-    const afterFrontend = loc.slice(frontendIdx + '/frontend/'.length);
-    const depth = (afterFrontend.match(/\//g) || []).length;
+    // Split path into parts, filter empty
+    const parts = loc.split('/').filter(Boolean);
+
+    // Remove the filename (last part) to get the directory depth
+    // e.g. /saved-events/saved-events.html → ['saved-events', 'saved-events.html'] → depth = 1
+    const depth = parts.length > 0 ? parts.length - 1 : 0;
+
     const prefix = depth > 0 ? '../'.repeat(depth) : './';
     return prefix + target;
   }
@@ -130,9 +129,9 @@
   if (loggedIn) {
     const cached = (typeof getCachedUser === 'function') ? getCachedUser() : null;
     if (cached) {
-      const fullName = cached.user_name || cached.username || cached.name || 'User';
+      const fullName = cached.full_name || cached.user_name || cached.username || cached.name || 'User';
       const role     = cached.role ? (cached.role.charAt(0).toUpperCase() + cached.role.slice(1)) : 'Member';
-      const parts    = fullName.trim().split(/\s+/);
+      const parts    = fullName.trim().split(/[\s_]+/).filter(Boolean);
       const initials = parts.length >= 2
         ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
         : fullName.slice(0, 2).toUpperCase();
@@ -159,9 +158,11 @@
   };
 
   function buildUserPopupHTML() {
-    const isOrgPage = currentPath.includes('org-dashboard') || currentPath.includes('org-profile');
-    const isDash    = currentPath.includes('/dashboard/');
-    const isSaved   = currentPath.includes('saved-events');
+    const role     = (user.role || '').toLowerCase();
+    const isOrg    = role === 'organizer' || role === 'admin';
+    const isSaved  = currentPath.includes('saved-events');
+    const isDash   = currentPath.includes('/dashboard/');
+    const isProfile= currentPath.includes('org-profile');
 
     return `
       <div class="popup-header">
@@ -173,11 +174,10 @@
           </div>
         </div>
       </div>
-      <a href="${PATHS.profile}"      class="popup-item ${currentPath.includes('org-profile')    ? 'active' : ''}">${ic.person}   Profile Settings</a>
-      <a href="${PATHS.dashboard}"    class="popup-item ${isDash                                  ? 'active' : ''}">${ic.dash}     My Dashboard</a>
-      <a href="${PATHS.orgDash}"      class="popup-item ${currentPath.includes('org-dashboard')  ? 'active' : ''}">${ic.calendar} My Events</a>
-      <a href="${PATHS.savedEvents}"  class="popup-item ${isSaved                                 ? 'active' : ''}">${ic.heart}    Saved Events</a>
-      <a href="${PATHS.settings}"     class="popup-item">${ic.settings} Settings</a>
+      <a href="${PATHS.profile}" class="popup-item ${isProfile ? 'active' : ''}">${ic.person} My Profile</a>
+      ${isOrg ? `<a href="${PATHS.orgDash}" class="popup-item ${currentPath.includes('org-dashboard') ? 'active' : ''}">${ic.calendar} My Events</a>` : ''}
+      <a href="${PATHS.savedEvents}" class="popup-item ${isSaved ? 'active' : ''}">${ic.heart} Saved Events</a>
+      <a href="${PATHS.settings}" class="popup-item">${ic.settings} Settings</a>
       <div class="popup-sep"></div>
       <button class="popup-item danger btn-do-logout">${ic.logout} Log out</button>
     `;
@@ -187,6 +187,13 @@
     ['userPopup', 'userPopupMob'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.innerHTML = buildUserPopupHTML();
+    });
+
+    // Fix org-dashboard drawer link: only show for organizer / admin
+    const isOrg = (user.role || '').toLowerCase() === 'organizer' ||
+                  (user.role || '').toLowerCase() === 'admin';
+    document.querySelectorAll('.drawer-link-org-dashboard').forEach(el => {
+      el.style.display = isOrg ? '' : 'none';
     });
   }
 

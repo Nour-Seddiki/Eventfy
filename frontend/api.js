@@ -286,6 +286,28 @@ async function fetchNotifications() {
   return await res.json();
 }
 
+/** Fetch unread notification count */
+async function fetchUnreadCount() {
+  const res = await apiFetch('/notifications/unread-count');
+  if (!res.ok) return 0;
+  const data = await res.json();
+  return data.count || data.unread_count || 0;
+}
+
+/** Mark a single notification as read */
+async function markNotificationRead(notifId) {
+  const res = await apiFetch(`/notifications/${notifId}/read`, { method: 'PUT' });
+  if (!res.ok) throw new Error('Failed to mark notification as read');
+  return await res.json();
+}
+
+/** Mark all notifications as read */
+async function markAllNotificationsRead() {
+  const res = await apiFetch('/notifications/mark-all-as-read', { method: 'PUT' });
+  if (!res.ok) throw new Error('Failed to mark all notifications as read');
+  return await res.json();
+}
+
 /* ── Logout ──────────────────────────────── */
 
 function apiLogout() {

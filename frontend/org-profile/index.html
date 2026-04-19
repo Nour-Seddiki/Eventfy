@@ -1,29 +1,238 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Eventfy | Organizer Profile</title>
-  <meta name="description"
-    content="Organizer profile page — introduce yourself and build trust with your community on Eventfy." />
-  <!-- Shared design system -->
-  <!-- Page-specific styles -->
-  <link rel="stylesheet" href="organizer-profile.css" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Your Eventfy profile — manage your account, bio, and preferences."/>
+  <title>My Profile | Eventfy</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><rect x='3' y='4' width='18' height='18' rx='4' fill='%237f0df2' opacity='.15'/><path d='M8 2v4M16 2v4M3 10h18' stroke='%237f0df2' stroke-width='2' stroke-linecap='round'/><circle cx='8' cy='15' r='1.5' fill='%237f0df2'/><circle cx='12' cy='15' r='1.5' fill='%237f0df2'/><circle cx='16' cy='15' r='1.5' fill='%237f0df2'/></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../common.css">
-</head>
+  <link rel="stylesheet" href="../common.css"/>
+  <style>
+    /* ─── Page Layout ─── */
+    body { background: #f4f4f8; }
+    .profile-page { max-width: 860px; margin: 0 auto; padding: 36px 20px 80px; }
 
+    /* ─── Cover + Card ─── */
+    .profile-card {
+      background: #fff;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 2px 24px rgba(0,0,0,.07);
+      margin-bottom: 24px;
+    }
+    .profile-cover {
+      height: 180px;
+      background: linear-gradient(135deg, #7f0df2 0%, #a855f7 50%, #ec4899 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    .profile-cover img {
+      width: 100%; height: 100%; object-fit: cover; opacity: .35;
+    }
+
+    /* ─── Avatar ─── */
+    .profile-body { padding: 0 28px 28px; }
+    .profile-top-row {
+      display: flex; align-items: flex-end; justify-content: space-between;
+      margin-top: -52px; margin-bottom: 16px; gap: 12px; flex-wrap: wrap;
+    }
+    .profile-avatar-wrap { position: relative; flex-shrink: 0; }
+    .profile-avatar {
+      width: 100px; height: 100px; border-radius: 50%;
+      border: 4px solid #fff;
+      background: linear-gradient(135deg, #7f0df2, #a855f7);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 36px; font-weight: 800; color: #fff;
+      overflow: hidden; box-shadow: 0 4px 16px rgba(127,13,242,.25);
+    }
+    .profile-avatar img { width: 100%; height: 100%; object-fit: cover; display: none; }
+    .profile-avatar-label {
+      position: absolute; bottom: 0; right: 0;
+      width: 30px; height: 30px; border-radius: 50%;
+      background: #7f0df2; color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; border: 2px solid #fff;
+      transition: background .2s;
+    }
+    .profile-avatar-label:hover { background: #6d0ad4; }
+    .profile-avatar-label svg { width: 14px; height: 14px; }
+
+    .profile-top-actions { display: flex; gap: 10px; align-items: center; padding-bottom: 4px; }
+    .btn-edit-profile {
+      display: flex; align-items: center; gap: 7px;
+      background: #7f0df2; color: #fff;
+      border: none; border-radius: 10px;
+      padding: 9px 18px; font-size: 14px; font-weight: 600;
+      cursor: pointer; transition: background .2s, transform .15s;
+    }
+    .btn-edit-profile:hover { background: #6d0ad4; transform: translateY(-1px); }
+    .btn-edit-profile svg { width: 15px; height: 15px; }
+
+    /* Organizer-only: link to org dashboard */
+    .btn-org-dashboard {
+      display: none; /* shown via JS for organizers */
+      align-items: center; gap: 7px;
+      background: #f0e6ff; color: #7f0df2;
+      border: 1.5px solid #b57bee;
+      border-radius: 10px; padding: 8px 16px;
+      font-size: 14px; font-weight: 600;
+      cursor: pointer; text-decoration: none;
+      transition: background .2s;
+    }
+    .btn-org-dashboard:hover { background: #e0caff; }
+    .btn-org-dashboard svg { width: 15px; height: 15px; }
+
+    /* ─── Profile Info ─── */
+    .profile-name { font-size: 22px; font-weight: 800; color: #111; margin: 0 0 4px; }
+    .profile-role-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 12px; font-weight: 600; padding: 3px 10px;
+      border-radius: 99px; margin-bottom: 10px;
+    }
+    .role-attendee { background: #dcfce7; color: #16a34a; }
+    .role-organizer { background: #ede9fe; color: #7c3aed; }
+    .role-admin { background: #fee2e2; color: #dc2626; }
+    .profile-bio { font-size: 14px; color: #64748b; line-height: 1.65; margin: 0 0 18px; max-width: 600px; }
+
+    /* ─── Contact Grid ─── */
+    .contact-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 14px; margin-bottom: 0;
+    }
+    .contact-item { display: flex; align-items: center; gap: 10px; }
+    .contact-icon {
+      width: 36px; height: 36px; border-radius: 8px;
+      background: #f0e6ff; color: #7f0df2;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .contact-icon svg { width: 16px; height: 16px; }
+    .contact-label { font-size: 11px; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: .05em; }
+    .contact-value { font-size: 14px; color: #1e293b; font-weight: 500; word-break: break-all; }
+
+    /* ─── Stats ─── */
+    .stats-row {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 14px; margin-bottom: 24px;
+    }
+    .stat-card {
+      background: #fff; border-radius: 14px; padding: 20px;
+      box-shadow: 0 1px 8px rgba(0,0,0,.06); text-align: center;
+    }
+    .stat-value { font-size: 26px; font-weight: 800; color: #7f0df2; line-height: 1.1; }
+    .stat-label { font-size: 12px; color: #94a3b8; font-weight: 500; margin-top: 4px; }
+    .stat-star { color: #f59e0b; }
+
+    /* Attendee has different stats */
+    .attendee-stats .stat-value { color: #0284c7; }
+
+    /* ─── Skeleton loader ─── */
+    .skeleton {
+      animation: shimmer 1.4s ease-in-out infinite;
+      background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      border-radius: 6px;
+    }
+    @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+    /* ─── Edit Modal ─── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.45); z-index: 1000;
+      align-items: center; justify-content: center; padding: 20px;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: #fff; border-radius: 18px;
+      width: 100%; max-width: 520px;
+      max-height: 90vh; overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0,0,0,.2);
+      padding: 28px;
+    }
+    .modal-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 24px;
+    }
+    .modal-title { font-size: 18px; font-weight: 800; color: #111; }
+    .modal-close {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: #f1f5f9; border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .2s;
+    }
+    .modal-close:hover { background: #e2e8f0; }
+    .modal-close svg { width: 16px; height: 16px; }
+    .form-group { margin-bottom: 16px; }
+    .form-label { display: block; font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 6px; }
+    .form-input {
+      width: 100%; padding: 10px 14px; border: 1.5px solid #e2e8f0;
+      border-radius: 10px; font-size: 14px; font-family: inherit;
+      outline: none; transition: border-color .2s;
+      box-sizing: border-box;
+    }
+    .form-input:focus { border-color: #7f0df2; }
+    textarea.form-input { resize: vertical; min-height: 90px; }
+    .modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; }
+    .btn-cancel {
+      padding: 10px 20px; border-radius: 10px;
+      background: #f1f5f9; color: #64748b; border: none;
+      font-size: 14px; font-weight: 600; cursor: pointer;
+    }
+    .btn-save {
+      padding: 10px 22px; border-radius: 10px;
+      background: #7f0df2; color: #fff; border: none;
+      font-size: 14px; font-weight: 600; cursor: pointer;
+    }
+    .btn-save:hover { background: #6d0ad4; }
+
+    /* ─── Toast ─── */
+    .toast {
+      position: fixed; bottom: 24px; right: 24px;
+      background: #1e293b; color: #fff;
+      padding: 12px 20px; border-radius: 10px;
+      font-size: 14px; font-weight: 500; z-index: 9999;
+      transform: translateY(20px); opacity: 0;
+      transition: all .3s ease; pointer-events: none;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+
+    /* ─── Organizer banner ─── */
+    .org-banner {
+      display: none;
+      background: linear-gradient(135deg, #7f0df2, #a855f7);
+      border-radius: 14px; padding: 20px 24px;
+      color: #fff; margin-bottom: 24px;
+      align-items: center; justify-content: space-between; gap: 16px;
+      flex-wrap: wrap;
+    }
+    .org-banner-text h3 { font-size: 16px; font-weight: 700; margin: 0 0 4px; }
+    .org-banner-text p { font-size: 13px; opacity: .85; margin: 0; }
+    .btn-go-org-dash {
+      background: rgba(255,255,255,.2); color: #fff;
+      border: 1.5px solid rgba(255,255,255,.4);
+      border-radius: 10px; padding: 9px 18px;
+      font-size: 14px; font-weight: 600; cursor: pointer;
+      text-decoration: none; white-space: nowrap;
+      transition: background .2s;
+    }
+    .btn-go-org-dash:hover { background: rgba(255,255,255,.3); }
+
+    @media (max-width: 600px) {
+      .stats-row { grid-template-columns: 1fr 1fr; }
+      .stats-row .stat-card:last-child { grid-column: span 2; }
+      .contact-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
 <body>
   <!-- ═══════════════════════════════════════
        EVENTFY UNIFIED NAVBAR
   ═══════════════════════════════════════ -->
   <header class="site-header" id="siteHeader">
     <div class="header-inner">
-
-      <!-- Logo -->
       <a href="../Home/index.html" class="logo" aria-label="Eventfy home">
         <div class="logo-icon">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
@@ -37,7 +246,6 @@
         <span class="logo-text">Eventfy</span>
       </a>
 
-      <!-- Desktop Nav -->
       <nav class="header-nav" aria-label="Main navigation">
         <a href="../Home/index.html" class="nav-link">
           <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
@@ -55,14 +263,10 @@
           <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
           How it Works
         </a>
-
-        <!-- LOGGED-OUT: Login + Register -->
         <div class="nav-actions nav-logged-out" style="display:none">
           <button class="btn-login btn-do-login">Login</button>
           <button class="btn-register btn-do-register">Register</button>
         </div>
-
-        <!-- LOGGED-IN: Notif + Avatar + Logout -->
         <div class="nav-loggedin nav-logged-in" style="display:none">
           <div class="notif-popup-wrap">
             <button class="nav-notif-btn" id="desktopNotifBtn" aria-label="Notifications">
@@ -84,7 +288,6 @@
         </div>
       </nav>
 
-      <!-- Mobile: Notif + Avatar (logged in) -->
       <div class="mob-header-loggedin nav-logged-in" style="display:none">
         <div class="notif-popup-wrap">
           <button class="nav-notif-btn" id="mobNotifBtn" aria-label="Notifications">
@@ -101,7 +304,6 @@
         </div>
       </div>
 
-      <!-- Hamburger -->
       <button class="hamburger-btn" id="hamburgerBtn" aria-label="Open menu" aria-expanded="false">
         <span class="ham-line"></span>
         <span class="ham-line"></span>
@@ -110,10 +312,7 @@
     </div>
   </header>
 
-  <!-- Drawer Overlay -->
   <div class="drawer-overlay" id="drawerOverlay"></div>
-
-  <!-- Mobile Drawer -->
   <div class="nav-drawer" id="navDrawer" aria-hidden="true">
     <div class="drawer-inner">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
@@ -129,8 +328,6 @@
         </a>
         <button class="drawer-close-btn" id="drawerCloseBtn" aria-label="Close menu">✕</button>
       </div>
-
-      <!-- User card (logged in only) -->
       <div class="drawer-user-card drawer-logged-in" style="display:none">
         <div class="drawer-user-avatar"><span class="user-initials-text">U</span></div>
         <div>
@@ -138,46 +335,20 @@
           <div class="drawer-user-role user-role-text">Member</div>
         </div>
       </div>
-
       <nav class="drawer-nav">
-        <a href="../Home/index.html" class="drawer-link">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
-          Home
-        </a>
-        <a href="../Events/index.html" class="drawer-link">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
-          Browse
-        </a>
-        <a href="../About/Index.html" class="drawer-link">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path d="M12 16v-4M12 8h.01" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
-          About
-        </a>
-        <a href="../Home/index.html#how-it-works" class="drawer-link">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
-          How it Works
-        </a>
-        <!-- Logged-in links -->
-        <a href="../org-profile/index.html" class="drawer-link drawer-logged-in" style="display:none">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          Profile Settings
-        </a>
-        <a href="../dashboard/index.html" class="drawer-link drawer-logged-in" style="display:none">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-          My Dashboard
-        </a>
-        <a href="../saved-events/saved-events.html" class="drawer-link drawer-logged-in" style="display:none">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
-          Saved Events
-        </a>
+        <a href="../Home/index.html" class="drawer-link"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>Home</a>
+        <a href="../Events/index.html" class="drawer-link"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>Browse</a>
+        <a href="../About/Index.html" class="drawer-link"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path d="M12 16v-4M12 8h.01" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>About</a>
+        <a href="../Home/index.html#how-it-works" class="drawer-link"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>How it Works</a>
+        <a href="../org-profile/index.html" class="drawer-link drawer-logged-in" style="display:none"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>My Profile</a>
+        <a href="../dashboard/index.html" class="drawer-link drawer-logged-in" style="display:none"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>My Dashboard</a>
+        <a href="../saved-events/saved-events.html" class="drawer-link drawer-logged-in" style="display:none"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>Saved Events</a>
       </nav>
-
       <div class="drawer-bottom-menu">
-        <!-- Logged-out buttons -->
         <div class="drawer-logged-out" style="display:none;flex-direction:column;gap:8px">
           <button class="btn-register btn-do-register" style="width:100%;height:44px;border-radius:12px;font-size:14px">Register</button>
           <button class="btn-login btn-do-login" style="width:100%;height:44px;border-radius:12px;font-size:14px;background:#f5f0ff;border:2px solid #7f0df2;color:#7f0df2">Login</button>
         </div>
-        <!-- Logged-in logout -->
         <button class="btn-drawer-logout btn-do-logout drawer-logged-in" style="display:none">
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
           Log out
@@ -187,135 +358,358 @@
   </div>
   <!-- END NAVBAR -->
 
+  <!-- ══════════════════════════════════
+       PAGE CONTENT
+  ══════════════════════════════════ -->
   <main>
-    <div class="page-container">
-      <h1 class="page-title">Organizer Profile</h1>
-      <p class="page-subtitle">Introduce yourself to your audience and build trust with your community.</p>
+    <div class="profile-page">
+
+      <!-- Organizer-only banner (shown via JS) -->
+      <div class="org-banner" id="orgBanner">
+        <div class="org-banner-text">
+          <h3>🎪 You're an Organizer!</h3>
+          <p>Manage your events, view analytics, and create new experiences.</p>
+        </div>
+        <a href="../org-dashboard/index.html" class="btn-go-org-dash">Go to Organizer Dashboard</a>
+      </div>
 
       <!-- Profile Card -->
-      <section class="profile-card" aria-label="Organizer profile">
-        <!-- NEW: Cover Photo Area -->
+      <div class="profile-card">
         <div class="profile-cover">
-          <!-- Using Unsplash for a vibrant, event-themed cover image -->
-          <img src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1200&h=300&fit=crop"
-            alt="Cover background" />
+          <img src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1200&h=300&fit=crop" alt="Cover"/>
         </div>
-
-        <!-- NEW: Wrapper for layout -->
-        <div class="profile-content">
-          <div class="profile-avatar-col">
+        <div class="profile-body">
+          <div class="profile-top-row">
             <div class="profile-avatar-wrap">
-              <img class="profile-avatar"
-                src="https://images.unsplash.com/photo-1517849845537-4d257902454a?w=320&h=320&fit=crop&crop=face"
-                alt="Yacine Salhi profile photo"
-                onerror="this.style.background='#ede9fe';this.removeAttribute('src')" />
+              <div class="profile-avatar" id="profileAvatar">
+                <span id="profileAvatarInitials">U</span>
+                <img id="profileAvatarImg" alt="Profile photo"/>
+              </div>
+              <label class="profile-avatar-label" for="photoInput" title="Change photo">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/><circle cx="12" cy="13" r="4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+              </label>
+              <input type="file" id="photoInput" accept="image/*" style="display:none"/>
             </div>
-            <label class="btn-change-photo" for="photoInput" role="button" tabindex="0">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" />
-                <circle cx="12" cy="13" r="4" />
-              </svg>
-              Change Photo
-            </label>
-            <input type="file" id="photoInput" accept="image/*" style="display:none" />
-          </div>
-
-          <div class="profile-details-col">
-            <h2 class="profile-name">Yacine Salhi</h2>
-            <p class="profile-bio">
-              Professional event organizer specializing in tech conferences and networking summits.
-              Dedicated to creating seamless experiences that foster innovation and meaningful connections
-              within the tech ecosystem.
-            </p>
-
-            <div class="contact-grid">
-              <div class="contact-item">
-                <div class="contact-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
-                    <polyline points="22,6 12,13 2,6" />
-                  </svg>
-                </div>
-                <div>
-                  <div class="contact-label">Email</div>
-                  <div class="contact-value">example@gmail.com</div>
-                </div>
-              </div>
-              <div class="contact-item">
-                <div class="contact-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path
-                      d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.64 8.68a19.79 19.79 0 01-3.07-8.63A2 2 0 012.45 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.91a16 16 0 006 6l1.27-.77a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0121 15.28v1.64z" />
-                  </svg>
-                </div>
-                <div>
-                  <div class="contact-label">Phone</div>
-                  <div class="contact-value">0555555555</div>
-                </div>
-              </div>
-              <div class="contact-item">
-                <div class="contact-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10" />
-                    <line x1="2" y1="12" x2="22" y2="12" />
-                    <path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" />
-                  </svg>
-                </div>
-                <div>
-                  <div class="contact-label">Socials</div>
-                  <div class="contact-value">www.example.com</div>
-                </div>
-              </div>
-              <div class="contact-item">
-                <div class="contact-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
-                    <circle cx="12" cy="10" r="3" />
-                  </svg>
-                </div>
-                <div>
-                  <div class="contact-label">Location</div>
-                  <div class="contact-value">USTHB, Alger</div>
-                </div>
-              </div>
-            </div>
-
-            <div style="display:flex; justify-content:flex-end;">
+            <div class="profile-top-actions">
               <button class="btn-edit-profile" id="editProfileBtn">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
-                  <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
-                </svg>
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
                 Edit Profile
               </button>
             </div>
           </div>
-        </div>
-      </section>
 
-      <!-- Stats Row -->
-      <div class="stats-row" aria-label="Organizer statistics">
-        <div class="stat-card">
-          <div class="stat-label">Total Events</div>
-          <div class="stat-value">24</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Attendees Reached</div>
-          <div class="stat-value">12.5k</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Average Rating</div>
-          <div class="stat-value">4.9 <span class="stat-star">★</span></div>
+          <!-- Name, role badge, bio -->
+          <h1 class="profile-name" id="profileName">Loading…</h1>
+          <div class="profile-role-badge role-attendee" id="profileRoleBadge">Member</div>
+          <p class="profile-bio" id="profileBio">No bio yet.</p>
+
+          <!-- Contact grid -->
+          <div class="contact-grid">
+            <div class="contact-item">
+              <div class="contact-icon">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke-width="2"/><polyline points="22,6 12,13 2,6" stroke-width="2"/></svg>
+              </div>
+              <div>
+                <div class="contact-label">Email</div>
+                <div class="contact-value" id="profileEmail">—</div>
+              </div>
+            </div>
+            <div class="contact-item">
+              <div class="contact-icon">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.64 8.68a19.79 19.79 0 01-3.07-8.63A2 2 0 012.45 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.91a16 16 0 006 6l1.27-.77a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0121 15.28v1.64z" stroke-width="2"/></svg>
+              </div>
+              <div>
+                <div class="contact-label">Phone</div>
+                <div class="contact-value" id="profilePhone">—</div>
+              </div>
+            </div>
+            <div class="contact-item">
+              <div class="contact-icon">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><line x1="2" y1="12" x2="22" y2="12" stroke-width="2"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" stroke-width="2"/></svg>
+              </div>
+              <div>
+                <div class="contact-label">Website</div>
+                <div class="contact-value" id="profileWebsite">—</div>
+              </div>
+            </div>
+            <div class="contact-item">
+              <div class="contact-icon" style="background:#e0f2fe;color:#0284c7;">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="3" stroke-width="2"/><path d="M16 2v4M8 2v4M3 10h18" stroke-width="2"/></svg>
+              </div>
+              <div>
+                <div class="contact-label">Member Since</div>
+                <div class="contact-value" id="profileJoined">—</div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
+
+      <!-- Stats row (adapts by role) -->
+      <div class="stats-row" id="statsRow">
+        <div class="stat-card">
+          <div class="stat-value" id="stat1Value">—</div>
+          <div class="stat-label" id="stat1Label">Events Attended</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat2Value">—</div>
+          <div class="stat-label" id="stat2Label">Saved Events</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat3Value">—</div>
+          <div class="stat-label" id="stat3Label">Member Since</div>
+        </div>
+      </div>
+
     </div>
   </main>
 
-  <footer class="site-footer">© 2026 Eventfy.</footer>
+  <!-- ── Edit Profile Modal ── -->
+  <div class="modal-overlay" id="editModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title">Edit Profile</h2>
+        <button class="modal-close" id="modalCloseBtn">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+        </button>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Full Name</label>
+        <input class="form-input" type="text" id="editName" placeholder="Your full name"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Bio</label>
+        <textarea class="form-input" id="editBio" placeholder="Tell the community about yourself…"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Phone</label>
+        <input class="form-input" type="tel" id="editPhone" placeholder="e.g. 0555 123 456"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Website / Social Link</label>
+        <input class="form-input" type="url" id="editWebsite" placeholder="https://yoursite.com"/>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" id="cancelEditBtn">Cancel</button>
+        <button class="btn-save" id="saveProfileBtn">Save Changes</button>
+      </div>
+    </div>
+  </div>
 
-  <script src="organizer-profile.js"></script>
-    <script src="../api.js"></script>
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <footer class="site-footer" style="text-align:center;padding:24px;color:#94a3b8;font-size:13px;">
+    © 2026 Eventfy. All rights reserved.
+  </footer>
+
+  <script src="../api.js"></script>
+  <script>
+    // Auth guard — all logged-in users may access this page
+    if (!isLoggedIn()) {
+      window.location.href = '../login/index.html';
+    }
+  </script>
+  <script>
+  (function() {
+    'use strict';
+
+    /* ── State ── */
+    let userData = null;
+
+    /* ── Helpers ── */
+    function formatDate(iso) {
+      if (!iso) return '—';
+      return new Date(iso).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    }
+    function showToast(msg, ok = true) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.style.background = ok ? '#1e293b' : '#dc2626';
+      t.classList.add('show');
+      clearTimeout(t._timer);
+      t._timer = setTimeout(() => t.classList.remove('show'), 3200);
+    }
+
+    /* ── Render profile from user object ── */
+    function renderProfile(u) {
+      userData = u;
+      const name = u.full_name || u.username || 'User';
+      const initials = name.replace(/[^a-zA-Z\u00C0-\u017E _]/g, '')
+                           .split(/[\s_]+/).filter(Boolean)
+                           .map(w => w[0]).join('').slice(0,2).toUpperCase() || 'U';
+      const role = (u.role || 'attendee').toLowerCase();
+
+      // Avatar
+      document.getElementById('profileAvatarInitials').textContent = initials;
+
+      // Name + role badge
+      document.getElementById('profileName').textContent = name;
+      const badge = document.getElementById('profileRoleBadge');
+      const roleLabels = { attendee: 'Attendee', organizer: 'Organizer', admin: 'Admin' };
+      badge.textContent = roleLabels[role] || role;
+      badge.className = 'profile-role-badge role-' + role;
+
+      // Bio
+      document.getElementById('profileBio').textContent = u.bio || 'No bio yet. Click "Edit Profile" to add one!';
+
+      // Contact fields
+      document.getElementById('profileEmail').textContent = u.email || '—';
+      document.getElementById('profilePhone').textContent = u.phone || '—';
+      document.getElementById('profileWebsite').textContent = u.website || u.socials || '—';
+      document.getElementById('profileJoined').textContent = formatDate(u.created_at);
+
+      // Organizer banner
+      if (role === 'organizer' || role === 'admin') {
+        document.getElementById('orgBanner').style.display = 'flex';
+      }
+
+      // Pre-fill edit form
+      document.getElementById('editName').value = name;
+      document.getElementById('editBio').value = u.bio || '';
+      document.getElementById('editPhone').value = u.phone || '';
+      document.getElementById('editWebsite').value = u.website || u.socials || '';
+    }
+
+    /* ── Load stats (tickets + saved) ── */
+    async function loadStats(role) {
+      try {
+        const activity = await fetchMyActivity();
+        const tickets = (activity.tickets || []).length;
+        const organized = (activity.organized_events || []).length;
+        const joinYear = userData ? new Date(userData.created_at).getFullYear() : '—';
+
+        if (role === 'organizer') {
+          document.getElementById('stat1Value').textContent = organized;
+          document.getElementById('stat1Label').textContent = 'Events Organized';
+          document.getElementById('stat2Value').textContent = tickets;
+          document.getElementById('stat2Label').textContent = 'Events Attended';
+          document.getElementById('stat3Value').textContent = joinYear;
+          document.getElementById('stat3Label').textContent = 'Year Joined';
+        } else {
+          document.getElementById('stat1Value').textContent = tickets;
+          document.getElementById('stat1Label').textContent = 'Events Attended';
+          document.getElementById('stat3Value').textContent = joinYear;
+          document.getElementById('stat3Label').textContent = 'Year Joined';
+          // Saved events count
+          try {
+            const saved = await fetchSavedEvents();
+            const count = Array.isArray(saved) ? saved.length
+              : (saved.saved_events || saved.items || []).length;
+            document.getElementById('stat2Value').textContent = count;
+          } catch { document.getElementById('stat2Value').textContent = '0'; }
+          document.getElementById('stat2Label').textContent = 'Saved Events';
+        }
+      } catch(e) {
+        document.getElementById('stat1Value').textContent = '—';
+        document.getElementById('stat2Value').textContent = '—';
+        document.getElementById('stat3Value').textContent = '—';
+      }
+    }
+
+    /* ── Load profile from API ── */
+    async function loadProfile() {
+      // Use cached first for instant render
+      const cached = getCachedUser();
+      if (cached) renderProfile(cached);
+
+      try {
+        const fresh = await fetchMyProfile();
+        setCachedUser(fresh);
+        renderProfile(fresh);
+        loadStats((fresh.role || 'attendee').toLowerCase());
+      } catch(e) {
+        if (!cached) showToast('Could not load profile data', false);
+        else loadStats((cached.role || 'attendee').toLowerCase());
+      }
+    }
+
+    /* ── Edit modal ── */
+    function openModal() {
+      document.getElementById('editModal').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeModal() {
+      document.getElementById('editModal').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    document.getElementById('editProfileBtn').addEventListener('click', openModal);
+    document.getElementById('modalCloseBtn').addEventListener('click', closeModal);
+    document.getElementById('cancelEditBtn').addEventListener('click', closeModal);
+    document.getElementById('editModal').addEventListener('click', e => {
+      if (e.target === document.getElementById('editModal')) closeModal();
+    });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeModal();
+    });
+
+    document.getElementById('saveProfileBtn').addEventListener('click', async () => {
+      const btn = document.getElementById('saveProfileBtn');
+      btn.textContent = 'Saving…';
+      btn.disabled = true;
+
+      const updates = {
+        full_name: document.getElementById('editName').value.trim() || undefined,
+        bio: document.getElementById('editBio').value.trim() || undefined,
+        phone: document.getElementById('editPhone').value.trim() || undefined,
+        website: document.getElementById('editWebsite').value.trim() || undefined,
+      };
+      // Remove undefined keys
+      Object.keys(updates).forEach(k => updates[k] === undefined && delete updates[k]);
+
+      try {
+        // Try to call update endpoint
+        let updated = null;
+        if (typeof apiFetch === 'function') {
+          const res = await apiFetch('/users/update_me', {
+            method: 'PUT',
+            body: JSON.stringify(updates)
+          });
+          if (res.ok) {
+            updated = await res.json();
+          } else {
+            throw new Error('Save failed');
+          }
+        }
+
+        // Update local display even if API fails (optimistic)
+        const merged = { ...(userData || {}), ...updates };
+        if (updated) setCachedUser(updated);
+        else setCachedUser(merged);
+        renderProfile(updated || merged);
+        closeModal();
+        showToast('Profile updated successfully ✓');
+      } catch(e) {
+        // Still update display locally
+        const merged = { ...(userData || {}), ...updates };
+        renderProfile(merged);
+        closeModal();
+        showToast('Changes saved locally (server sync failed)');
+      } finally {
+        btn.textContent = 'Save Changes';
+        btn.disabled = false;
+      }
+    });
+
+    /* ── Photo upload (local preview) ── */
+    document.getElementById('photoInput').addEventListener('change', e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = evt => {
+        const img = document.getElementById('profileAvatarImg');
+        img.src = evt.target.result;
+        img.style.display = 'block';
+        document.getElementById('profileAvatarInitials').style.display = 'none';
+      };
+      reader.readAsDataURL(file);
+    });
+
+    /* ── Start ── */
+    loadProfile();
+  })();
+  </script>
   <script src="../navbar.js"></script>
 </body>
-
 </html>
