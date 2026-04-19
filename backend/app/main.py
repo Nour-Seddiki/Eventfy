@@ -5,7 +5,7 @@ from app.db.base import Base
 import app.models
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
-from app.routes import auth, tickets, events, users, recommendations, admin, review, notifications, saving_events, payments
+from app.routes import auth, tickets, events, users, recommendations, admin, review, notifications, saving_events, payments, active_sessions
 
 load_dotenv(dotenv_path=Path(__file__).resolve().parents[1] / ".env")
 
@@ -29,3 +29,4 @@ app.include_router(review.router)
 app.include_router(notifications.router)
 app.include_router(saving_events.router)
 app.include_router(payments.router)
+app.include_router(active_sessions.router)

@@ -27,8 +27,10 @@ def hashing_password(password):
 def verifying_password(password,NewPassword):
     return bcrypt_context.verify(password,NewPassword)
 
-def create_access_token(username:str,user_id:int , user_role:str ,expired_delta:timedelta):
+def create_access_token(username:str,user_id:int , user_role:str ,expired_delta:timedelta, jti:str = None):
     encode = {'sub':username , 'user_id':user_id , 'user_role':user_role}
+    if jti:
+        encode['jti'] = jti
     expires =  datetime.now(timezone.utc)  + expired_delta
     encode.update({'exp':expires})
     return jwt.encode(encode ,SECRET_KEY , algorithm=ALGORITHM)
@@ -138,7 +140,12 @@ async def get_current_user(token:Annotated[str,Depends(oauth2_bearer)], db: db_d
        user = db.query(User).filter(User.id == user_id).first()
        if user is None or user.is_deleted:
            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='could not validate user')
-       return {'username': user.username, 'user_id': user.id, 'user_role': user.role}
+       jti = payload.get('jti')
+       if jti:
+           from app.services.active_session_service import is_session_active
+           if not is_session_active(jti, db):
+               raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Session has been revoked')
+       return {'username': user.username, 'user_id': user.id, 'user_role': user.role, 'jti': jti}
     except JWTError:
       raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
     

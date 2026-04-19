@@ -1,6 +1,6 @@
 from datetime import timedelta
 from typing import Annotated
-from fastapi import APIRouter, Depends,HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.security import OAuth2PasswordRequestForm 
 from app.db.session import db_dependency 
 from starlette import status 
@@ -12,6 +12,7 @@ from app.services.auth_service import (
     create_user,
     user_dependency,
 )
+from app.services.active_session_service import create_session
 from app.schemas.user import CreateUser, GoogleTokenRequest, Token, update_password
 from app.services.user_service import userServices
 
@@ -26,27 +27,31 @@ async def sign_up(user:CreateUser,db:db_dependency):
 
 
 @router.post("/token",response_model=Token)
-async def login_access(form_data:Annotated[OAuth2PasswordRequestForm,Depends()],db:db_dependency):
+async def login_access(form_data:Annotated[OAuth2PasswordRequestForm,Depends()],db:db_dependency, request: Request):
     user = Authentication_user(form_data.username,form_data.password,db)
     if not user:
         raise HTTPException(status_code=401 , detail='Authentication failed')
+    jti = create_session(user.id, request, db)
     token = create_access_token(
         user.username,
         user.id,
         user.role,
         timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
+        jti=jti,
     )
     return {'access_token': token , 'token_type':'bearer'}
 
 
 @router.post("/google", response_model=Token)
-async def login_with_google(payload: GoogleTokenRequest, db: db_dependency):
+async def login_with_google(payload: GoogleTokenRequest, db: db_dependency, request: Request):
     user = authenticate_google_user(payload.id_token, db)
+    jti = create_session(user.id, request, db)
     token = create_access_token(
         user.username,
         user.id,
         user.role,
         timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
+        jti=jti,
     )
     return {"access_token": token, "token_type": "bearer"}
 
