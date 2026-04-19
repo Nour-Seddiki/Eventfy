@@ -1,30 +1,24 @@
-<!DOCTYPE html>
-<html lang="en">
+#!/usr/bin/env python3
+"""
+update_navbars.py
+Injects the canonical Eventfy navbar into all frontend HTML pages.
+Run from the project root:  python update_navbars.py
+"""
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Eventfy | Organizer Profile</title>
-  <meta name="description"
-    content="Organizer profile page — introduce yourself and build trust with your community on Eventfy." />
-  <!-- Shared design system -->
-  <!-- Page-specific styles -->
-  <link rel="stylesheet" href="organizer-profile.css" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../common.css">
-</head>
+import os, re, pathlib
 
-<body>
-  <!-- ═══════════════════════════════════════
+ROOT = pathlib.Path(__file__).parent / "frontend"
+
+# ── Canonical navbar HTML (uses {HOME} {BROWSE} {ABOUT} {HOWITWORKS} placeholders
+#    for active class, and {LOGO_HREF} {COMMON_CSS} {NAVBAR_JS} {API_JS} for paths)
+NAVBAR_TEMPLATE = """  <!-- ═══════════════════════════════════════
        EVENTFY UNIFIED NAVBAR
   ═══════════════════════════════════════ -->
   <header class="site-header" id="siteHeader">
     <div class="header-inner">
 
       <!-- Logo -->
-      <a href="../Home/index.html" class="logo" aria-label="Eventfy home">
+      <a href="{rel}Home/index.html" class="logo" aria-label="Eventfy home">
         <div class="logo-icon">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
             <rect x="3" y="4" width="18" height="18" rx="4" fill="#7f0df2" opacity="0.15"/>
@@ -39,19 +33,19 @@
 
       <!-- Desktop Nav -->
       <nav class="header-nav" aria-label="Main navigation">
-        <a href="../Home/index.html" class="nav-link">
+        <a href="{rel}Home/index.html" class="nav-link{home_active}">
           <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
           Home
         </a>
-        <a href="../Events/index.html" class="nav-link">
+        <a href="{rel}Events/index.html" class="nav-link{browse_active}">
           <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
           Browse
         </a>
-        <a href="../About/Index.html" class="nav-link">
+        <a href="{rel}About/Index.html" class="nav-link{about_active}">
           <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path d="M12 16v-4M12 8h.01" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
           About
         </a>
-        <a href="../Home/index.html#how-it-works" class="nav-link">
+        <a href="{rel}Home/index.html#how-it-works" class="nav-link">
           <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
           How it Works
         </a>
@@ -117,7 +111,7 @@
   <div class="nav-drawer" id="navDrawer" aria-hidden="true">
     <div class="drawer-inner">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-        <a href="../Home/index.html" class="logo">
+        <a href="{rel}Home/index.html" class="logo">
           <div class="logo-icon">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
               <rect x="3" y="4" width="18" height="18" rx="4" fill="#7f0df2" opacity="0.15"/>
@@ -140,32 +134,32 @@
       </div>
 
       <nav class="drawer-nav">
-        <a href="../Home/index.html" class="drawer-link">
+        <a href="{rel}Home/index.html" class="drawer-link{home_active}">
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
           Home
         </a>
-        <a href="../Events/index.html" class="drawer-link">
+        <a href="{rel}Events/index.html" class="drawer-link{browse_active}">
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
           Browse
         </a>
-        <a href="../About/Index.html" class="drawer-link">
+        <a href="{rel}About/Index.html" class="drawer-link{about_active}">
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path d="M12 16v-4M12 8h.01" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
           About
         </a>
-        <a href="../Home/index.html#how-it-works" class="drawer-link">
+        <a href="{rel}Home/index.html#how-it-works" class="drawer-link">
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
           How it Works
         </a>
         <!-- Logged-in links -->
-        <a href="../org-profile/index.html" class="drawer-link drawer-logged-in" style="display:none">
+        <a href="{rel}org-profile/index.html" class="drawer-link drawer-logged-in" style="display:none">
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
           Profile Settings
         </a>
-        <a href="../dashboard/index.html" class="drawer-link drawer-logged-in" style="display:none">
+        <a href="{rel}dashboard/index.html" class="drawer-link drawer-logged-in" style="display:none">
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
           My Dashboard
         </a>
-        <a href="../saved-events/saved-events.html" class="drawer-link drawer-logged-in" style="display:none">
+        <a href="{rel}saved-events/saved-events.html" class="drawer-link drawer-logged-in" style="display:none">
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
           Saved Events
         </a>
@@ -185,137 +179,125 @@
       </div>
     </div>
   </div>
-  <!-- END NAVBAR -->
+  <!-- END NAVBAR -->"""
 
-  <main>
-    <div class="page-container">
-      <h1 class="page-title">Organizer Profile</h1>
-      <p class="page-subtitle">Introduce yourself to your audience and build trust with your community.</p>
+# CSS link block for <head>
+HEAD_LINKS = """  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{common_css}">"""
 
-      <!-- Profile Card -->
-      <section class="profile-card" aria-label="Organizer profile">
-        <!-- NEW: Cover Photo Area -->
-        <div class="profile-cover">
-          <!-- Using Unsplash for a vibrant, event-themed cover image -->
-          <img src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1200&h=300&fit=crop"
-            alt="Cover background" />
-        </div>
+# Scripts block
+SCRIPTS_BLOCK = """  <script src="{api_js}"></script>
+  <script src="{navbar_js}"></script>"""
 
-        <!-- NEW: Wrapper for layout -->
-        <div class="profile-content">
-          <div class="profile-avatar-col">
-            <div class="profile-avatar-wrap">
-              <img class="profile-avatar"
-                src="https://images.unsplash.com/photo-1517849845537-4d257902454a?w=320&h=320&fit=crop&crop=face"
-                alt="Yacine Salhi profile photo"
-                onerror="this.style.background='#ede9fe';this.removeAttribute('src')" />
-            </div>
-            <label class="btn-change-photo" for="photoInput" role="button" tabindex="0">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" />
-                <circle cx="12" cy="13" r="4" />
-              </svg>
-              Change Photo
-            </label>
-            <input type="file" id="photoInput" accept="image/*" style="display:none" />
-          </div>
+# Pages and their config
+PAGES = {
+    # (folder, filename, active_page)
+    # active_page: 'home', 'browse', 'about', or None
+    "Home/index.html":            "home",
+    "Events/index.html":          "browse",
+    "About/Index.html":           "about",
+    "dashboard/index.html":       None,
+    "saved-events/saved-events.html": None,
+    "setting/index.html":         None,
+    "new Event/index.html":       None,
+    "org-profile/index.html":     None,
+    "org-dashboard/index.html":   None,
+    "map/browse.html":            "browse",
+    "event Description/event-detail.html": "browse",
+}
 
-          <div class="profile-details-col">
-            <h2 class="profile-name">Yacine Salhi</h2>
-            <p class="profile-bio">
-              Professional event organizer specializing in tech conferences and networking summits.
-              Dedicated to creating seamless experiences that foster innovation and meaningful connections
-              within the tech ecosystem.
-            </p>
+def get_rel(filepath):
+    """Get relative prefix from file to frontend/ root, e.g. '../' or '../../'"""
+    parts = pathlib.Path(filepath).parts
+    # Count directory levels below ROOT
+    depth = len(parts) - 1   # -1 for the filename itself
+    return "../" * depth if depth > 0 else "./"
 
-            <div class="contact-grid">
-              <div class="contact-item">
-                <div class="contact-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
-                    <polyline points="22,6 12,13 2,6" />
-                  </svg>
-                </div>
-                <div>
-                  <div class="contact-label">Email</div>
-                  <div class="contact-value">example@gmail.com</div>
-                </div>
-              </div>
-              <div class="contact-item">
-                <div class="contact-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path
-                      d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.64 8.68a19.79 19.79 0 01-3.07-8.63A2 2 0 012.45 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.91a16 16 0 006 6l1.27-.77a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0121 15.28v1.64z" />
-                  </svg>
-                </div>
-                <div>
-                  <div class="contact-label">Phone</div>
-                  <div class="contact-value">0555555555</div>
-                </div>
-              </div>
-              <div class="contact-item">
-                <div class="contact-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10" />
-                    <line x1="2" y1="12" x2="22" y2="12" />
-                    <path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" />
-                  </svg>
-                </div>
-                <div>
-                  <div class="contact-label">Socials</div>
-                  <div class="contact-value">www.example.com</div>
-                </div>
-              </div>
-              <div class="contact-item">
-                <div class="contact-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
-                    <circle cx="12" cy="10" r="3" />
-                  </svg>
-                </div>
-                <div>
-                  <div class="contact-label">Location</div>
-                  <div class="contact-value">USTHB, Alger</div>
-                </div>
-              </div>
-            </div>
+def make_navbar(rel, active):
+    home   = " active" if active == "home"   else ""
+    browse = " active" if active == "browse" else ""
+    about  = " active" if active == "about"  else ""
+    return NAVBAR_TEMPLATE.format(
+        rel=rel, home_active=home, browse_active=browse, about_active=about
+    )
 
-            <div style="display:flex; justify-content:flex-end;">
-              <button class="btn-edit-profile" id="editProfileBtn">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
-                  <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
-                </svg>
-                Edit Profile
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
+def process_file(rel_path, active):
+    filepath = ROOT / rel_path
+    if not filepath.exists():
+        print(f"  SKIP (not found): {rel_path}")
+        return
 
-      <!-- Stats Row -->
-      <div class="stats-row" aria-label="Organizer statistics">
-        <div class="stat-card">
-          <div class="stat-label">Total Events</div>
-          <div class="stat-value">24</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Attendees Reached</div>
-          <div class="stat-value">12.5k</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Average Rating</div>
-          <div class="stat-value">4.9 <span class="stat-star">★</span></div>
-        </div>
-      </div>
-    </div>
-  </main>
+    content = filepath.read_text(encoding="utf-8", errors="replace")
+    
+    # Compute relative prefix
+    depth = len(pathlib.Path(rel_path).parts) - 1
+    rel = "../" * depth if depth > 0 else "./"
 
-  <footer class="site-footer">© 2026 Eventfy.</footer>
+    # -- 1. Fix <head> CSS links
+    common_css = f"{rel}common.css"
+    api_js     = f"{rel}api.js"
+    navbar_js  = f"{rel}navbar.js"
 
-  <script src="organizer-profile.js"></script>
-    <script src="../api.js"></script>
-  <script src="../navbar.js"></script>
-</body>
+    # Remove old common.css / navbar.css link if present
+    content = re.sub(r'<link[^>]+common\.css[^>]*>\s*', '', content)
+    content = re.sub(r'<link[^>]+navbar\.css[^>]*>\s*', '', content)
+    # Remove old Google Font links if present
+    content = re.sub(r'<link[^>]+fonts\.googleapis[^>]*>\s*', '', content)
+    content = re.sub(r'<link[^>]+fonts\.gstatic[^>]*>\s*', '', content)
 
-</html>
+    # Ensure head ends with our links (before </head>)
+    head_block = HEAD_LINKS.format(common_css=common_css)
+    if common_css not in content:
+        content = content.replace("</head>", f"{head_block}\n</head>")
+
+    # -- 2. Replace entire existing navbar block
+    # Pattern: from <header class="site-header" to <!-- END NAVBAR -->
+    # Also handle drawer overlay and drawer div as part of bloc
+    nav_block = make_navbar(rel, active)
+
+    # Try to replace between start marker and END NAVBAR
+    replaced = False
+    pattern = r'<!-- [═=]+\s+(?:UNIFIED|EVENTFY)\s+NAVBAR.*?-->.*?<!-- END NAVBAR -->'
+    m = re.search(pattern, content, re.DOTALL | re.IGNORECASE)
+    if m:
+        content = content[:m.start()] + nav_block + content[m.end():]
+        replaced = True
+
+    # Fallback: replace from <header class="site-header" to <!-- END NAVBAR -->
+    if not replaced:
+        pattern2 = r'<header class="site-header".*?<!-- END NAVBAR -->'
+        m2 = re.search(pattern2, content, re.DOTALL)
+        if m2:
+            content = content[:m2.start()] + nav_block + content[m2.end():]
+            replaced = True
+
+    if not replaced:
+        # Insert navbar right after <body>
+        content = content.replace('<body>', f'<body>\n{nav_block}', 1)
+        print(f"  INSERTED (no existing navbar): {rel_path}")
+
+    # -- 3. Fix script paths
+    # Remove old api.js/navbar.js script tags
+    content = re.sub(r'<script[^>]+api\.js[^>]*>\s*</script>\s*', '', content)
+    content = re.sub(r'<script[^>]+navbar\.js[^>]*>\s*</script>\s*', '', content)
+    # Add before first inline script or </body>
+    scripts = SCRIPTS_BLOCK.format(api_js=api_js, navbar_js=navbar_js)
+    if '</body>' in content:
+        content = content.replace('</body>', f'{scripts}\n</body>', 1)
+    
+    filepath.write_text(content, encoding="utf-8")
+    print(f"  OK: {rel_path}")
+
+print("Updating navbars...")
+for rel_path, active in PAGES.items():
+    process_file(rel_path, active)
+
+# Also sync frontend/common.css and frontend/navbar.js from root
+import shutil
+root = pathlib.Path(__file__).parent
+shutil.copy(root / "common.css",  root / "frontend" / "common.css")
+shutil.copy(root / "navbar.js",   root / "frontend" / "navbar.js")
+print("\nSynced common.css + navbar.js → frontend/")
+print("Done!")
