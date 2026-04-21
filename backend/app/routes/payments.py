@@ -12,10 +12,15 @@ router = APIRouter(prefix="/payment", tags=["payment"])
 async def create_checkout(
     user: user_dependency,
     db: db_dependency,
+    background_tasks: BackgroundTasks,
     event_id: int = Path(gt=0),
     payment_method: PaymentMethodEnum = Query(default=PaymentMethodEnum.edahabia),
 ):
-    """Create a Chargily checkout for a paid event (EDAHABIA or CIB)."""
+    """
+    Book a ticket for an event.
+    - Free event  → ticket issued immediately.
+    - Paid event  → returns a Chargily checkout URL; ticket issued after payment confirmation.
+    """
     return PaymentService.create_checkout_session(user, db, event_id, payment_method.value)
 
 

@@ -27,8 +27,59 @@ def _ticket_to_dict(ticket: Ticket) -> dict:
 
 
 class TickectService:
-    
-   def purchase_ticket(self, user, db, event_id ,background_tasks: BackgroundTasks):
+
+   def purchase_ticket(self, user, db, event_id, background_tasks: BackgroundTasks, payment_method: str = "edahabia"):
+       """Smart entry point: redirects to payment checkout for paid events, or creates ticket directly for free events."""
+       if user is None:
+           raise HTTPException(status_code=401, detail="Authentication failed")
+
+       user_model = db.query(User).filter(User.id == user.get("user_id")).first()
+       if user_model is None:
+           raise HTTPException(status_code=401, detail="Authentication failed")
+
+       event_model = db.query(Event).filter(Event.id == event_id).first()
+       if event_model is None:
+           raise HTTPException(status_code=404, detail="Event not found")
+
+       # Validate event date
+       current_time = datetime.now(timezone.utc)
+       if event_model.date is None:
+           raise HTTPException(status_code=400, detail="Event date is missing")
+       event_time = event_model.date
+       if event_time.tzinfo is None:
+           event_time = event_time.replace(tzinfo=timezone.utc)
+       if event_time < current_time:
+           raise HTTPException(status_code=400, detail="The event time is over")
+
+       # Check ticket availability
+       if event_model.available_tickets <= 0:
+           raise HTTPException(status_code=400, detail="The event tickets have been sold out")
+
+       # Prevent duplicate purchase
+       existing_ticket = db.query(Ticket).filter(
+           and_(
+               Ticket.user_id == user_model.id,
+               Ticket.event_id == event_id,
+               Ticket.status == TicketStatus.active,
+           )
+       ).first()
+       if existing_ticket:
+           raise HTTPException(
+               status_code=status.HTTP_409_CONFLICT,
+               detail="User has already purchased a ticket for this event.",
+           )
+
+       # Route: paid event → payment checkout, free event → create ticket directly
+       if event_model.price is not None and event_model.price > 0:
+           from app.services.payment_service import PaymentService
+           return {
+               **PaymentService.create_checkout_session(user, db, event_id, payment_method),
+               "message": "Complete payment to receive your ticket.",
+           }
+
+       return self.create_ticket_after_payment(user, db, event_id, background_tasks)
+
+   def create_ticket_after_payment(self, user, db, event_id, background_tasks: BackgroundTasks):
 
     #  Authenticate user
     if user is None:

@@ -1,6 +1,7 @@
 import json
 import hmac
 import hashlib
+import uuid
 from chargily_pay import ChargilyClient
 from chargily_pay.entity import Checkout
 from fastapi import HTTPException, BackgroundTasks
@@ -53,8 +54,14 @@ class PaymentService:
         if event.available_tickets <= 0:
             raise HTTPException(status_code=400, detail="Sold out")
 
-        if not event.price or event.price <= 0:
-            raise HTTPException(status_code=400, detail="This is a free event. Use /ticket/purchase_ticket instead")
+        # Free event → create ticket directly, no payment needed
+        if event.price is None or event.price <= 0:
+            from app.services.ticket_service import TickectService
+            from fastapi import BackgroundTasks as _BG
+            bg = _BG()
+            return TickectService().create_ticket_after_payment(
+                user, db, event_id, bg
+            )
 
         # Create Chargily Checkout
         try:
@@ -120,10 +127,10 @@ class PaymentService:
 
             # Create the ticket via existing ticket service
             user = {"user_id": payment.user_id}
-            ticket_result = TickectService().purchase_ticket(
+            ticket_result = TickectService().create_ticket_after_payment(
                 user, db, payment.event_id, background_tasks
             )
-            payment.ticket_id = ticket_result["id"]
+            payment.ticket_id = uuid.UUID(ticket_result["id"])
 
         elif event_type == "checkout.failed":
             payment.status = PaymentStatus.failed
