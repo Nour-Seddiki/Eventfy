@@ -73,7 +73,7 @@ class TickectService:
        if event_model.price is not None and event_model.price > 0:
            from app.services.payment_service import PaymentService
            return {
-               **PaymentService.create_checkout_session(user, db, event_id, payment_method),
+               **PaymentService.create_checkout_session(user, db, event_id, payment_method, background_tasks),
                "message": "Complete payment to receive your ticket.",
            }
 

@@ -10,6 +10,7 @@ from app.models.payment import Payment
 from app.models.event import Event
 from app.models.user import User
 from app.schemas.payment import PaymentStatus
+from app.schemas.notification import CreateNotification, NotificationType
 from app.services.ticket_service import TickectService
 from app.config import settings
 
@@ -38,7 +39,7 @@ def _payment_to_dict(p: Payment) -> dict:
 class PaymentService:
 
     @staticmethod
-    def create_checkout_session(user: dict, db: Session, event_id: int, payment_method: str = "edahabia") -> dict:
+    def create_checkout_session(user: dict, db: Session, event_id: int, payment_method: str = "edahabia", background_tasks: BackgroundTasks = None) -> dict:
         """Create a Chargily checkout and a pending Payment record."""
         if user is None:
             raise HTTPException(status_code=401, detail="Authentication failed")
@@ -57,8 +58,7 @@ class PaymentService:
         # Free event → create ticket directly, no payment needed
         if event.price is None or event.price <= 0:
             from app.services.ticket_service import TickectService
-            from fastapi import BackgroundTasks as _BG
-            bg = _BG()
+            bg = background_tasks if background_tasks is not None else BackgroundTasks()
             return TickectService().create_ticket_after_payment(
                 user, db, event_id, bg
             )
@@ -157,8 +157,14 @@ class PaymentService:
         """Cancel the linked ticket (Chargily does not support API refunds)."""
         if user is None:
             raise HTTPException(status_code=401, detail="Authentication failed")
+
+        try:
+            payment_uuid = uuid.UUID(payment_id)
+        except (ValueError, AttributeError):
+            raise HTTPException(status_code=400, detail="Invalid payment ID format")
+
         payment = db.query(Payment).filter(
-            Payment.id == payment_id,
+            Payment.id == payment_uuid,
             Payment.user_id == user.get("user_id"),
         ).first()
         if not payment:
@@ -174,4 +180,19 @@ class PaymentService:
 
         db.commit()
         db.refresh(payment)
+
+        # Create refund notification
+        from app.services.notification_service import NotificationService
+        event = db.query(Event).filter(Event.id == payment.event_id).first()
+        event_title = event.title if event else f"event #{payment.event_id}"
+        notification_data = CreateNotification(
+            user_id=payment.user_id,
+            type=NotificationType.PAYMENT_REFUNDED,
+            title="Payment Refunded",
+            message=f"Your payment for '{event_title}' has been refunded and your ticket has been cancelled.",
+            related_object_id=str(payment.id),
+            related_object_type="payment",
+        )
+        NotificationService.create_notification(db, notification_data)
+
         return _payment_to_dict(payment)
