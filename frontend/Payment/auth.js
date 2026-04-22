@@ -1,9 +1,4 @@
 'use strict';
-
-/* ══════════════════════════════════════════
-   event-detail.js
-══════════════════════════════════════════ */
-
 const USER = { name: 'Mohamed', initials: 'M', role: 'Member' };
 
 /* ── On DOM ready ── */
