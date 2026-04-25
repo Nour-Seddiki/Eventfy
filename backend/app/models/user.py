@@ -14,3 +14,10 @@ class User(Base):
     is_deleted = Column(Boolean, default=False)
     deleted_at = Column(DateTime, nullable=True)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+
+    # Extended profile fields
+    full_name = Column(String, nullable=True)
+    bio = Column(String, nullable=True)
+    phone = Column(String, nullable=True)
+    location = Column(String, nullable=True)
+    website = Column(String, nullable=True)

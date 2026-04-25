@@ -2,129 +2,280 @@
 
 /* ══════════════════════════════════════════
    event-detail.js
+   Loads a single event by ID and renders it.
+   Navbar/drawer/popups are handled by navbar.js.
 ══════════════════════════════════════════ */
 
-const USER = { name: 'Yacine Salhi', initials: 'YS', role: 'Member' };
+/* ── Load Event Details ── */
+async function loadEventDetails() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const eventId = urlParams.get('id');
+  const container = document.getElementById('eventDetailsContainer');
 
-/* ── On DOM ready ── */
-document.addEventListener('DOMContentLoaded', () => {
-
-  /* scroll shadow on header */
-  const header = document.getElementById('siteHeader');
-  window.addEventListener('scroll', () =>
-    header.classList.toggle('scrolled', window.scrollY > 10), { passive: true });
-
-  /* ── DRAWER ── */
-  const hamburgerBtn   = document.getElementById('hamburgerBtn');
-  const navDrawer      = document.getElementById('navDrawer');
-  const drawerOverlay  = document.getElementById('drawerOverlay');
-  const drawerCloseBtn = document.getElementById('drawerCloseBtn');
-
-  function openDrawer() {
-    navDrawer.classList.add('open');
-    drawerOverlay.classList.add('open');
-    navDrawer.setAttribute('aria-hidden', 'false');
-    hamburgerBtn.setAttribute('aria-expanded', 'true');
-    hamburgerBtn.classList.add('open');
-    document.body.style.overflow = 'hidden';
-  }
-  function closeDrawer() {
-    navDrawer.classList.remove('open');
-    drawerOverlay.classList.remove('open');
-    navDrawer.setAttribute('aria-hidden', 'true');
-    hamburgerBtn.setAttribute('aria-expanded', 'false');
-    hamburgerBtn.classList.remove('open');
-    document.body.style.overflow = '';
+  if (!eventId) {
+    if (container) container.innerHTML = '<p style="text-align:center; padding:4rem; color:red;">No Event ID provided.</p>';
+    return;
   }
 
-  hamburgerBtn.addEventListener('click', () =>
-    navDrawer.classList.contains('open') ? closeDrawer() : openDrawer());
-  drawerCloseBtn.addEventListener('click', closeDrawer);
-  drawerOverlay.addEventListener('click', closeDrawer);
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeDrawer(); closeAllPopups(); } });
-  document.querySelectorAll('.drawer-link').forEach(l => l.addEventListener('click', closeDrawer));
+  try {
+    const ev = await fetchEventById(eventId);
+    if (!ev) throw new Error("Event not found");
 
-  /* ── USER POPUP (desktop + mobile) ── */
-  const desktopAvatarBtn = document.getElementById('desktopAvatarBtn');
-  const mobAvatarBtn     = document.getElementById('mobAvatarBtn');
+    // Update page title dynamically
+    document.title = `${ev.title || 'Event Details'} — Eventfy`;
 
-  desktopAvatarBtn?.addEventListener('click', e => {
-    e.stopPropagation();
-    closeAllNotifPopups();
-    togglePopup('userPopup');
-  });
-  mobAvatarBtn?.addEventListener('click', e => {
-    e.stopPropagation();
-    closeAllNotifPopups();
-    togglePopup('userPopupMob');
-  });
+    renderEventHTML(ev, container);
 
-  /* ── NOTIFICATION POPUP (desktop + mobile) ── */
-  const desktopNotifBtn = document.getElementById('desktopNotifBtn');
-  const mobNotifBtn     = document.getElementById('mobNotifBtn');
+  } catch (err) {
+    console.error("Error loading event:", err);
+    if (container) container.innerHTML = '<p style="text-align:center; padding:4rem; color:red;">Failed to load event details.</p>';
+  }
+}
 
-  desktopNotifBtn?.addEventListener('click', e => {
-    e.stopPropagation();
-    closeAllUserPopups();
-    togglePopup('notifPopupDesktop');
-  });
-  mobNotifBtn?.addEventListener('click', e => {
-    e.stopPropagation();
-    closeAllUserPopups();
-    togglePopup('notifPopupMob');
-  });
+function renderEventHTML(ev, container) {
+  const dateObj = ev.date ? new Date(ev.date) : new Date();
+  const dateStr = dateObj.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+  const timeStr = dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+  
+  const imgUrl = ev.image 
+      ? (ev.image.startsWith('http') ? ev.image : `${API_BASE}${ev.image}`)
+      : 'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=600&q=80';
 
-  /* close all popups on outside click */
-  document.addEventListener('click', e => {
-    if (!e.target.closest('.user-popup')  && !e.target.closest('.nav-user-avatar-btn') &&
-        !e.target.closest('.notif-popup') && !e.target.closest('.nav-notif-btn')) {
-      closeAllPopups();
+  const isFree = !ev.price || ev.price <= 0;
+  const priceDisplay = isFree ? 'Free' : '$' + ev.price;
+
+  container.innerHTML = `
+    <!-- Hero -->
+    <header class="hero-banner" style="background: url('${imgUrl}') center/cover no-repeat; position: relative;">
+      <div class="hero-gradient" style="background: linear-gradient(to top, rgba(15,23,42,0.95), rgba(15,23,42,0.4));">
+        <div class="hero-badge">
+          <svg class="hero-badge-icon" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71L12 2z"/></svg>
+          ${ev.category || 'Event'}
+        </div>
+        <h1 class="hero-title">${ev.title || 'Untitled Event'}</h1>
+        <div class="hero-meta">
+          <div class="hero-meta-item">
+            <svg class="hero-meta-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+            ${dateStr} • ${timeStr}
+          </div>
+          <div class="hero-meta-item">
+            <svg class="hero-meta-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/><path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+            ${ev.location || 'TBA'}
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="content-grid">
+      <!-- ── MAIN CONTENT ── -->
+      <div class="content-main">
+        <!-- About -->
+        <section id="about">
+          <div class="section-heading">
+            <div class="section-bar"></div>
+            <h2>About the Event</h2>
+          </div>
+          <div class="about-body">
+            <p>${ev.description ? ev.description.replace(/\\n/g, '<br>') : 'No description provided.'}</p>
+          </div>
+        </section>
+      </div>
+
+      <!-- ── SIDEBAR ── -->
+      <aside class="sidebar">
+        <div class="reg-card">
+          <div class="reg-card-top">
+            <div>
+              <p class="price-label">Price</p>
+              <h3 class="price-value">${priceDisplay}</h3>
+            </div>
+            <div class="seats-badge">
+              <svg class="seats-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path d="M12 6v6l4 2" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+              ${ev.available_tickets > 0 ? ev.available_tickets + ' Seats Left' : 'Sold Out'}
+            </div>
+          </div>
+          <div class="reg-details">
+            <div class="reg-detail-item">
+              <div class="reg-detail-icon reg-detail-icon--blue">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+              </div>
+              <div>
+                <p class="reg-detail-title">${dateStr}</p>
+                <p class="reg-detail-sub">${timeStr}</p>
+              </div>
+            </div>
+            <div class="reg-detail-item">
+              <div class="reg-detail-icon reg-detail-icon--indigo">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/><path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+              </div>
+              <div>
+                <p class="reg-detail-title">${ev.location || 'TBA'}</p>
+              </div>
+            </div>
+          </div>
+          <button class="btn-register" id="buyTicketBtn">
+            Buy Ticket
+            <svg class="btn-register-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17 8l4 4m0 0l-4 4m4-4H3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+          </button>
+          <button class="btn-save" id="saveEventBtn" style="width:100%;margin-top:12px;padding:14px;border-radius:12px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px;background:#f8fafc;color:#64748b;border:1px solid #e2e8f0;cursor:pointer;transition:all 0.2s;">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="20" height="20"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" stroke-width="2"/></svg>
+            Save Event
+          </button>
+        </div>
+      </aside>
+    </div>
+  `;
+
+  // Buy Ticket — real purchase flow
+  const buyBtn = container.querySelector('#buyTicketBtn');
+  buyBtn?.addEventListener('click', async () => {
+    if (!isLoggedIn()) {
+      window.location.href = '../login/index.html';
+      return;
+    }
+
+    // Prevent double-click
+    buyBtn.disabled = true;
+    buyBtn.style.opacity = '0.7';
+    buyBtn.innerHTML = 'Processing…';
+
+    try {
+      const res = await apiFetch(`/ticket/purchase_ticket/${ev.id}`, { method: 'POST' });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.detail || 'Purchase failed');
+      }
+
+      showEventToast('🎫 Ticket purchased successfully!');
+
+      // Update seats count in sidebar
+      const seatsBadge = container.querySelector('.seats-badge');
+      if (seatsBadge && ev.available_tickets > 0) {
+        ev.available_tickets--;
+        const seatsText = ev.available_tickets > 0
+          ? ev.available_tickets + ' Seats Left'
+          : 'Sold Out';
+        seatsBadge.innerHTML = `
+          <svg class="seats-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path d="M12 6v6l4 2" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+          ${seatsText}
+        `;
+      }
+
+      buyBtn.innerHTML = '✓ Purchased';
+      buyBtn.style.opacity = '1';
+      // Keep button disabled after successful purchase
+
+    } catch (err) {
+      console.error('Ticket purchase error:', err);
+      showEventToast(`❌ ${err.message || 'Failed to purchase ticket.'}`);
+      buyBtn.disabled = false;
+      buyBtn.style.opacity = '1';
+      buyBtn.innerHTML = `Buy Ticket <svg class="btn-register-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17 8l4 4m0 0l-4 4m4-4H3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>`;
     }
   });
 
-  /* ── LOGOUT ── */
-  document.querySelectorAll('.btn-do-logout').forEach(b => b.addEventListener('click', logout));
+  // Attach Save Event logic
+  const saveBtn = container.querySelector('#saveEventBtn');
+  let isSaved = false;
+  let savingId = null;
 
-  /* ── RESIZE: reset layout when switching desktop ↔ mobile ── */
-  let lastMobile = window.innerWidth <= 900;
-  window.addEventListener('resize', () => {
-    const isMobile = window.innerWidth <= 900;
-    if (isMobile === lastMobile) return;
-    lastMobile = isMobile;
-    if (!isMobile) document.body.style.overflow = '';
-  }, { passive: true });
+  // Check if already saved or purchased
+  if (isLoggedIn()) {
+    // Check for purchased ticket
+    fetchMyActivity().then(activity => {
+      const tickets = activity.tickets || [];
+      if (tickets.some(t => t.event_id == ev.id)) {
+        if (buyBtn) {
+          buyBtn.innerHTML = '✓ Purchased';
+          buyBtn.style.opacity = '1';
+          buyBtn.style.background = '#10b981';
+          buyBtn.style.borderColor = '#10b981';
+          buyBtn.style.color = '#fff';
+          buyBtn.disabled = true;
+        }
+      }
+    }).catch(console.error);
 
-  /* ── fill user info everywhere ── */
-  renderUserInfo();
-});
+    // Check for saved event
+    fetchSavedEvents().then(res => {
+      const savedList = res.items || res || [];
+      const match = savedList.find(s => s.event_id == ev.id);
+      if (match) {
+        isSaved = true;
+        savingId = match.id;
+        updateSaveBtnUI();
+      }
+    }).catch(console.error);
+  }
 
-/* ══ USER INFO FILL ══ */
-function renderUserInfo() {
-  document.querySelectorAll('.user-initials-text').forEach(el => el.textContent = USER.initials);
-  document.querySelectorAll('.user-name-text').forEach(el => el.textContent = USER.name);
-  document.querySelectorAll('.user-role-text').forEach(el => el.textContent = USER.role);
+  function updateSaveBtnUI() {
+    if (isSaved) {
+      saveBtn.style.color = '#ef4444';
+      saveBtn.style.borderColor = '#fee2e2';
+      saveBtn.style.background = '#fef2f2';
+      saveBtn.innerHTML = `
+        <svg fill="currentColor" stroke="currentColor" viewBox="0 0 24 24" width="20" height="20"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" stroke-width="2"/></svg>
+        Saved
+      `;
+    } else {
+      saveBtn.style.color = '#64748b';
+      saveBtn.style.borderColor = '#e2e8f0';
+      saveBtn.style.background = '#f8fafc';
+      saveBtn.innerHTML = `
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="20" height="20"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" stroke-width="2"/></svg>
+        Save Event
+      `;
+    }
+  }
+
+  saveBtn.addEventListener('click', async () => {
+    if (!isLoggedIn()) {
+      window.location.href = '../login/index.html';
+      return;
+    }
+    
+    saveBtn.disabled = true;
+    saveBtn.style.opacity = '0.7';
+    
+    try {
+      if (isSaved && savingId) {
+        await unsaveEvent(savingId);
+        isSaved = false;
+        savingId = null;
+      } else {
+        const res = await saveEvent(ev.id);
+        isSaved = true;
+        savingId = res.id;
+      }
+      updateSaveBtnUI();
+    } catch (err) {
+      console.error(err);
+      showEventToast('Failed to save event. Please try again.');
+    } finally {
+      saveBtn.disabled = false;
+      saveBtn.style.opacity = '1';
+    }
+  });
 }
 
-/* ══ POPUP HELPERS ══ */
-function togglePopup(id) {
-  const el = document.getElementById(id);
-  if (el) el.classList.toggle('open');
-}
-function closeAllUserPopups() {
-  document.getElementById('userPopup')    ?.classList.remove('open');
-  document.getElementById('userPopupMob') ?.classList.remove('open');
-}
-function closeAllNotifPopups() {
-  document.getElementById('notifPopupDesktop') ?.classList.remove('open');
-  document.getElementById('notifPopupMob')     ?.classList.remove('open');
-}
-function closeAllPopups() {
-  closeAllUserPopups();
-  closeAllNotifPopups();
+/* ══ TOAST HELPER (replaces alert()) ══ */
+function showEventToast(msg) {
+  let t = document.getElementById('event-detail-toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'event-detail-toast';
+    t.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#1e293b;color:#fff;padding:14px 24px;border-radius:12px;font-size:14px;font-weight:500;z-index:9999;transition:opacity .3s,transform .3s;box-shadow:0 8px 24px rgba(0,0,0,.25);';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.opacity = '1';
+  t.style.transform = 'translateY(0)';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => {
+    t.style.opacity = '0';
+    t.style.transform = 'translateY(8px)';
+  }, 3000);
 }
 
-/* ══ LOGOUT (demo) ══ */
-function logout() {
-  closeAllPopups();
-  alert('Logged out (demo)');
-}
+/* ── Init ── */
+loadEventDetails();

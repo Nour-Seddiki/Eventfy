@@ -5,9 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>My Saved Events | Eventfy</title>
   <link rel="stylesheet" href="saved-events.css"/>
-  <link rel="icon" type="image/png" href="/Home/img_logo/Evenitfylogo.png">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><rect x='3' y='4' width='18' height='18' rx='4' fill='%237f0df2' opacity='.15'/><path d='M8 2v4M16 2v4M3 10h18' stroke='%237f0df2' stroke-width='2' stroke-linecap='round'/><circle cx='8' cy='15' r='1.5' fill='%237f0df2'/><circle cx='12' cy='15' r='1.5' fill='%237f0df2'/><circle cx='16' cy='15' r='1.5' fill='%237f0df2'/></svg>">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../common.css">
@@ -43,7 +42,7 @@
           <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
           Browse
         </a>
-        <a href="../About/Index.html" class="nav-link">
+        <a href="../About/index.html" class="nav-link">
           <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path d="M12 16v-4M12 8h.01" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
           About
         </a>
@@ -144,7 +143,7 @@
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
           Browse
         </a>
-        <a href="../About/Index.html" class="drawer-link">
+        <a href="../About/index.html" class="drawer-link">
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path d="M12 16v-4M12 8h.01" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
           About
         </a>
@@ -188,118 +187,16 @@
   <header class="page-header">
     <div class="page-header-row">
       <h1 class="page-title">My Saved Events</h1>
-      <span class="saved-count-badge">4 Saved</span>
+      <span class="saved-count-badge">0 Saved</span>
     </div>
     <p class="page-subtitle">Keep track of the events you don't want to miss.</p>
   </header>
 
-  <div class="events-grid">
-
-    <!-- Card 1: Festival -->
-    <article class="event-card">
-      <div class="card-img-wrap">
-        <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCuhizBKUSsUNbSLsZIH238FuvfmyTxnZ4PX4DV6ME8OmZtiSDUpDAsdM8YaSK6zdfh33zQLBtFsBGVALvTl0bs95NoYrO7IthX9cKLlNLwxiLsZTXsJ0Q6WX9tyFvMAthByiTqYQpyj2EvFsxRmdPfi-5M6KihGDpk4KLOAOdu4u5wDZg4ENeyx7jZPYVt7QlGk7WNKZVtaN4-0IpXgBcGvY5BKx9Z8VYyZSl5O6qoAOyFhCuB9QtRH8grd_FbTJ1QxMoidndPvseo" alt="Algiers Jazz Nights"/>
-        <button class="fav-btn" aria-label="Remove from saved">
-          <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
-        </button>
-        <span class="card-cat-badge cat-festival">Festival</span>
+    <div class="events-grid" id="savedEventsGrid">
+      <div style="grid-column: 1/-1; text-align: center; padding: 3rem;">
+        <p style="color: #64748b; font-size: 1.1rem;">Loading your saved events...</p>
       </div>
-      <div class="card-body">
-        <div class="card-date-row">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" stroke-width="2"/><line x1="16" y1="2" x2="16" y2="6" stroke-width="2"/><line x1="8" y1="2" x2="8" y2="6" stroke-width="2"/><line x1="3" y1="10" x2="21" y2="10" stroke-width="2"/></svg>
-          <span class="card-date-text">Aug 24, 2026</span>
-        </div>
-        <h3 class="card-title">Algiers Jazz Nights: Casbah Session</h3>
-        <div class="card-location">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0118 0z" stroke-width="2"/><circle cx="12" cy="10" r="3" stroke-width="2"/></svg>
-          <span>Palais des Raïs, Algiers</span>
-        </div>
-        <div class="card-footer-row">
-          <span class="card-price">3,500 DZD</span>
-          <button class="btn-view-details">View Details</button>
-        </div>
-      </div>
-    </article>
-
-    <!-- Card 2: Science & Tech -->
-    <article class="event-card">
-      <div class="card-img-wrap">
-        <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuAddhZL64AxnroIzH7H5sCwXwIU8cCgOR5v8ZOep6gvvf3mNn9880aizP7V9ZxmxaXLcN858ljJ72gFMxwuuy-ZOkigSM9k5QQ_wrRIOMxqBR1d0wzppPix2lM4vN9m1Cxm8OWrxPFEk5mOYYdHqXujvNfiMhuD4WhQ-2sOzwer9Z8BACc7q-TwgwUX9HmdQ297exU6l5R5AdgIBtU-4HfJKw8iae9iaxGyArQ-1T4hbQRMhhBw0uGFgh69JYpIZ2p8s40uKpvaWVcg" alt="Oran Digital Innovation Summit"/>
-        <button class="fav-btn" aria-label="Remove from saved">
-          <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
-        </button>
-        <span class="card-cat-badge cat-tech">Science &amp; Tech</span>
-      </div>
-      <div class="card-body">
-        <div class="card-date-row">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" stroke-width="2"/><line x1="16" y1="2" x2="16" y2="6" stroke-width="2"/><line x1="8" y1="2" x2="8" y2="6" stroke-width="2"/><line x1="3" y1="10" x2="21" y2="10" stroke-width="2"/></svg>
-          <span class="card-date-text">Sep 12, 2026</span>
-        </div>
-        <h3 class="card-title">Oran Digital Innovation Summit</h3>
-        <div class="card-location">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0118 0z" stroke-width="2"/><circle cx="12" cy="10" r="3" stroke-width="2"/></svg>
-          <span>Meridien Hotel, Oran</span>
-        </div>
-        <div class="card-footer-row">
-          <span class="card-price">Free</span>
-          <button class="btn-view-details">View Details</button>
-        </div>
-      </div>
-    </article>
-
-    <!-- Card 3: Art -->
-    <article class="event-card">
-      <div class="card-img-wrap">
-        <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBOdNjZIf146if2Xo8BrdpFAMgpkjCYnmGvYSgxFrOJSBHGBBQDp_bYQkV3kt6ZZhosfcwSb1UXj0Wy5Mq3NwA91MFQigsn4FdketHaCFIJ03p9np78vAlj2jCxN4XE1S2_wkC-LC_Xc1diuEHt1LZahgDt5v4V5A3qFnGUNt2Nwn41YR3miFhepsnNQDvl7l_jU53hMvdjSbiW8mGH_o3JlLz5Wu-bblZVgN_8K-oWZWPJoBCSSOCPjD4xkNADT-qa74fGvnCJW-pZ" alt="Mediterranean Contemporary Art Expo"/>
-        <button class="fav-btn" aria-label="Remove from saved">
-          <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
-        </button>
-        <span class="card-cat-badge cat-art">Art</span>
-      </div>
-      <div class="card-body">
-        <div class="card-date-row">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" stroke-width="2"/><line x1="16" y1="2" x2="16" y2="6" stroke-width="2"/><line x1="8" y1="2" x2="8" y2="6" stroke-width="2"/><line x1="3" y1="10" x2="21" y2="10" stroke-width="2"/></svg>
-          <span class="card-date-text">Oct 05, 2026</span>
-        </div>
-        <h3 class="card-title">Mediterranean Contemporary Art Expo</h3>
-        <div class="card-location">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0118 0z" stroke-width="2"/><circle cx="12" cy="10" r="3" stroke-width="2"/></svg>
-          <span>MAMA Museum, Algiers</span>
-        </div>
-        <div class="card-footer-row">
-          <span class="card-price">1,200 DZD</span>
-          <button class="btn-view-details">View Details</button>
-        </div>
-      </div>
-    </article>
-
-    <!-- Card 4: Music -->
-    <article class="event-card">
-      <div class="card-img-wrap">
-        <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuB9PGNN_TzrK4fKDlpO4UkwSq3LAcufJMjDYYFhcC3TL1YN33elDJITwMpjQTZZ8pbN_kNL3WyR4aQogqTVw6V9LfUIWKmfGJ2TK_O-ckLtaA5BDnfOlK3QW4INho8B43snAKf9NDJaMHowtVhmoY5LNNBv5Qo0CoO7bSHt3WrOTsJklvy9d3vqn_G1FYlSyFWiCfSy-lNtVBE0QSYbbB1ARtWTrLwHaL61JtE9t8v5rTcc4RkdCbSyEUX_vaIjNCsFXyDFt0-Rq_h8" alt="Sunset Beats: Oran Rooftop Session"/>
-        <button class="fav-btn" aria-label="Remove from saved">
-          <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
-        </button>
-        <span class="card-cat-badge cat-music">Music</span>
-      </div>
-      <div class="card-body">
-        <div class="card-date-row">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" stroke-width="2"/><line x1="16" y1="2" x2="16" y2="6" stroke-width="2"/><line x1="8" y1="2" x2="8" y2="6" stroke-width="2"/><line x1="3" y1="10" x2="21" y2="10" stroke-width="2"/></svg>
-          <span class="card-date-text">Aug 30, 2026</span>
-        </div>
-        <h3 class="card-title">Sunset Beats: Oran Rooftop Session</h3>
-        <div class="card-location">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0118 0z" stroke-width="2"/><circle cx="12" cy="10" r="3" stroke-width="2"/></svg>
-          <span>Sky Lounge, Oran</span>
-        </div>
-        <div class="card-footer-row">
-          <span class="card-price">2,000 DZD</span>
-          <button class="btn-view-details">View Details</button>
-        </div>
-      </div>
-    </article>
-
-  </div>
+    </div>
 </main>
 
 <!-- ════════ FOOTER ════════ -->
@@ -319,13 +216,13 @@
 </footer>
 
 <script src="../api.js"></script>
-  <script>
-    // Auth guard — redirect if not logged in
-    if (!isLoggedIn()) {
-      window.location.href = '../login/index.html';
-    }
-  </script>
-  <script src="saved-events.js"></script>
-  <script src="../navbar.js"></script>
+<script>
+  // Auth guard — redirect if not logged in
+  if (!isLoggedIn()) {
+    window.location.href = '../login/index.html';
+  }
+</script>
+<script src="saved-events.js"></script>
+<script src="../navbar.js"></script>
 </body>
 </html>

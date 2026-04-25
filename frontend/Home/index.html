@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -7,16 +7,16 @@
   <title>Eventfy — Discover Events That Move You</title>
   <meta name="description" content="Find and host amazing events near you. From science clubs to city marathons — Eventfy connects people through passions.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><rect x='3' y='4' width='18' height='18' rx='4' fill='%237f0df2' opacity='.15'/><path d='M8 2v4M16 2v4M3 10h18' stroke='%237f0df2' stroke-width='2' stroke-linecap='round'/><circle cx='8' cy='15' r='1.5' fill='%237f0df2'/><circle cx='12' cy='15' r='1.5' fill='%237f0df2'/><circle cx='16' cy='15' r='1.5' fill='%237f0df2'/></svg>">
-  <link rel="stylesheet" href="Home.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../common.css">
+  <link rel="stylesheet" href="Home.css">
 </head>
 
 <body>
 
-    <!-- ═══════════════════════════════════════
+  <!-- ═══════════════════════════════════════
        EVENTFY UNIFIED NAVBAR
   ═══════════════════════════════════════ -->
   <header class="site-header" id="siteHeader">
@@ -46,7 +46,7 @@
           <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
           Browse
         </a>
-        <a href="../About/Index.html" class="nav-link">
+        <a href="../About/index.html" class="nav-link">
           <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path d="M12 16v-4M12 8h.01" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
           About
         </a>
@@ -147,7 +147,7 @@
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
           Browse
         </a>
-        <a href="../About/Index.html" class="drawer-link">
+        <a href="../About/index.html" class="drawer-link">
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path d="M12 16v-4M12 8h.01" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
           About
         </a>
@@ -186,6 +186,7 @@
   </div>
   <!-- END NAVBAR -->
 
+  <section class="hero-section">
     <div class="hero">
       <div class="page1-1 reveal-left">
         <div>
@@ -205,7 +206,7 @@
         <img src="Container.png" alt="Eventfy hero illustration" loading="lazy">
       </div>
     </div>
-  </header>
+  </section>
 
   <!-- ══ CATEGORY ══ -->
   <section class="category">
@@ -227,97 +228,7 @@
   <section class="events">
     <p class="section-title reveal">Featured Events</p>
     <div class="events-grid" id="featuredEventsGrid">
-
-      <div class="event reveal-scale">
-        <div class="event-up">
-          <div class="event-type">Science</div>
-          <button class="like-btn" aria-label="Like">❤</button>
-        </div>
-        <div class="event-down">
-          <div class="event-down-1">
-            <div class="event-date">
-              <div class="event-month">Oct</div>
-              <div class="event-day">12</div>
-            </div>
-            <div class="envent-desb">
-              <div class="event-name">Tech Innovators Meetup</div>
-              <div class="event-map">Science Center Hall A</div>
-            </div>
-          </div>
-          <div class="event-down-2">
-            <div class="event-member">
-              <svg width="72" height="28" viewBox="0 0 72 28" fill="none">
-                <circle cx="14" cy="14" r="13" fill="#c4b5fd" stroke="white" stroke-width="2"/>
-                <text x="14" y="18" text-anchor="middle" font-size="10" fill="#4c1d95" font-family="sans-serif" font-weight="700">A</text>
-                <circle cx="30" cy="14" r="13" fill="#a78bfa" stroke="white" stroke-width="2"/>
-                <text x="30" y="18" text-anchor="middle" font-size="10" fill="#4c1d95" font-family="sans-serif" font-weight="700">B</text>
-                <circle cx="46" cy="14" r="13" fill="#7c3aed" stroke="white" stroke-width="2"/>
-                <text x="46" y="18" text-anchor="middle" font-size="10" fill="white" font-family="sans-serif" font-weight="700">+8</text>
-              </svg>
-            </div>
-            <div class="event-price">$15.00</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="event reveal-scale">
-        <div class="event-up" style="background-image:url(https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=600&q=80)">
-          <div class="event-type">Workshop</div>
-          <button class="like-btn" aria-label="Like">❤</button>
-        </div>
-        <div class="event-down">
-          <div class="event-down-1">
-            <div class="event-date">
-              <div class="event-month">Nov</div>
-              <div class="event-day">5</div>
-            </div>
-            <div class="envent-desb">
-              <div class="event-name">Design Thinking Lab</div>
-              <div class="event-map">Innovation Hub, Floor 3</div>
-            </div>
-          </div>
-          <div class="event-down-2">
-            <div class="event-member">
-              <svg width="72" height="28" viewBox="0 0 72 28" fill="none">
-                <circle cx="14" cy="14" r="13" fill="#c4b5fd" stroke="white" stroke-width="2"/><text x="14" y="18" text-anchor="middle" font-size="10" fill="#4c1d95" font-family="sans-serif" font-weight="700">C</text>
-                <circle cx="30" cy="14" r="13" fill="#a78bfa" stroke="white" stroke-width="2"/><text x="30" y="18" text-anchor="middle" font-size="10" fill="#4c1d95" font-family="sans-serif" font-weight="700">D</text>
-                <circle cx="46" cy="14" r="13" fill="#7c3aed" stroke="white" stroke-width="2"/><text x="46" y="18" text-anchor="middle" font-size="10" fill="white" font-family="sans-serif" font-weight="700">+8</text>
-              </svg>
-            </div>
-            <div class="event-price">$25.00</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="event reveal-scale">
-        <div class="event-up" style="background-image:url(https://images.unsplash.com/photo-1517649763962-0c623066013b?w=600&q=80)">
-          <div class="event-type">Marathon</div>
-          <button class="like-btn" aria-label="Like">❤</button>
-        </div>
-        <div class="event-down">
-          <div class="event-down-1">
-            <div class="event-date">
-              <div class="event-month">Dec</div>
-              <div class="event-day">20</div>
-            </div>
-            <div class="envent-desb">
-              <div class="event-name">City Run 2026</div>
-              <div class="event-map">Central Park, East Gate</div>
-            </div>
-          </div>
-          <div class="event-down-2">
-            <div class="event-member">
-              <svg width="72" height="28" viewBox="0 0 72 28" fill="none">
-                <circle cx="14" cy="14" r="13" fill="#c4b5fd" stroke="white" stroke-width="2"/><text x="14" y="18" text-anchor="middle" font-size="10" fill="#4c1d95" font-family="sans-serif" font-weight="700">E</text>
-                <circle cx="30" cy="14" r="13" fill="#a78bfa" stroke="white" stroke-width="2"/><text x="30" y="18" text-anchor="middle" font-size="10" fill="#4c1d95" font-family="sans-serif" font-weight="700">F</text>
-                <circle cx="46" cy="14" r="13" fill="#7c3aed" stroke="white" stroke-width="2"/><text x="46" y="18" text-anchor="middle" font-size="10" fill="white" font-family="sans-serif" font-weight="700">+1k</text>
-              </svg>
-            </div>
-            <div class="event-price">Free</div>
-          </div>
-        </div>
-      </div>
-
+      <!-- Events will be loaded dynamically via Home.js -->
     </div>
   </section>
 
@@ -409,24 +320,73 @@
 
   <button class="scroll-top" id="scrollTopBtn" aria-label="Back to top">↑</button>
 
-  <script>
-    /* ── CTA / Hero button wiring ── */
+<script>
+    /* ── Role-aware hero CTA + bottom CTA wiring ── */
+
+    /** Adapts #btnHost based on auth state & role */
+    function initHostBtn() {
+      const btn = document.getElementById('btnHost');
+      if (!btn) return;
+
+      if (typeof isLoggedIn === 'function' && isLoggedIn()) {
+        const user = typeof getCachedUser === 'function' ? getCachedUser() : null;
+        if (user && user.role === 'organizer') {
+          // Organizer → "Host an Event" (original dark-border style)
+          btn.textContent = 'Host an Event';
+          btn.className = 'btn-host';
+          btn.onclick = () => { window.location.href = '../new Event/index.html'; };
+        } else {
+          // Attendee → "My Dashboard" (purple variant)
+          btn.textContent = 'My Dashboard';
+          btn.className = 'btn-host btn-dashboard';
+          btn.onclick = () => { window.location.href = '../dashboard/index.html'; };
+        }
+      } else {
+        // Not logged in → "About Us" (amber variant)
+        btn.textContent = 'About Us';
+        btn.className = 'btn-host btn-about';
+        btn.onclick = () => { window.location.href = '../About/Index.html'; };
+      }
+    }
+
+    /** Adapts #btnGetStarted based on auth state & role */
+    function initCtaBtn() {
+      const btn = document.getElementById('btnGetStarted');
+      if (!btn) return;
+
+      if (typeof isLoggedIn === 'function' && isLoggedIn()) {
+        const user = typeof getCachedUser === 'function' ? getCachedUser() : null;
+        if (user && user.role === 'organizer') {
+          btn.textContent = 'Create an Event';
+          btn.className = 'btn-cta-primary btn-cta-host';
+          btn.onclick = () => { window.location.href = '../new Event/index.html'; };
+        } else {
+          btn.textContent = 'Browse Events';
+          btn.className = 'btn-cta-primary';
+          btn.onclick = () => { window.location.href = '../Events/index.html'; };
+        }
+      } else {
+        btn.textContent = 'Get Started Now';
+        btn.className = 'btn-cta-primary';
+        btn.onclick = () => { window.location.href = '../signup/index.html'; };
+      }
+    }
+
+    /* Run after api.js is loaded */
+    function initRoleButtons() {
+      initHostBtn();
+      initCtaBtn();
+    }
+
+    if (document.readyState === 'complete') {
+      initRoleButtons();
+    } else {
+      window.addEventListener('load', initRoleButtons);
+    }
+
+    /* ── Static button wiring ── */
     document.getElementById('btnExplore')?.addEventListener('click', () => {
       window.location.href = '../Events/index.html';
-    });
-    document.getElementById('btnHost')?.addEventListener('click', () => {
-      if (typeof isLoggedIn === 'function' && isLoggedIn()) {
-        window.location.href = '../new-event/index.html';
-      } else {
-        window.location.href = '../login/index.html';
-      }
-    });
-    document.getElementById('btnGetStarted')?.addEventListener('click', () => {
-      if (typeof isLoggedIn === 'function' && isLoggedIn()) {
-        window.location.href = '../Events/index.html';
-      } else {
-        window.location.href = '../signup/index.html';
-      }
     });
     document.getElementById('btnBrowseCategories')?.addEventListener('click', () => {
       window.location.href = '../Events/index.html';
@@ -440,8 +400,8 @@
       });
     });
   </script>
-  <script src="Home.js"></script>
   <script src="../api.js"></script>
+  <script src="Home.js"></script>
   <script src="../navbar.js"></script>
 </body>
 

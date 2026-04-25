@@ -34,20 +34,22 @@
    * so this function builds paths relative to the CURRENT FILE.
    */
   function relPath(target) {
-    // Live Server serves from d:\Eventfy-Pro\frontend\ as root.
-    // So URL paths are like:  /saved-events/saved-events.html  (depth 1)
-    //                          /Home/index.html                 (depth 1)
-    //                          /                               (depth 0)
-    // We need to build a relative path from current dir to /target.
+    // target is relative to the server root (e.g. 'Home/index.html')
     const loc = window.location.pathname;
 
-    // Split path into parts, filter empty
-    const parts = loc.split('/').filter(Boolean);
+    // If served behind a /frontend/ prefix (e.g. from repo root), strip it
+    const frontendIdx = loc.toLowerCase().indexOf('/frontend/');
+    let afterRoot;
+    if (frontendIdx !== -1) {
+      afterRoot = loc.slice(frontendIdx + '/frontend/'.length);
+    } else {
+      // Served directly from the frontend dir (root = frontend/)
+      // e.g. /Home/index.html → afterRoot = 'Home/index.html'
+      afterRoot = loc.startsWith('/') ? loc.slice(1) : loc;
+    }
 
-    // Remove the filename (last part) to get the directory depth
-    // e.g. /saved-events/saved-events.html → ['saved-events', 'saved-events.html'] → depth = 1
-    const depth = parts.length > 0 ? parts.length - 1 : 0;
-
+    // Count how many directories deep we are
+    const depth = (afterRoot.match(/\//g) || []).length;
     const prefix = depth > 0 ? '../'.repeat(depth) : './';
     return prefix + target;
   }
@@ -61,10 +63,10 @@
     signup     : relPath('signup/index.html'),
     dashboard  : relPath('dashboard/index.html'),
     orgDash    : relPath('org-dashboard/index.html'),
-    savedEvents: relPath('saved-events/index.html'),
+    savedEvents: relPath('saved-events/saved-events.html'),
     profile    : relPath('org-profile/index.html'),
     settings   : relPath('setting/index.html'),
-    newEvent   : relPath('new-event/index.html'),
+    newEvent   : relPath('new Event/index.html'),
     notifications: relPath('notifications/index.html'),
   };
 
@@ -129,12 +131,12 @@
   if (loggedIn) {
     const cached = (typeof getCachedUser === 'function') ? getCachedUser() : null;
     if (cached) {
-      const fullName = cached.full_name || cached.user_name || cached.username || cached.name || 'User';
+      const fullName = cached.user_name || cached.username || cached.name || 'User';
       const role     = cached.role ? (cached.role.charAt(0).toUpperCase() + cached.role.slice(1)) : 'Member';
-      const parts    = fullName.trim().split(/[\s_]+/).filter(Boolean);
+      const parts    = fullName.trim().split(/\s+/);
       const initials = parts.length >= 2
         ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
-        : fullName.slice(0, 2).toUpperCase();
+        : fullName.charAt(0).toUpperCase();
       user = { name: fullName, initials, role };
     }
 
@@ -158,11 +160,9 @@
   };
 
   function buildUserPopupHTML() {
-    const role     = (user.role || '').toLowerCase();
-    const isOrg    = role === 'organizer' || role === 'admin';
-    const isSaved  = currentPath.includes('saved-events');
-    const isDash   = currentPath.includes('/dashboard/');
-    const isProfile= currentPath.includes('org-profile');
+    const isOrgPage = currentPath.includes('org-dashboard') || currentPath.includes('org-profile');
+    const isDash    = currentPath.includes('/dashboard/');
+    const isSaved   = currentPath.includes('saved-events');
 
     return `
       <div class="popup-header">
@@ -174,10 +174,11 @@
           </div>
         </div>
       </div>
-      <a href="${PATHS.profile}" class="popup-item ${isProfile ? 'active' : ''}">${ic.person} My Profile</a>
-      ${isOrg ? `<a href="${PATHS.orgDash}" class="popup-item ${currentPath.includes('org-dashboard') ? 'active' : ''}">${ic.calendar} My Events</a>` : ''}
-      <a href="${PATHS.savedEvents}" class="popup-item ${isSaved ? 'active' : ''}">${ic.heart} Saved Events</a>
-      <a href="${PATHS.settings}" class="popup-item">${ic.settings} Settings</a>
+      <a href="${PATHS.profile}"      class="popup-item ${currentPath.includes('org-profile')    ? 'active' : ''}">${ic.person}   Profile Settings</a>
+      <a href="${PATHS.dashboard}"    class="popup-item ${isDash                                  ? 'active' : ''}">${ic.dash}     My Dashboard</a>
+      ${user.role.toLowerCase() !== 'attendee' ? `<a href="${PATHS.orgDash}"      class="popup-item ${currentPath.includes('org-dashboard')  ? 'active' : ''}">${ic.calendar} My Events</a>` : ''}
+      <a href="${PATHS.savedEvents}"  class="popup-item ${isSaved                                 ? 'active' : ''}">${ic.heart}    Saved Events</a>
+      <a href="${PATHS.settings}"     class="popup-item">${ic.settings} Settings</a>
       <div class="popup-sep"></div>
       <button class="popup-item danger btn-do-logout">${ic.logout} Log out</button>
     `;
@@ -187,13 +188,6 @@
     ['userPopup', 'userPopupMob'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.innerHTML = buildUserPopupHTML();
-    });
-
-    // Fix org-dashboard drawer link: only show for organizer / admin
-    const isOrg = (user.role || '').toLowerCase() === 'organizer' ||
-                  (user.role || '').toLowerCase() === 'admin';
-    document.querySelectorAll('.drawer-link-org-dashboard').forEach(el => {
-      el.style.display = isOrg ? '' : 'none';
     });
   }
 
@@ -206,18 +200,108 @@
         <span class="notif-popup-title">Notifications</span>
         <a href="${PATHS.notifications}" class="notif-view-all">View all</a>
       </div>
-      <div class="notif-empty">
-        <div class="notif-empty-icon">🔔</div>
-        <div class="notif-empty-msg">No notifications yet</div>
-        <div class="notif-empty-sub">We'll let you know when something arrives</div>
+      <div class="notif-list" id="notifListContainer">
+        <div class="notif-empty">
+          <div style="text-align:center;padding:20px;">
+            <div style="width:24px;height:24px;border:2px solid #e2e8f0;border-top-color:#7f0df2;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 10px;"></div>
+            <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+          </div>
+        </div>
       </div>
     `;
   }
 
-  ['notifPopupDesktop', 'notifPopupMob'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.innerHTML = buildNotifPopupHTML();
-  });
+  if (loggedIn) {
+    ['notifPopupDesktop', 'notifPopupMob'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.innerHTML = buildNotifPopupHTML();
+    });
+
+    // ── Badge count only on page load (lightweight, 1 small API call) ──
+    if (typeof fetchUnreadCount === 'function') {
+      fetchUnreadCount().then(unreadCount => {
+        const dots = document.querySelectorAll('.notif-dot');
+        if (unreadCount > 0) {
+          dots.forEach(dot => {
+            dot.style.display = 'flex';
+            dot.textContent = unreadCount > 9 ? '9+' : unreadCount;
+          });
+        } else {
+          dots.forEach(dot => dot.style.display = 'none');
+        }
+      }).catch(() => {});
+    }
+
+    // ── Full notification list: lazy-loaded on first bell click ──
+    let _notifLoaded = false;
+
+    function timeAgo(dateInput) {
+      const date = new Date(dateInput);
+      const now = new Date();
+      const diffMs = now - date;
+      const diffSec = Math.floor(diffMs / 1000);
+      const diffMin = Math.floor(diffSec / 60);
+      const diffHour = Math.floor(diffMin / 60);
+      const diffDay = Math.floor(diffHour / 24);
+
+      if (diffSec < 60) return 'Just now';
+      if (diffMin < 60) return `${diffMin}m ago`;
+      if (diffHour < 24) return `${diffHour}h ago`;
+      if (diffDay === 1) return 'Yesterday';
+      return `${diffDay}d ago`;
+    }
+
+    function loadNotifList() {
+      if (_notifLoaded || typeof fetchNotifications !== 'function') return;
+      _notifLoaded = true;
+
+      fetchNotifications().then(notifs => {
+        const notifArray = Array.isArray(notifs) ? notifs : (notifs.notifications || notifs.items || []);
+
+        let displayNotifs = notifArray.filter(n => !n.read).slice(0, 2);
+        if (displayNotifs.length < 2) {
+          const readNotifs = notifArray.filter(n => n.read).slice(0, 2 - displayNotifs.length);
+          displayNotifs = displayNotifs.concat(readNotifs);
+        }
+
+        const listHTML = displayNotifs.length === 0 ? `
+          <div class="notif-empty">
+            <div class="notif-empty-icon">🔔</div>
+            <div class="notif-empty-msg">No notifications yet</div>
+            <div class="notif-empty-sub">We'll let you know when something arrives</div>
+          </div>
+        ` : displayNotifs.map(n => `
+          <div class="notif-item ${!n.read ? 'unread' : ''}" style="padding:12px;border-bottom:1px solid #f1f5f9;display:flex;gap:12px;align-items:flex-start;${n.read ? 'background:#f8fafc;opacity:0.7;' : 'background:#fff;'}">
+            <div style="background:${!n.read ? '#f0e6ff' : '#e2e8f0'};color:${!n.read ? '#7f0df2' : '#64748b'};width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              🔔
+            </div>
+            <div>
+              <div style="font-size:13px;font-weight:${!n.read ? '600' : '500'};color:${!n.read ? '#1e293b' : '#64748b'};margin-bottom:4px;">${n.message || n.title || 'New Notification'}</div>
+              <div style="font-size:11px;color:#94a3b8;">${timeAgo(n.created_at)}</div>
+            </div>
+          </div>
+        `).join('') + `<a href="${PATHS.notifications}" style="display:block;text-align:center;padding:12px;font-size:13px;color:#7f0df2;text-decoration:none;font-weight:600;background:#f8fafc;">View all notifications</a>`;
+
+        document.querySelectorAll('#notifListContainer').forEach(container => {
+          container.innerHTML = listHTML;
+        });
+      }).catch(err => {
+        console.error('Failed to load notifications', err);
+        document.querySelectorAll('#notifListContainer').forEach(container => {
+          container.innerHTML = `
+            <div class="notif-empty">
+              <div class="notif-empty-icon">⚠️</div>
+              <div class="notif-empty-msg">Failed to load</div>
+            </div>`;
+        });
+      });
+    }
+
+    // Hook into bell-click to lazy-load
+    document.querySelectorAll('.nav-notif-btn').forEach(btn => {
+      btn.addEventListener('click', loadNotifList, { once: false });
+    });
+  }
 
   /* ─────────────────────────────────────────────────────────────────
      7. FIX NAV LINK HREFS (logged-out: login/signup buttons)

@@ -21,12 +21,12 @@ router = APIRouter( prefix='/auth', tags=['auth'])
 
 
 @router.post("/sign_up" , status_code=status.HTTP_201_CREATED)
-async def sign_up(user:CreateUser,db:db_dependency):
+def sign_up(user:CreateUser,db:db_dependency):
     return create_user(user,db)
 
 
 @router.post("/token",response_model=Token)
-async def login_access(form_data:Annotated[OAuth2PasswordRequestForm,Depends()],db:db_dependency):
+def login_access(form_data:Annotated[OAuth2PasswordRequestForm,Depends()],db:db_dependency):
     user = Authentication_user(form_data.username,form_data.password,db)
     if not user:
         raise HTTPException(status_code=401 , detail='Authentication failed')
@@ -40,7 +40,7 @@ async def login_access(form_data:Annotated[OAuth2PasswordRequestForm,Depends()],
 
 
 @router.post("/google", response_model=Token)
-async def login_with_google(payload: GoogleTokenRequest, db: db_dependency):
+def login_with_google(payload: GoogleTokenRequest, db: db_dependency):
     user = authenticate_google_user(payload.id_token, db)
     token = create_access_token(
         user.username,
@@ -52,7 +52,7 @@ async def login_with_google(payload: GoogleTokenRequest, db: db_dependency):
 
 
 @router.post("/reset_password" , status_code=status.HTTP_202_ACCEPTED)
-async def reset_password(user:user_dependency , db: db_dependency,data:update_password):
+def reset_password(user:user_dependency , db: db_dependency,data:update_password):
     return userServices.change_password(user, db , data)
 
 

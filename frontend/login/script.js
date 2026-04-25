@@ -34,7 +34,12 @@ async function handleLogin(e) {
 
         showNotification('Welcome back! Redirecting...');
         setTimeout(() => {
-            window.location.href = '../dashboard/index.html';
+            const user = getCachedUser();
+            if (user && (user.role === 'organizer' || user.role === 'admin')) {
+                window.location.href = '../org-dashboard/index.html';
+            } else {
+                window.location.href = '../dashboard/index.html';
+            }
         }, 800);
     } catch (err) {
         errorDiv.textContent = err.message || 'Login failed. Please check your credentials.';
@@ -90,5 +95,10 @@ function showNotification(message) {
 
 // Auto-redirect if already logged in
 if (isLoggedIn()) {
-    window.location.href = '../dashboard/index.html';
+    const user = getCachedUser();
+    if (user && (user.role === 'organizer' || user.role === 'admin')) {
+        window.location.href = '../org-dashboard/index.html';
+    } else {
+        window.location.href = '../dashboard/index.html';
+    }
 }

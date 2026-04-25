@@ -3,11 +3,18 @@
    organizer-profile.js
    ================================================================ */
 
-window.EVENTFY_USER = { name: 'Alex Rivers', initials: 'AR', role: 'Organizer' };
+/* Use real cached user from api.js (populated by navbar.js) */
+window.EVENTFY_USER = (function() {
+  try {
+    const u = typeof getCachedUser === 'function' ? getCachedUser() : null;
+    if (u) return { name: u.username || 'User', initials: (u.username || 'U').substring(0, 2).toUpperCase(), role: u.role || 'Member' };
+  } catch {}
+  return { name: 'User', initials: 'U', role: 'Member' };
+})();
 window.EVENTFY_LINKS = {
   profile:     'index.html',
-  myEvents:    '../organizer-dashboard/index.html',
-  savedEvents: '../my-dashboard/index.html'
+  myEvents:    '../org-dashboard/index.html',
+  savedEvents: '../dashboard/index.html'
 };
 
 (function () {

@@ -39,6 +39,14 @@ class UserUpdate(BaseModel):
     password: Optional[str]
     role: Optional[UserRole]
 
+class UpdateProfile(BaseModel):
+    """Schema for the profile edit modal — all fields optional for partial updates."""
+    full_name: Optional[str] = None
+    bio: Optional[str] = None
+    phone: Optional[str] = None
+    location: Optional[str] = None
+    website: Optional[str] = None
+
 class Token(BaseModel):
     access_token : str
     token_type : str

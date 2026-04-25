@@ -156,9 +156,6 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_bearer)], db: db
 
 
 def create_user(user: CreateUser, db):
-    # Validate email domain first before touching DB
-    if not (user.email.endswith("@gmail.com") or user.email.endswith("@estin.dz")):
-        raise HTTPException(status_code=422, detail="Only @gmail.com and @estin.dz emails are accepted")
 
     # Check for existing user
     existing = db.query(User).filter(

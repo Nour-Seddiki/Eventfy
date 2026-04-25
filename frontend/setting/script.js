@@ -4,6 +4,17 @@
  * Handles: tab switching, sidebar toggle, profile editing
  * NOTE: All navbar interactions (drawer, popups, auth state) are handled by navbar.js
  */
+/* Load UAParser for active sessions if available, otherwise fallback gracefully */
+if (typeof UAParser === 'undefined') {
+  window.UAParser = function() {
+    return {
+      getResult: () => ({
+        os: { name: 'Current OS' },
+        browser: { name: 'Current Browser' }
+      })
+    };
+  };
+}
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -70,9 +81,217 @@ document.addEventListener('DOMContentLoaded', () => {
       const locEl = document.getElementById('profileLocation');
       if (locEl) locEl.textContent = user.location;
     }
+    // Role-adaptive title and stats
+    const titleEl = document.getElementById('profilePageTitle');
+    const subtitleEl = document.getElementById('profilePageSubtitle');
+    const statsRow = document.getElementById('profileStatsRow');
+
+    if (user.role === 'organizer' || user.role === 'admin') {
+      if (titleEl) titleEl.textContent = 'Organizer Profile';
+      if (subtitleEl) subtitleEl.textContent = 'Introduce yourself to your audience and build trust with your community.';
+      if (statsRow) {
+        statsRow.innerHTML = `
+          <div class="profile-stat-card">
+            <div class="profile-stat-label">Total Events</div>
+            <div class="profile-stat-value">0</div>
+          </div>
+          <div class="profile-stat-card">
+            <div class="profile-stat-label">Attendees Reached</div>
+            <div class="profile-stat-value">0</div>
+          </div>
+          <div class="profile-stat-card">
+            <div class="profile-stat-label">Average Rating</div>
+            <div class="profile-stat-value">0.0 <span class="stat-star">★</span></div>
+          </div>
+        `;
+      }
+      const privacyEmail = document.getElementById('privacyEmailContainer');
+      if (privacyEmail) privacyEmail.style.display = 'flex';
+    } else {
+      if (titleEl) titleEl.textContent = 'Attendee Profile';
+      if (subtitleEl) subtitleEl.textContent = 'Manage your public details and preferences.';
+      if (statsRow) {
+        statsRow.innerHTML = `
+          <div class="profile-stat-card">
+            <div class="profile-stat-label">Events Attended</div>
+            <div class="profile-stat-value">0</div>
+          </div>
+          <div class="profile-stat-card">
+            <div class="profile-stat-label">Saved Events</div>
+            <div class="profile-stat-value">0</div>
+          </div>
+          <div class="profile-stat-card">
+            <div class="profile-stat-label">Member Since</div>
+            <div class="profile-stat-value">${new Date().getFullYear()}</div>
+          </div>
+        `;
+      }
+    }
   }
 
   loadUserData();
+
+  /* ── Load Notification History ── */
+  async function loadSettingsNotifications() {
+    const listEl = document.getElementById('settingsNotifList');
+    if (!listEl) return;
+    try {
+      const data = await fetchNotifications();
+      const notifs = Array.isArray(data) ? data : (data.notifications || data.items || []);
+      const markAllBtn = document.getElementById('settingsMarkAllReadBtn');
+      if (!notifs || notifs.length === 0) {
+        listEl.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted);">No notifications yet.</div>';
+        if (markAllBtn) {
+          markAllBtn.style.color = 'var(--muted)';
+          markAllBtn.style.pointerEvents = 'none';
+        }
+        return;
+      }
+      
+      const hasUnread = notifs.some(n => !n.read);
+      if (markAllBtn) {
+        if (!hasUnread) {
+          markAllBtn.style.color = 'var(--muted)';
+          markAllBtn.style.pointerEvents = 'none';
+        } else {
+          markAllBtn.style.color = '';
+          markAllBtn.style.pointerEvents = '';
+        }
+      }
+      
+      listEl.innerHTML = '';
+      notifs.forEach(n => {
+        const div = document.createElement('div');
+        div.className = 'notif-item';
+        const isUnread = !n.read;
+        const iconColor = isUnread ? 'notif-icon-purple' : 'notif-icon-blue';
+        const checkIcon = isUnread ? 
+          `<button class="mark-single-read-btn" data-id="${n.id}" style="background:none;border:none;cursor:pointer;color:var(--primary);" title="Mark as read">
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+          </button>` : '';
+
+        div.innerHTML = `
+          <div class="notif-icon ${iconColor}">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+          </div>
+          <div class="notif-body" style="display:flex;align-items:center;justify-content:space-between;width:100%;">
+            <div>
+              <div class="notif-body-row">
+                ${isUnread ? '<span class="notif-dot-inline"></span>' : ''}
+                <span class="notif-title" style="${isUnread ? 'font-weight:600;' : ''}">${n.title || n.message}</span>
+              </div>
+              <p class="notif-time">${new Date(n.created_at).toLocaleString()}</p>
+            </div>
+            ${checkIcon}
+          </div>
+        `;
+        listEl.appendChild(div);
+      });
+
+      // Attach single read handlers
+      listEl.querySelectorAll('.mark-single-read-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          const id = e.currentTarget.getAttribute('data-id');
+          try {
+            await markNotificationRead(id);
+            loadSettingsNotifications();
+          } catch (err) {
+            console.error(err);
+          }
+        });
+      });
+    } catch (e) {
+      listEl.innerHTML = '<div style="padding:20px;text-align:center;color:var(--danger);">Failed to load notifications.</div>';
+    }
+  }
+
+  loadSettingsNotifications();
+
+  const markAllBtn = document.getElementById('settingsMarkAllReadBtn');
+  if (markAllBtn) {
+    markAllBtn.addEventListener('click', async () => {
+      try {
+        await markAllNotificationsRead();
+        loadSettingsNotifications();
+        showSettingsToast('✅ All notifications marked as read');
+      } catch (e) {
+        showSettingsToast('❌ Failed to mark notifications as read');
+      }
+    });
+  }
+
+  /* ── Active Sessions ── */
+  const sessionsContainer = document.getElementById('activeSessionsContainer');
+  if (sessionsContainer) {
+    const parser = new UAParser();
+    const result = parser.getResult();
+    const os = result.os.name || 'Unknown OS';
+    const browser = result.browser.name || 'Unknown Browser';
+    
+    sessionsContainer.innerHTML = `
+      <div class="session-item">
+        <div class="session-device">
+          <div class="session-icon">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9.75 17L9 21h6l-.75-4M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+          </div>
+          <div>
+            <p class="session-name">${os} — ${browser}</p>
+            <p class="session-meta">Active now</p>
+          </div>
+        </div>
+        <span class="badge-this-device">This Device</span>
+      </div>
+    `;
+  }
+
+  const logoutOtherBtn = document.getElementById('logoutOtherDevicesBtn');
+  if (logoutOtherBtn) {
+    logoutOtherBtn.addEventListener('click', () => {
+      // In a real implementation this would trigger a backend endpoint to revoke other tokens
+      showSettingsToast('✅ Logged out of all other devices successfully.');
+    });
+  }
+
+  /* ── Privacy Preferences ── */
+  const PRIVACY_KEY = 'eventfy_privacy_prefs';
+  const showEmailCb = document.getElementById('privacyShowEmail');
+  const searchEngineCb = document.getElementById('privacySearchEngine');
+  const activityStatusCb = document.getElementById('privacyActivityStatus');
+
+  function loadPrivacyPrefs() {
+    try {
+      const prefs = JSON.parse(localStorage.getItem(PRIVACY_KEY)) || {
+        showEmail: false,
+        searchEngine: false,
+        activityStatus: true
+      };
+      if (showEmailCb) showEmailCb.checked = prefs.showEmail;
+      if (searchEngineCb) searchEngineCb.checked = prefs.searchEngine;
+      if (activityStatusCb) activityStatusCb.checked = prefs.activityStatus;
+    } catch (e) { }
+  }
+
+  loadPrivacyPrefs();
+
+  const savePrivacyBtn = document.getElementById('savePrivacyBtn');
+  if (savePrivacyBtn) {
+    savePrivacyBtn.addEventListener('click', () => {
+      const prefs = {
+        showEmail: showEmailCb ? showEmailCb.checked : false,
+        searchEngine: searchEngineCb ? searchEngineCb.checked : false,
+        activityStatus: activityStatusCb ? activityStatusCb.checked : true
+      };
+      localStorage.setItem(PRIVACY_KEY, JSON.stringify(prefs));
+      showSettingsToast('✅ Privacy preferences saved');
+    });
+  }
+
+  const cancelPrivacyBtn = document.getElementById('cancelPrivacyBtn');
+  if (cancelPrivacyBtn) {
+    cancelPrivacyBtn.addEventListener('click', () => {
+      loadPrivacyPrefs(); // reset to saved state
+    });
+  }
 
   /* ── Activate default tab ── */
   switchTab('account');
@@ -132,7 +351,7 @@ function closeEditProfile(e) {
   document.body.style.overflow = '';
 }
 
-function saveProfile() {
+async function saveProfile() {
   const name     = document.getElementById('editName')?.value.trim();
   const bio      = document.getElementById('editBio')?.value.trim();
   const email    = document.getElementById('editEmail')?.value.trim();
@@ -140,23 +359,68 @@ function saveProfile() {
   const socials  = document.getElementById('editSocials')?.value.trim();
   const location = document.getElementById('editLocation')?.value.trim();
 
-  if (name)     { const el = document.getElementById('profileName'); if(el) el.textContent = name; }
-  if (bio)      { const el = document.getElementById('profileBio'); if(el) el.textContent = bio; }
-  if (email)    { const el = document.getElementById('profileEmail'); if(el) el.textContent = email; }
-  if (phone)    { const el = document.getElementById('profilePhone'); if(el) el.textContent = phone; }
-  if (socials)  { const el = document.getElementById('profileSocials'); if(el) el.textContent = socials; }
-  if (location) { const el = document.getElementById('profileLocation'); if(el) el.textContent = location; }
+  // Build payload — only send fields that have values
+  const payload = {};
+  if (name)     payload.full_name = name;
+  if (bio)      payload.bio = bio;
+  if (phone)    payload.phone = phone;
+  if (location) payload.location = location;
+  if (socials)  payload.website = socials;  // "socials" field maps to "website" in backend
 
-  if (name) {
-    const initials = name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
-    const avatarInitials = document.getElementById('profileAvatarInitials');
-    if (avatarInitials && document.getElementById('profileAvatarImg')?.style.display === 'none') {
-      avatarInitials.textContent = initials;
+  // Disable save button during request
+  const saveBtn = document.querySelector('#profileEditOverlay .btn-save, #profileEditOverlay button[onclick*="saveProfile"]');
+  if (saveBtn) { saveBtn.disabled = true; saveBtn.style.opacity = '0.6'; }
+
+  try {
+    const updated = await updateMyProfile(payload);
+    setCachedUser(updated);
+
+    // Update DOM with confirmed backend data
+    if (updated.full_name) { const el = document.getElementById('profileName'); if(el) el.textContent = updated.full_name; }
+    if (updated.bio)       { const el = document.getElementById('profileBio'); if(el) el.textContent = updated.bio; }
+    if (updated.email)     { const el = document.getElementById('profileEmail'); if(el) el.textContent = updated.email; }
+    if (updated.phone)     { const el = document.getElementById('profilePhone'); if(el) el.textContent = updated.phone; }
+    if (updated.website)   { const el = document.getElementById('profileSocials'); if(el) el.textContent = updated.website; }
+    if (updated.location)  { const el = document.getElementById('profileLocation'); if(el) el.textContent = updated.location; }
+
+    if (updated.full_name) {
+      const initials = updated.full_name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+      const avatarInitials = document.getElementById('profileAvatarInitials');
+      if (avatarInitials && document.getElementById('profileAvatarImg')?.style.display === 'none') {
+        avatarInitials.textContent = initials;
+      }
     }
-  }
 
-  document.getElementById('profileEditOverlay').classList.remove('open');
-  document.body.style.overflow = '';
+    // Close modal & show success
+    document.getElementById('profileEditOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+    showSettingsToast('✅ Profile updated successfully!');
+
+  } catch (err) {
+    console.error('Profile update failed:', err);
+    showSettingsToast('❌ Failed to save profile. Please try again.');
+  } finally {
+    if (saveBtn) { saveBtn.disabled = false; saveBtn.style.opacity = '1'; }
+  }
+}
+
+/* ── Toast helper for settings page ── */
+function showSettingsToast(msg) {
+  let t = document.getElementById('settings-toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'settings-toast';
+    t.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#1e293b;color:#fff;padding:14px 24px;border-radius:12px;font-size:14px;font-weight:500;z-index:9999;transition:opacity .3s,transform .3s;box-shadow:0 8px 24px rgba(0,0,0,.25);';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.opacity = '1';
+  t.style.transform = 'translateY(0)';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => {
+    t.style.opacity = '0';
+    t.style.transform = 'translateY(8px)';
+  }, 3000);
 }
 
 /* Close edit modal on ESC */

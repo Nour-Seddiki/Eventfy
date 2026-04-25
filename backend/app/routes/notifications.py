@@ -11,7 +11,7 @@ router = APIRouter(prefix="/notifications", tags=["notifications"])
 
 
 @router.get("", status_code=status.HTTP_200_OK, response_model=NotificationListResponse)
-async def get_notifications(
+def get_notifications(
     user: user_dependency,
     db: db_dependency,
     skip: int = Query(0, ge=0),
@@ -22,19 +22,19 @@ async def get_notifications(
 
 
 @router.get("/unread-count", status_code=status.HTTP_200_OK)
-async def get_unread_count(user: user_dependency, db: db_dependency):
+def get_unread_count(user: user_dependency, db: db_dependency):
     """Get count of unread notifications"""
     return NotificationService.get_unread_count(user, db)
 
 
 @router.put("/mark-all-as-read", status_code=status.HTTP_200_OK)
-async def mark_all_notifications_as_read(user: user_dependency, db: db_dependency):
+def mark_all_notifications_as_read(user: user_dependency, db: db_dependency):
     """Mark all notifications as read"""
     return NotificationService.mark_all_as_read(user, db)
 
 
 @router.get("/{notification_id}", status_code=status.HTTP_200_OK, response_model=NotificationResponse)
-async def get_notification(
+def get_notification(
     user: user_dependency,
     db: db_dependency,
     notification_id: int
@@ -44,7 +44,7 @@ async def get_notification(
 
 
 @router.put("/{notification_id}/read", status_code=status.HTTP_200_OK, response_model=NotificationResponse)
-async def mark_notification_as_read(
+def mark_notification_as_read(
     user: user_dependency,
     db: db_dependency,
     notification_id: int
@@ -54,7 +54,7 @@ async def mark_notification_as_read(
 
 
 @router.delete("/{notification_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_notification(
+def delete_notification(
     user: user_dependency,
     db: db_dependency,
     notification_id: int

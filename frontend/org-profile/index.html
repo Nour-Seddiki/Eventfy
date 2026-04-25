@@ -6,10 +6,6 @@
   <meta name="description" content="Your Eventfy profile — manage your account, bio, and preferences."/>
   <title>My Profile | Eventfy</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><rect x='3' y='4' width='18' height='18' rx='4' fill='%237f0df2' opacity='.15'/><path d='M8 2v4M16 2v4M3 10h18' stroke='%237f0df2' stroke-width='2' stroke-linecap='round'/><circle cx='8' cy='15' r='1.5' fill='%237f0df2'/><circle cx='12' cy='15' r='1.5' fill='%237f0df2'/><circle cx='16' cy='15' r='1.5' fill='%237f0df2'/></svg>">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../common.css"/>
   <style>
     /* ─── Page Layout ─── */
     body { background: #f4f4f8; }
@@ -226,6 +222,10 @@
       .contact-grid { grid-template-columns: 1fr; }
     }
   </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../common.css">
 </head>
 <body>
   <!-- ═══════════════════════════════════════
@@ -233,6 +233,8 @@
   ═══════════════════════════════════════ -->
   <header class="site-header" id="siteHeader">
     <div class="header-inner">
+
+      <!-- Logo -->
       <a href="../Home/index.html" class="logo" aria-label="Eventfy home">
         <div class="logo-icon">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
@@ -246,6 +248,7 @@
         <span class="logo-text">Eventfy</span>
       </a>
 
+      <!-- Desktop Nav -->
       <nav class="header-nav" aria-label="Main navigation">
         <a href="../Home/index.html" class="nav-link">
           <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
@@ -255,7 +258,7 @@
           <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
           Browse
         </a>
-        <a href="../About/Index.html" class="nav-link">
+        <a href="../About/index.html" class="nav-link">
           <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path d="M12 16v-4M12 8h.01" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
           About
         </a>
@@ -263,10 +266,14 @@
           <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
           How it Works
         </a>
+
+        <!-- LOGGED-OUT: Login + Register -->
         <div class="nav-actions nav-logged-out" style="display:none">
           <button class="btn-login btn-do-login">Login</button>
           <button class="btn-register btn-do-register">Register</button>
         </div>
+
+        <!-- LOGGED-IN: Notif + Avatar + Logout -->
         <div class="nav-loggedin nav-logged-in" style="display:none">
           <div class="notif-popup-wrap">
             <button class="nav-notif-btn" id="desktopNotifBtn" aria-label="Notifications">
@@ -288,6 +295,7 @@
         </div>
       </nav>
 
+      <!-- Mobile: Notif + Avatar (logged in) -->
       <div class="mob-header-loggedin nav-logged-in" style="display:none">
         <div class="notif-popup-wrap">
           <button class="nav-notif-btn" id="mobNotifBtn" aria-label="Notifications">
@@ -304,6 +312,7 @@
         </div>
       </div>
 
+      <!-- Hamburger -->
       <button class="hamburger-btn" id="hamburgerBtn" aria-label="Open menu" aria-expanded="false">
         <span class="ham-line"></span>
         <span class="ham-line"></span>
@@ -312,7 +321,10 @@
     </div>
   </header>
 
+  <!-- Drawer Overlay -->
   <div class="drawer-overlay" id="drawerOverlay"></div>
+
+  <!-- Mobile Drawer -->
   <div class="nav-drawer" id="navDrawer" aria-hidden="true">
     <div class="drawer-inner">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
@@ -328,6 +340,8 @@
         </a>
         <button class="drawer-close-btn" id="drawerCloseBtn" aria-label="Close menu">✕</button>
       </div>
+
+      <!-- User card (logged in only) -->
       <div class="drawer-user-card drawer-logged-in" style="display:none">
         <div class="drawer-user-avatar"><span class="user-initials-text">U</span></div>
         <div>
@@ -335,20 +349,46 @@
           <div class="drawer-user-role user-role-text">Member</div>
         </div>
       </div>
+
       <nav class="drawer-nav">
-        <a href="../Home/index.html" class="drawer-link"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>Home</a>
-        <a href="../Events/index.html" class="drawer-link"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>Browse</a>
-        <a href="../About/Index.html" class="drawer-link"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path d="M12 16v-4M12 8h.01" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>About</a>
-        <a href="../Home/index.html#how-it-works" class="drawer-link"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>How it Works</a>
-        <a href="../org-profile/index.html" class="drawer-link drawer-logged-in" style="display:none"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>My Profile</a>
-        <a href="../dashboard/index.html" class="drawer-link drawer-logged-in" style="display:none"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>My Dashboard</a>
-        <a href="../saved-events/saved-events.html" class="drawer-link drawer-logged-in" style="display:none"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>Saved Events</a>
+        <a href="../Home/index.html" class="drawer-link">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+          Home
+        </a>
+        <a href="../Events/index.html" class="drawer-link">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+          Browse
+        </a>
+        <a href="../About/index.html" class="drawer-link">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path d="M12 16v-4M12 8h.01" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+          About
+        </a>
+        <a href="../Home/index.html#how-it-works" class="drawer-link">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+          How it Works
+        </a>
+        <!-- Logged-in links -->
+        <a href="../org-profile/index.html" class="drawer-link drawer-logged-in" style="display:none">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Profile Settings
+        </a>
+        <a href="../dashboard/index.html" class="drawer-link drawer-logged-in" style="display:none">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          My Dashboard
+        </a>
+        <a href="../saved-events/saved-events.html" class="drawer-link drawer-logged-in" style="display:none">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+          Saved Events
+        </a>
       </nav>
+
       <div class="drawer-bottom-menu">
+        <!-- Logged-out buttons -->
         <div class="drawer-logged-out" style="display:none;flex-direction:column;gap:8px">
           <button class="btn-register btn-do-register" style="width:100%;height:44px;border-radius:12px;font-size:14px">Register</button>
           <button class="btn-login btn-do-login" style="width:100%;height:44px;border-radius:12px;font-size:14px;background:#f5f0ff;border:2px solid #7f0df2;color:#7f0df2">Login</button>
         </div>
+        <!-- Logged-in logout -->
         <button class="btn-drawer-logout btn-do-logout drawer-logged-in" style="display:none">
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
           Log out
@@ -411,7 +451,7 @@
               </div>
               <div>
                 <div class="contact-label">Email</div>
-                <div class="contact-value" id="profileEmail">—</div>
+                <div class="contact-value" id="profileEmail">Not provided</div>
               </div>
             </div>
             <div class="contact-item">
@@ -420,7 +460,16 @@
               </div>
               <div>
                 <div class="contact-label">Phone</div>
-                <div class="contact-value" id="profilePhone">—</div>
+                <div class="contact-value" id="profilePhone">Not provided</div>
+              </div>
+            </div>
+            <div class="contact-item">
+              <div class="contact-icon">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0118 0z" stroke-width="2"/><circle cx="12" cy="10" r="3" stroke-width="2"/></svg>
+              </div>
+              <div>
+                <div class="contact-label">Location</div>
+                <div class="contact-value" id="profileLocation">Not provided</div>
               </div>
             </div>
             <div class="contact-item">
@@ -429,7 +478,7 @@
               </div>
               <div>
                 <div class="contact-label">Website</div>
-                <div class="contact-value" id="profileWebsite">—</div>
+                <div class="contact-value" id="profileWebsite">Not provided</div>
               </div>
             </div>
             <div class="contact-item">
@@ -448,11 +497,11 @@
       <!-- Stats row (adapts by role) -->
       <div class="stats-row" id="statsRow">
         <div class="stat-card">
-          <div class="stat-value" id="stat1Value">—</div>
+          <div class="stat-value" id="stat1Value">0</div>
           <div class="stat-label" id="stat1Label">Events Attended</div>
         </div>
         <div class="stat-card">
-          <div class="stat-value" id="stat2Value">—</div>
+          <div class="stat-value" id="stat2Value">0</div>
           <div class="stat-label" id="stat2Label">Saved Events</div>
         </div>
         <div class="stat-card">
@@ -484,6 +533,10 @@
       <div class="form-group">
         <label class="form-label">Phone</label>
         <input class="form-input" type="tel" id="editPhone" placeholder="e.g. 0555 123 456"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Location</label>
+        <input class="form-input" type="text" id="editLocation" placeholder="e.g. Algiers, Algeria"/>
       </div>
       <div class="form-group">
         <label class="form-label">Website / Social Link</label>
@@ -554,9 +607,10 @@
       document.getElementById('profileBio').textContent = u.bio || 'No bio yet. Click "Edit Profile" to add one!';
 
       // Contact fields
-      document.getElementById('profileEmail').textContent = u.email || '—';
-      document.getElementById('profilePhone').textContent = u.phone || '—';
-      document.getElementById('profileWebsite').textContent = u.website || u.socials || '—';
+      document.getElementById('profileEmail').textContent = u.email || 'Not provided';
+      document.getElementById('profilePhone').textContent = u.phone || 'Not provided';
+      document.getElementById('profileLocation').textContent = u.location || 'Not provided';
+      document.getElementById('profileWebsite').textContent = u.website || u.socials || 'Not provided';
       document.getElementById('profileJoined').textContent = formatDate(u.created_at);
 
       // Organizer banner
@@ -568,7 +622,18 @@
       document.getElementById('editName').value = name;
       document.getElementById('editBio').value = u.bio || '';
       document.getElementById('editPhone').value = u.phone || '';
-      document.getElementById('editWebsite').value = u.website || u.socials || '';
+      document.getElementById('editLocation').value = u.location || '';
+      
+      const websiteField = document.getElementById('editWebsite');
+      websiteField.value = u.website || u.socials || '';
+      
+      if (role === 'attendee') {
+        document.getElementById('profileWebsite').parentElement.parentElement.style.display = 'none';
+        websiteField.parentElement.style.display = 'none';
+      } else {
+        document.getElementById('profileWebsite').parentElement.parentElement.style.display = 'flex';
+        websiteField.parentElement.style.display = 'block';
+      }
     }
 
     /* ── Load stats (tickets + saved) ── */
@@ -601,8 +666,8 @@
           document.getElementById('stat2Label').textContent = 'Saved Events';
         }
       } catch(e) {
-        document.getElementById('stat1Value').textContent = '—';
-        document.getElementById('stat2Value').textContent = '—';
+        document.getElementById('stat1Value').textContent = '0';
+        document.getElementById('stat2Value').textContent = '0';
         document.getElementById('stat3Value').textContent = '—';
       }
     }
@@ -653,31 +718,19 @@
         full_name: document.getElementById('editName').value.trim() || undefined,
         bio: document.getElementById('editBio').value.trim() || undefined,
         phone: document.getElementById('editPhone').value.trim() || undefined,
+        location: document.getElementById('editLocation').value.trim() || undefined,
         website: document.getElementById('editWebsite').value.trim() || undefined,
       };
       // Remove undefined keys
       Object.keys(updates).forEach(k => updates[k] === undefined && delete updates[k]);
 
       try {
-        // Try to call update endpoint
-        let updated = null;
-        if (typeof apiFetch === 'function') {
-          const res = await apiFetch('/users/update_me', {
-            method: 'PUT',
-            body: JSON.stringify(updates)
-          });
-          if (res.ok) {
-            updated = await res.json();
-          } else {
-            throw new Error('Save failed');
-          }
-        }
+        // Use the dedicated profile update API
+        const updated = await updateMyProfile(updates);
 
-        // Update local display even if API fails (optimistic)
-        const merged = { ...(userData || {}), ...updates };
-        if (updated) setCachedUser(updated);
-        else setCachedUser(merged);
-        renderProfile(updated || merged);
+        // Update local cache and display
+        setCachedUser(updated);
+        renderProfile(updated);
         closeModal();
         showToast('Profile updated successfully ✓');
       } catch(e) {

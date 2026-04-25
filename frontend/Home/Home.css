@@ -137,6 +137,23 @@ header { width:100%; padding-top: var(--nav-h); }
 .btn-host:hover { background:var(--text); color:var(--white); border-color:var(--text); transform:translateY(-3px); }
 .btn-host:active { transform:scale(.97); }
 
+/* ── Role-aware hero CTA variants ── */
+.btn-host.btn-about {
+  background: #fff7ed; border-color: #f59e0b; color: #92400e;
+}
+.btn-host.btn-about:hover {
+  background: #f59e0b; color: var(--white); border-color: #f59e0b;
+  transform: translateY(-3px);
+}
+
+.btn-host.btn-dashboard {
+  background: #f5f0ff; border-color: var(--purple); color: var(--purple);
+}
+.btn-host.btn-dashboard:hover {
+  background: var(--purple); color: var(--white); border-color: var(--purple);
+  transform: translateY(-3px);
+}
+
 .page1-2 {
   flex:1; display:flex; justify-content:center; position:relative; z-index:1;
 }
@@ -316,6 +333,15 @@ header { width:100%; padding-top: var(--nav-h); }
 .btn-cta-primary:hover::after { transform:translateX(100%); }
 .btn-cta-primary:hover { transform:translateY(-3px) scale(1.03); box-shadow:0 8px 28px rgba(0,0,0,.25); }
 .btn-cta-primary:active { transform:scale(.97); }
+
+/* ── Role-aware CTA variants ── */
+.btn-cta-primary.btn-cta-host {
+  background: var(--orange); color: var(--white);
+  box-shadow: 0 4px 16px rgba(255,107,0,.35);
+}
+.btn-cta-primary.btn-cta-host:hover {
+  box-shadow: 0 8px 28px rgba(255,107,0,.45);
+}
 
 .btn-cta-outline {
   height:56px; padding:0 32px; border-radius:24px;

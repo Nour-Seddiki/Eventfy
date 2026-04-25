@@ -115,7 +115,7 @@
     // View details buttons
     grid.querySelectorAll('.btn-view-details').forEach(btn => {
       btn.addEventListener('click', () => {
-        window.location.href = `../event Description/event-detail.html?eventId=${btn.dataset.eventId}`;
+        window.location.href = `../event Description/event-detail.html?id=${btn.dataset.eventId}`;
       });
     });
   }

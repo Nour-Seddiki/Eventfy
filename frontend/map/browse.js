@@ -1,11 +1,11 @@
 'use strict';
 
 /* ── NAV / DRAWER ── */
-const hamburgerBtn   = document.getElementById('hamburgerBtn');
-const navDrawer      = document.getElementById('navDrawer');
-const drawerOverlay  = document.getElementById('drawerOverlay');
+const hamburgerBtn = document.getElementById('hamburgerBtn');
+const navDrawer = document.getElementById('navDrawer');
+const drawerOverlay = document.getElementById('drawerOverlay');
 const drawerCloseBtn = document.getElementById('drawerCloseBtn');
-const siteHeader     = document.getElementById('siteHeader');
+const siteHeader = document.getElementById('siteHeader');
 
 window.addEventListener('scroll', () =>
   siteHeader.classList.toggle('scrolled', window.scrollY > 10), { passive: true });
@@ -34,33 +34,88 @@ drawerOverlay.addEventListener('click', closeDrawer);
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDrawer(); });
 document.querySelectorAll('.drawer-link').forEach(l => l.addEventListener('click', closeDrawer));
 
-document.addEventListener('DOMContentLoaded', () => { authInit(); });
+/* auth/drawer/popup init handled by navbar.js */
 
-/* ── EVENT DATA ── */
-const EVENTS = [
-  {id:1,  name:"Tech Innovators Summit 2026",   catKey:"science",  badge:"indigo", month:10, city:"Algiers",     dateStr:"NOV 14", time:"10:00 AM", venue:"Bab Ezzouar, Algiers",              lat:36.7372, lng:3.15,     price:1200, img:"https://lh3.googleusercontent.com/aida-public/AB6AXuDId7VpFfX0ROxT52voezzX99Bcxa63u1UvsN0BqOGQpJEhFQgHPuqk5WbDNqTyeIqmVW_VlQ_OHNTcReVpEVgZmFo8Z9WN-EjUuMN348qEbsPFMCXYRNN1txB1XZ6ckDmujjzqLpMBYcqXwNC-N5aFMTOsVa6UCYP3Akea9tDCC8z5xyQJtpE6_2_FI1hL3gdQF3hSVGLAsNknIXSs7_ea8QezAuUUW2xrDvSpy7SJ6xmYZyTlH1YkLaL8wTByEnyVtbX0Wj9EzXJF"},
-  {id:2,  name:"Annual City Marathon",           catKey:"sports",   badge:"orange", month:11, city:"Algiers",     dateStr:"DEC 02", time:"07:00 AM", venue:"Alger Center, Algiers",             lat:36.7538, lng:3.0588,  price:0,    img:"https://lh3.googleusercontent.com/aida-public/AB6AXuAtlXD3Q4HnGv46VZY3uhwE7m1FfJDsxslCMjzhP7uPnNsDi-yTM6HnaiePFzFFNZNlmAxwuCgSp8FcajfqcA3qU57XQB_x7LXNxWURzK5H1EOuKlynF-vhvxYpGHRwGq_aXwt2igpNNs2UV-qDdjMj3s_9H_oa7aAoAU2xx71cN5rfidYn_r1YW4e-F_couLomtB-a-xnfzQR9Wm8lkw41MZLHsh8JCxsfCsd_TzLBd7aPujJQ3v_tQFegZTMx5mmztCAQCP22D4vj"},
-  {id:3,  name:"NexTrace CTF",                   catKey:"science",  badge:"blue",   month:9,  city:"Bejaia",      dateStr:"OCT 28", time:"08:00 PM", venue:"Estin, Bejaia",                     lat:36.7515, lng:5.0564,  price:0,    img:"https://lh3.googleusercontent.com/aida-public/AB6AXuCK0TO831JBi1eDeUDyShTKyB1_nIX6XhlPxwVNPvWr-33nmVuHRmKxZ4yexavieSJtPX9FKVn_AKSj28lSM7ElgKQ4jrAsYWcqNw_s68ESjD5HyGNPzSto3iIqr_jiDCkOijKTBOQ3DKawENQMolN2PzGXpNllwg8et6pAp1UhmqmPa6vFo0IpS3ni68JtpLme2ZAKSDPkT5b29nivR3beiZSy90bbnUYdGTSsPtber_V_ijQdqjX1T5AQ6QMaQPz0ydZ5odYklkve"},
-  {id:4,  name:"Startup Founder Meetup",         catKey:"business", badge:"green",  month:10, city:"Batna",       dateStr:"NOV 18", time:"02:00 PM", venue:"Batna University, Batna",           lat:35.5556, lng:6.1744,  price:500,  img:"https://lh3.googleusercontent.com/aida-public/AB6AXuANkTIexrer3vGWa7u5uGphJoOFIcAuMmHMFqO3PIwiz1sRU4anD_lJ8Grp7P1qjz0Z9fQuSO0eN7qVN-Nwr4usHpoTrjEMCM6ygUHOfDJLUUTHyUMNsRVo5ta_QxIwDzUcLR88FaTI5NkuQzj01JAfdsxxO5fCwoE7Aw92jgmXveTEt3Owgd8KQI6fMETm4wF8ef7OJYbEsTS7hnsqsAvxnPOS3E70zvj0mNyu12XycUYLmVeO9xHzAAKiqG585J4kbZbFr63uiaWs"},
-  {id:5,  name:"Valorant Tournament",            catKey:"gaming",   badge:"purple", month:11, city:"Algiers",     dateStr:"DEC 10", time:"06:00 PM", venue:"eSports Hub, Algiers",              lat:36.72,   lng:3.08,    price:800,  img:"https://lh3.googleusercontent.com/aida-public/AB6AXuD4Db2Wc6wmWsEDkWGM4F2xBoUfc6_DiW0-rii9vWGdLryBJObKzmXfCW4gJp6NBO3r_MDPOE8n9nBrFFPnA8iiRoMl6LUVbp7NceMjufpR5U4BmxVYleRxA7229D-9KA_Lb5MwxBa5S6kZ9c7FydfyK3hXqfq_eS-nzZnTb6x-v5Lnmj9CLXLVrlQwGp7esNZhXN4smQicWDa8lItpl5R4HMa3UJqS1233BfkARcgQ8Fbzu80ZbpWpNmoayCtSYf1s2cXIjx_Hiy_r"},
-  {id:6,  name:"Festival Algérien du Couscous",  catKey:"food",     badge:"rose",   month:0,  city:"Algiers",     dateStr:"JAN 05", time:"01:00 PM", venue:"Riad El Feth, Algiers",             lat:36.744,  lng:3.062,   price:300,  img:"https://lh3.googleusercontent.com/aida-public/AB6AXuCG3Sd72Dc0x-2Ghzy1lJ7nfmmZOjnLr1ODO9TUnEBAHDI8SVo8bJw4cXF-TgaJbSk0LKE2XrhIWeUTWeG-slgsPjfHF1fRi8M7PGbFfclS3sxNwvwEKHGOzZH9-rxLUwhtXcdss8_e6iYTYo5Di3qNBYZ79ogOh_xNmyFOMlvkgu7RTFo1KZKVlu5lk2ZKQAbGl8PsdWTwAAgjnM0ntMVzFWqEN4g8-csa5HlHBZkIKivd_rknmeaun7RXwWh6JOlEn_Yja_Vc"},
-  {id:7,  name:"Jazz Night Under the Stars",     catKey:"music",    badge:"indigo", month:1,  city:"Algiers",     dateStr:"FEB 12", time:"08:00 PM", venue:"Jardin d'Essai, Algiers",           lat:36.76,   lng:3.075,   price:1000, img:"https://images.unsplash.com/photo-1511192336575-5a79af67a629?w=600&auto=format&fit=crop"},
-  {id:8,  name:"Modern Art Exhibition",          catKey:"art",      badge:"amber",  month:2,  city:"Algiers",     dateStr:"MAR 05", time:"10:00 AM", venue:"MAMA Museum, Algiers",              lat:36.735,  lng:3.058,   price:200,  img:"https://images.unsplash.com/photo-1536924940846-227afb31e2a5?w=600&auto=format&fit=crop"},
-  {id:9,  name:"Sunset Yoga Session",            catKey:"sports",   badge:"teal",   month:2,  city:"Algiers",     dateStr:"MAR 15", time:"05:30 PM", venue:"Sablettes, Algiers",                lat:36.77,   lng:3.045,   price:0,    img:"https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=600&auto=format&fit=crop"},
-  {id:10, name:"Oran Summer Vibes Festival",     catKey:"music",    badge:"purple", month:10, city:"Oran",        dateStr:"NOV 05", time:"06:00 PM", venue:"Le Méridien, Oran",                 lat:35.6976, lng:-0.6337, price:1500, img:"https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=600&auto=format&fit=crop"},
-  {id:11, name:"Constantine Book Fair",          catKey:"science",  badge:"blue",   month:11, city:"Constantine", dateStr:"DEC 14", time:"09:00 AM", venue:"Palais de la Culture, Constantine", lat:36.365,  lng:6.6147,  price:0,    img:"https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=600&auto=format&fit=crop"},
-  {id:12, name:"Tlemcen Arts & Crafts Fair",     catKey:"art",      badge:"amber",  month:10, city:"Tlemcen",     dateStr:"NOV 08", time:"10:00 AM", venue:"Grande Mosquée, Tlemcen",           lat:34.8839, lng:-1.3151, price:300,  img:"https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=600&auto=format&fit=crop"}
-];
+let EVENTS = [];
 
 let map, markers = {}, activeId = null;
 const filters = { date: 'all', category: 'all', location: 'all', price: 'all' };
 let activeCat = 'all';
 
-document.addEventListener('DOMContentLoaded', () => {
+const CITY_COORDS = {
+  "Algiers": {lat: 36.7372, lng: 3.15},
+  "Oran": {lat: 35.6976, lng: -0.6337},
+  "Constantine": {lat: 36.365, lng: 6.6147},
+  "Tlemcen": {lat: 34.8839, lng: -1.3151},
+  "Batna": {lat: 35.5556, lng: 6.1744},
+  "Bejaia": {lat: 36.7515, lng: 5.0564},
+  "Annaba": {lat: 36.9, lng: 7.7667},
+  "Tizi Ouzou": {lat: 36.7118, lng: 4.0459},
+  "Tamanrasset": {lat: 22.785, lng: 5.5228}
+};
+
+document.addEventListener('DOMContentLoaded', async () => {
   map = L.map('map', { center: [28.0339, 1.6596], zoom: 5, zoomControl: false, attributionControl: false });
   L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { maxZoom: 19 }).addTo(map);
   L.control.attribution({ prefix: false, position: 'bottomright' })
     .addAttribution('© <a href="https://carto.com">CartoDB</a>').addTo(map);
+
+  try {
+    const apiEvents = await fetchPublicEvents(100);
+    EVENTS = apiEvents.map(ev => {
+      const d = new Date(ev.date || new Date());
+      const m = d.getMonth();
+      const price = parseFloat(ev.price) || 0;
+
+      let cat = (ev.category || 'all').toLowerCase();
+      let badgeColor = 'purple';
+      if (cat.includes('science') || cat.includes('tech')) badgeColor = 'indigo';
+      else if (cat.includes('sport')) badgeColor = 'orange';
+      else if (cat.includes('business')) badgeColor = 'green';
+      else if (cat.includes('food')) badgeColor = 'rose';
+      else if (cat.includes('art')) badgeColor = 'amber';
+      else if (cat.includes('music')) badgeColor = 'blue';
+
+      let city = "Algiers";
+      if (ev.location) {
+         let locLower = ev.location.toLowerCase();
+         if (locLower.includes("oran")) city = "Oran";
+         else if (locLower.includes("constantine")) city = "Constantine";
+         else if (locLower.includes("tlemcen")) city = "Tlemcen";
+         else if (locLower.includes("batna")) city = "Batna";
+         else if (locLower.includes("bejaia")) city = "Bejaia";
+         else if (locLower.includes("annaba")) city = "Annaba";
+         else if (locLower.includes("tizi")) city = "Tizi Ouzou";
+         else if (locLower.includes("tamanrasset")) city = "Tamanrasset";
+         else city = ev.location.split(',')[0].trim();
+      }
+
+      let coords = CITY_COORDS[city] || CITY_COORDS["Algiers"];
+      
+      // Random offset so markers don't overlap perfectly
+      let rLat = coords.lat + (Math.random() - 0.5) * 0.04;
+      let rLng = coords.lng + (Math.random() - 0.5) * 0.04;
+
+      return {
+        id: ev.id,
+        name: ev.title || "Untitled",
+        catKey: cat,
+        badge: badgeColor,
+        month: m,
+        city: city,
+        dateStr: d.toLocaleString('en-US', {month: 'short', day: '2-digit'}).toUpperCase(),
+        time: d.toLocaleTimeString('en-US', {hour: '2-digit', minute:'2-digit'}),
+        venue: ev.location || "TBA",
+        lat: rLat,
+        lng: rLng,
+        price: price,
+        img: ev.image ? (ev.image.startsWith('http') ? ev.image : `${API_BASE}${ev.image}`) : "https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=600&q=80"
+      };
+    });
+  } catch(e) {
+    console.error("Failed to fetch events", e);
+  }
+
   EVENTS.forEach(ev => addMarker(ev));
   renderList();
   document.getElementById('panelSubtitle').textContent =
@@ -110,20 +165,20 @@ function getFiltered() {
     if (filters.category !== 'all' && ev.catKey !== filters.category) return false;
     if (activeCat !== 'all' && filters.category === 'all' && ev.catKey !== activeCat) return false;
     const m = ev.month;
-    if (filters.date === 'oct' && m !== 9)  return false;
+    if (filters.date === 'oct' && m !== 9) return false;
     if (filters.date === 'nov' && m !== 10) return false;
     if (filters.date === 'dec' && m !== 11) return false;
-    if (filters.date === 'jan' && m !== 0)  return false;
-    if (filters.date === 'feb' && m !== 1)  return false;
-    if (filters.date === 'mar' && m !== 2)  return false;
+    if (filters.date === 'jan' && m !== 0) return false;
+    if (filters.date === 'feb' && m !== 1) return false;
+    if (filters.date === 'mar' && m !== 2) return false;
     return true;
   });
 }
 
 function renderList() {
-  const list     = document.getElementById('eventList');
-  const noRes    = document.getElementById('noResults');
-  const meta     = document.getElementById('resultsMeta');
+  const list = document.getElementById('eventList');
+  const noRes = document.getElementById('noResults');
+  const meta = document.getElementById('resultsMeta');
   const filtered = getFiltered();
   EVENTS.forEach(ev => {
     const m = markers[ev.id]; if (!m) return;
@@ -165,7 +220,7 @@ function openDD(type, btn) {
   closeAllDD();
   const dd = document.getElementById('dd-' + type); if (!dd) return;
   const r = btn.getBoundingClientRect();
-  dd.style.top  = (r.bottom + 6) + 'px';
+  dd.style.top = (r.bottom + 6) + 'px';
   dd.style.left = r.left + 'px';
   dd.classList.add('open');
   btn.classList.add('active');
@@ -188,21 +243,21 @@ function pickFilter(type, value, el) {
   renderList();
 }
 
-function setCat(cat)      { activeCat = cat; filters.category = 'all'; syncCatPills(cat); renderList(); }
-function syncCatPills(cat){ document.querySelectorAll('.cat-pill').forEach(p => p.classList.toggle('active', p.dataset.ckey === cat)); }
-function mapIn()  { map.zoomIn(); }
+function setCat(cat) { activeCat = cat; filters.category = 'all'; syncCatPills(cat); renderList(); }
+function syncCatPills(cat) { document.querySelectorAll('.cat-pill').forEach(p => p.classList.toggle('active', p.dataset.ckey === cat)); }
+function mapIn() { map.zoomIn(); }
 function mapOut() { map.zoomOut(); }
 function fitAll() { const f = getFiltered(); if (!f.length) return; map.fitBounds(L.latLngBounds(f.map(e => [e.lat, e.lng])), { padding: [60, 60] }); }
-function geoMe()  { if (!navigator.geolocation) return; navigator.geolocation.getCurrentPosition(p => map.flyTo([p.coords.latitude, p.coords.longitude], 13), () => {}); }
+function geoMe() { if (!navigator.geolocation) return; navigator.geolocation.getCurrentPosition(p => map.flyTo([p.coords.latitude, p.coords.longitude], 13), () => { }); }
 
 /* ── MOBILE TAB SWITCHER ── */
 let currentMobileTab = 'list';
 function switchMobileTab(tab) {
   currentMobileTab = tab;
-  const leftPanel    = document.querySelector('.left-panel');
+  const leftPanel = document.querySelector('.left-panel');
   const mapContainer = document.querySelector('.map-container');
-  const tabListBtn   = document.getElementById('tabList');
-  const tabMapBtn    = document.getElementById('tabMap');
+  const tabListBtn = document.getElementById('tabList');
+  const tabMapBtn = document.getElementById('tabMap');
   if (tab === 'list') {
     leftPanel.classList.remove('mob-hidden');
     mapContainer.classList.add('mob-hidden');
@@ -224,7 +279,7 @@ window.addEventListener('resize', () => {
   const isMobile = window.innerWidth <= 900;
   if (isMobile === lastMobile) return;
   lastMobile = isMobile;
-  const leftPanel    = document.querySelector('.left-panel');
+  const leftPanel = document.querySelector('.left-panel');
   const mapContainer = document.querySelector('.map-container');
   if (!isMobile) {
     /* restored to desktop: show both panels, reset body style */

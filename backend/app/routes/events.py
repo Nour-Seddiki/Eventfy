@@ -21,9 +21,16 @@ public_router = APIRouter(tags=['Public Events'])
 # ══════════════════════════════════════════
 
 @public_router.get("/events/public", status_code=status.HTTP_200_OK)
-async def list_public_events(db: db_dependency, limit: int = Query(20, ge=1, le=100)):
-    """List all upcoming events — no login required."""
-    events = db.query(Event).order_by(Event.date.asc()).limit(limit).all()
+def list_public_events(db: db_dependency, limit: int = Query(20, ge=1, le=100)):
+    """List all upcoming events with ticket sales count — no login required."""
+    rows = (
+        db.query(Event, func.count(Ticket.id).label("tickets_sold"))
+        .outerjoin(Ticket, (Ticket.event_id == Event.id) & (Ticket.status != "cancelled"))
+        .group_by(Event.id)
+        .order_by(Event.date.asc())
+        .limit(limit)
+        .all()
+    )
     return [
         {
             "id": e.id,
@@ -36,13 +43,14 @@ async def list_public_events(db: db_dependency, limit: int = Query(20, ge=1, le=
             "available_tickets": e.available_tickets,
             "image": e.image,
             "organizer_id": e.organizer_id,
+            "tickets_sold": tickets_sold,
         }
-        for e in events
+        for e, tickets_sold in rows
     ]
 
 
 @public_router.get("/events/trending", status_code=status.HTTP_200_OK)
-async def trending_events(db: db_dependency, limit: int = Query(5, ge=1, le=50)):
+def trending_events(db: db_dependency, limit: int = Query(5, ge=1, le=50)):
     """Trending events (most tickets sold) — no login required."""
     current_time = datetime.now(timezone.utc)
     rows = (
@@ -73,7 +81,7 @@ async def trending_events(db: db_dependency, limit: int = Query(5, ge=1, le=50))
 
 
 @public_router.get("/events/{event_id}/similar", status_code=status.HTTP_200_OK)
-async def similar_events(db: db_dependency, event_id: int = Path(gt=0), limit: int = Query(5, ge=1, le=50)):
+def similar_events(db: db_dependency, event_id: int = Path(gt=0), limit: int = Query(5, ge=1, le=50)):
     """Similar events by category — no login required."""
     base = db.query(Event).filter(Event.id == event_id).first()
     if not base:
@@ -105,8 +113,28 @@ async def similar_events(db: db_dependency, event_id: int = Path(gt=0), limit: i
     ]
 
 
+@public_router.get("/events/public/{event_id}", status_code=status.HTTP_200_OK)
+def get_public_event(db: db_dependency, event_id: int = Path(gt=0)):
+    """Get a single event by ID — no login required."""
+    e = db.query(Event).filter(Event.id == event_id).first()
+    if not e:
+        raise HTTPException(status_code=404, detail="Event not found")
+    return {
+        "id": e.id,
+        "title": e.title,
+        "description": e.description,
+        "category": e.category,
+        "location": e.location,
+        "price": e.price,
+        "date": e.date.isoformat() if e.date else None,
+        "available_tickets": e.available_tickets,
+        "image": e.image,
+        "organizer_id": e.organizer_id,
+    }
+
+
 @public_router.get("/events/search", status_code=status.HTTP_200_OK)
-async def search_events(
+def search_events(
     db: db_dependency,
     q: str = Query("", description="Search keyword"),
     category: str = Query("", description="Category filter"),
@@ -144,37 +172,37 @@ async def search_events(
 # ══════════════════════════════════════════
 
 @router.post("/create_event", status_code=status.HTTP_201_CREATED)
-async def create_event(user: user_dependency, db: db_dependency, event_data: eventRequest):
+def create_event(user: user_dependency, db: db_dependency, event_data: eventRequest):
     return EventService().create_event(user, db, event_data)
 
 
 @router.get("/event_list", status_code=status.HTTP_200_OK)
-async def list_all_events(user: user_dependency, db: db_dependency):
+def list_all_events(user: user_dependency, db: db_dependency):
     return EventService().list_events(user, db)
 
 
 @router.get("/get_event_by_id/{event_id}", status_code=status.HTTP_200_OK)
-async def get_event_by_id(user: user_dependency, db: db_dependency, event_id: int = Path(gt=0)):
+def get_event_by_id(user: user_dependency, db: db_dependency, event_id: int = Path(gt=0)):
     return EventService().get_event_by_id(user, db, event_id)
 
 
 @router.get("/list_event_by_location/{keyword}", status_code=status.HTTP_200_OK)
-async def list_events_by_location(user: user_dependency, db: db_dependency, keyword: str):
+def list_events_by_location(user: user_dependency, db: db_dependency, keyword: str):
     return EventService().search_events_by_location(user, db, keyword)
 
 
 @router.get("/list_event_by_title/{keyword}", status_code=status.HTTP_200_OK)
-async def list_events_by_title(user: user_dependency, db: db_dependency, keyword: str):
+def list_events_by_title(user: user_dependency, db: db_dependency, keyword: str):
     return EventService().search_events_by_title(user, db, keyword)
 
 
 @router.get("/list_event_by_category/{keyword}", status_code=status.HTTP_200_OK)
-async def list_events_by_category(user: user_dependency, db: db_dependency, keyword: str):
+def list_events_by_category(user: user_dependency, db: db_dependency, keyword: str):
     return EventService().search_events_by_category(user, db, keyword)
 
 
 @router.put("/update_event/{event_id}", status_code=status.HTTP_202_ACCEPTED)
-async def update_event(user: user_dependency, db: db_dependency, data: eventUpdate, event_id: int = Path(gt=0)):
+def update_event(user: user_dependency, db: db_dependency, data: eventUpdate, event_id: int = Path(gt=0)):
     return EventService().update_event(user, db, data, event_id)
 
 
@@ -203,5 +231,5 @@ async def upload_event_image(
 
 
 @router.delete("/delete_event/{event_id}", status_code=status.HTTP_202_ACCEPTED)
-async def delete_event(user: user_dependency, db: db_dependency, event_id: int = Path(gt=0)):
+def delete_event(user: user_dependency, db: db_dependency, event_id: int = Path(gt=0)):
     return EventService().delete_event(user, db, event_id)

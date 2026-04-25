@@ -9,7 +9,7 @@ router = APIRouter(prefix="/payment", tags=["payment"])
 
 
 @router.post("/checkout/{event_id}", status_code=status.HTTP_201_CREATED)
-async def create_checkout(
+def create_checkout(
     user: user_dependency,
     db: db_dependency,
     event_id: int = Path(gt=0),
@@ -20,12 +20,12 @@ async def create_checkout(
 
 
 @router.get("/my_payments", status_code=status.HTTP_200_OK)
-async def get_my_payments(user: user_dependency, db: db_dependency):
+def get_my_payments(user: user_dependency, db: db_dependency):
     return PaymentService.get_user_payments(user, db)
 
 
 @router.post("/refund/{payment_id}", status_code=status.HTTP_200_OK)
-async def refund_payment(user: user_dependency, db: db_dependency, payment_id: str):
+def refund_payment(user: user_dependency, db: db_dependency, payment_id: str):
     """Mark payment as refunded and cancel the linked ticket."""
     return PaymentService.refund_payment(user, db, payment_id)
 

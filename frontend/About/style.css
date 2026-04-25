@@ -72,7 +72,7 @@
 .drawer-actions .btn-register{ width:100%; height:44px; border-radius:99px; }
 
 /* Offset page content below fixed nav */
-.page-wrapper { padding-top: 70px; }
+.page-wrapper { }
 
 /* ===== CSS VARIABLES ===== */
 :root {

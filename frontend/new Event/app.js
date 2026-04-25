@@ -754,10 +754,22 @@ function scrollToErr(){
 
 /* ══ SAVE DRAFT ══ */
 $('saveDraftBtn').addEventListener('click', () => {
-  const errs=validate();
-  if(errs.length){toast(`Fix ${errs.length} field${errs.length>1?'s':''} before saving.`,'error');scrollToErr();return;}
-  try{localStorage.setItem('eventfy_draft',JSON.stringify({title:$('eventTitle').value,savedAt:new Date().toISOString()}));}catch(e){}
-  openModal('💾','Draft Saved!',`"${$('eventTitle').value}" has been saved.`,false);
+  clearErrs();
+  const t = $('eventTitle');
+  if (!t.value.trim()) {
+    t.classList.add('err');
+    setE('errTitle', 'Event title is required to save a draft.');
+    toast('Please add an Event Title before saving a draft.', 'error');
+    scrollToErr();
+    return;
+  }
+  try {
+    localStorage.setItem('eventfy_draft', JSON.stringify({
+      title: t.value,
+      savedAt: new Date().toISOString()
+    }));
+  } catch(e) {}
+  openModal('💾','Draft Saved!',`"${t.value}" has been saved.`,false);
 });
 
 /* ══ PUBLISH ══ */

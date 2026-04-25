@@ -54,12 +54,23 @@ class SavingEventService:
                 detail="Authentication failed"
             )
 
-        saved_events = db.query(SavingEvent).filter(
+        results = db.query(SavingEvent, Event).join(Event, SavingEvent.event_id == Event.id).filter(
             SavingEvent.user_id == user.get("user_id"),
             SavingEvent.is_deleted == False
         ).all()
         
-        return saved_events
+        response = []
+        for saving, event in results:
+            response.append({
+                "saving_id": saving.id,
+                "id": saving.id,
+                "user_id": saving.user_id,
+                "event_id": saving.event_id,
+                "created_at": saving.created_at,
+                "event": event
+            })
+            
+        return response
 
     def remove_saved_event(self, user: dict, db, saving_event_id: int):
         """Soft delete a saved event"""

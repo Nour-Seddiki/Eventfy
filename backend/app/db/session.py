@@ -3,7 +3,6 @@ from sqlalchemy.orm import Session
 from sqlalchemy import create_engine
 from sqlalchemy.engine import URL
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.pool import NullPool
 from typing import Annotated
 from app.config import settings
 
@@ -18,10 +17,15 @@ SQLALCHEMY_DATABASE_URL = URL.create(
     database=settings.db_name,
 )
 
-# NullPool delegates connection pooling to Supabase's PgBouncer.
+# QueuePool keeps a pool of open connections, avoiding the ~200-500ms
+# TCP+TLS handshake penalty on every request to Supabase.
+# pool_pre_ping detects and replaces stale / dropped connections.
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL,
-    poolclass=NullPool,
+    pool_size=5,
+    max_overflow=10,
+    pool_pre_ping=True,
+    pool_recycle=300,
 )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

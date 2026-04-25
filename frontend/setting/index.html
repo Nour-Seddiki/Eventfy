@@ -3,17 +3,18 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Eventfy — Settings</title>
+  <title>Eventfy &mdash; Settings</title>
   <link rel="stylesheet" href="styles.css"/>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../common.css">
+  <script src="../auth-guard.js"></script>
 </head>
 <body>
-  <!-- ═══════════════════════════════════════
+  <!-- ========================================================================
        EVENTFY UNIFIED NAVBAR
-  ═══════════════════════════════════════ -->
+  ======================================================================== -->
   <header class="site-header" id="siteHeader">
     <div class="header-inner">
 
@@ -41,7 +42,7 @@
           <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
           Browse
         </a>
-        <a href="../About/Index.html" class="nav-link">
+        <a href="../About/index.html" class="nav-link">
           <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path d="M12 16v-4M12 8h.01" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
           About
         </a>
@@ -121,7 +122,7 @@
           </div>
           <span class="logo-text">Eventfy</span>
         </a>
-        <button class="drawer-close-btn" id="drawerCloseBtn" aria-label="Close menu">✕</button>
+        <button class="drawer-close-btn" id="drawerCloseBtn" aria-label="Close menu">&times;</button>
       </div>
 
       <!-- User card (logged in only) -->
@@ -142,7 +143,7 @@
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
           Browse
         </a>
-        <a href="../About/Index.html" class="drawer-link">
+        <a href="../About/index.html" class="drawer-link">
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path d="M12 16v-4M12 8h.01" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
           About
         </a>
@@ -183,7 +184,7 @@
 
 <main class="page-wrapper">
 
-  <!-- ── SIDEBAR ── -->
+  <!-- ———— SIDEBAR ———— -->
   <aside class="sidebar">
     <!-- Mobile toggle bar -->
     <button class="sidebar-toggle-bar" id="sidebarToggle" aria-expanded="false" aria-controls="sidebarNav">
@@ -216,15 +217,15 @@
     </nav>
   </aside>
 
-  <!-- ── CONTENT AREA ── -->
+  <!-- ———— CONTENT AREA ———— -->
   <div class="content-area">
 
-    <!-- ════ ACCOUNT ════ -->
+    <!-- ==== ACCOUNT ==== -->
     <section class="content-section" id="section-account">
-      <h1 class="section-title">Organizer Profile</h1>
-      <p class="section-subtitle">Introduce yourself to your audience and build trust with your community.</p>
+      <h1 class="section-title" id="profilePageTitle">My Profile</h1>
+      <p class="section-subtitle" id="profilePageSubtitle">Introduce yourself to your audience and build trust with your community.</p>
 
-      <!-- ── Profile Card ── -->
+      <!-- — Profile Card — -->
       <div class="card profile-card" style="margin-bottom:28px;">
         <div class="card-body profile-card-body">
 
@@ -246,8 +247,8 @@
 
           <!-- Info column -->
           <div class="profile-info-col">
-            <h2 class="profile-name" id="profileName">Mohamed</h2>
-            <p class="profile-bio" id="profileBio">Professional event organizer specializing in tech conferences and networking summits. Dedicated to creating seamless experiences that foster innovation and meaningful connections within the tech ecosystem.</p>
+            <h2 class="profile-name" id="profileName">&mdash;</h2>
+            <p class="profile-bio" id="profileBio">&mdash;</p>
 
             <div class="profile-meta-grid">
               <div class="profile-meta-item">
@@ -256,7 +257,7 @@
                 </div>
                 <div>
                   <div class="profile-meta-label">EMAIL</div>
-                  <div class="profile-meta-value" id="profileEmail">example@gmail.com</div>
+                  <div class="profile-meta-value" id="profileEmail">&mdash;</div>
                 </div>
               </div>
               <div class="profile-meta-item">
@@ -265,7 +266,7 @@
                 </div>
                 <div>
                   <div class="profile-meta-label">PHONE</div>
-                  <div class="profile-meta-value" id="profilePhone">0555555555</div>
+                  <div class="profile-meta-value" id="profilePhone">&mdash;</div>
                 </div>
               </div>
               <div class="profile-meta-item">
@@ -274,7 +275,7 @@
                 </div>
                 <div>
                   <div class="profile-meta-label">SOCIALS</div>
-                  <div class="profile-meta-value" id="profileSocials">www.example.com</div>
+                  <div class="profile-meta-value" id="profileSocials">&mdash;</div>
                 </div>
               </div>
               <div class="profile-meta-item">
@@ -283,7 +284,7 @@
                 </div>
                 <div>
                   <div class="profile-meta-label">LOCATION</div>
-                  <div class="profile-meta-value" id="profileLocation">USTHB, Alger</div>
+                  <div class="profile-meta-value" id="profileLocation">&mdash;</div>
                 </div>
               </div>
             </div>
@@ -298,25 +299,12 @@
         </div>
       </div>
 
-      <!-- ── Stats Row ── -->
-      <div class="profile-stats-row">
-        <div class="profile-stat-card">
-          <div class="profile-stat-label">Total Events</div>
-          <div class="profile-stat-value" id="statTotalEvents">24</div>
-        </div>
-        <div class="profile-stat-card">
-          <div class="profile-stat-label">Attendees Reached</div>
-          <div class="profile-stat-value" id="statAttendees">12.5k</div>
-        </div>
-        <div class="profile-stat-card">
-          <div class="profile-stat-label">Average Rating</div>
-          <div class="profile-stat-value" id="statRating">
-            4.9 <span class="stat-star">★</span>
-          </div>
-        </div>
+      <!-- â”€â”€ Stats Row â”€â”€ -->
+      <div class="profile-stats-row" id="profileStatsRow">
+        <!-- Will be injected by script.js -->
       </div>
 
-      <!-- ── Edit Profile Modal ── -->
+      <!-- â”€â”€ Edit Profile Modal â”€â”€ -->
       <div class="profile-edit-overlay" id="profileEditOverlay" onclick="closeEditProfile(event)">
         <div class="profile-edit-modal">
           <div class="profile-edit-modal-header">
@@ -328,27 +316,28 @@
           <div class="profile-edit-body">
             <div class="form-group">
               <label class="form-label">Full Name</label>
-              <input class="form-input" type="text" id="editName" value="Alex Rivers"/>
+              <input class="form-input" type="text" id="editName" value=""/>
             </div>
             <div class="form-group">
               <label class="form-label">Bio</label>
-              <textarea class="form-input form-textarea" id="editBio" rows="4">Professional event organizer specializing in tech conferences and networking summits. Dedicated to creating seamless experiences that foster innovation and meaningful connections within the tech ecosystem.</textarea>
+              <textarea class="form-input form-textarea" id="editBio" rows="4"></textarea>
             </div>
             <div class="form-group">
               <label class="form-label">Email</label>
-              <input class="form-input" type="email" id="editEmail" value="example@gmail.com"/>
+              <input class="form-input" type="email" id="editEmail" value="" disabled/>
+              <p class="form-hint" style="font-size:12px;margin-top:4px;">Email cannot be changed here.</p>
             </div>
             <div class="form-group">
               <label class="form-label">Phone</label>
-              <input class="form-input" type="tel" id="editPhone" value="0555555555"/>
+              <input class="form-input" type="tel" id="editPhone" value=""/>
             </div>
             <div class="form-group">
               <label class="form-label">Website / Socials</label>
-              <input class="form-input" type="url" id="editSocials" value="www.example.com"/>
+              <input class="form-input" type="url" id="editSocials" value=""/>
             </div>
             <div class="form-group">
               <label class="form-label">Location</label>
-              <input class="form-input" type="text" id="editLocation" value="USTHB, Alger"/>
+              <input class="form-input" type="text" id="editLocation" value=""/>
             </div>
           </div>
           <div class="profile-edit-footer">
@@ -360,7 +349,7 @@
 
     </section>
 
-    <!-- ════ NOTIFICATIONS ════ -->
+    <!-- â•â•â•â• NOTIFICATIONS â•â•â•â• -->
     <section class="content-section" id="section-notifications">
       <h1 class="section-title">Notifications</h1>
       <p class="section-subtitle">Manage how you receive alerts and stay updated on your events.</p>
@@ -389,58 +378,11 @@
       <!-- History -->
       <div class="notif-actions">
         <h2 class="notif-history-title">Notification History</h2>
-        <button class="mark-read-btn">Mark all as read</button>
+        <button class="mark-read-btn" id="settingsMarkAllReadBtn">Mark all as read</button>
       </div>
 
-      <div class="card notif-list">
-        <div class="notif-item">
-          <div class="notif-icon notif-icon-purple">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
-          </div>
-          <div class="notif-body">
-            <div class="notif-body-row">
-              <span class="notif-dot-inline"></span>
-              <span class="notif-title">You joined AI Workshop</span>
-            </div>
-            <p class="notif-time">2 hours ago</p>
-          </div>
-        </div>
-        <div class="notif-item">
-          <div class="notif-icon notif-icon-purple">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
-          </div>
-          <div class="notif-body">
-            <div class="notif-body-row">
-              <span class="notif-dot-inline"></span>
-              <span class="notif-title">Your event is tomorrow</span>
-            </div>
-            <p class="notif-time">5 hours ago</p>
-          </div>
-        </div>
-        <div class="notif-item">
-          <div class="notif-icon notif-icon-orange">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.382-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
-          </div>
-          <div class="notif-body" style="display:flex;align-items:center;justify-content:space-between;">
-            <div>
-              <p class="notif-title" style="font-weight:500;color:var(--muted);">Rate your recent event: Chess Tournament</p>
-              <p class="notif-time">1 day ago</p>
-            </div>
-            <svg class="notif-check" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
-          </div>
-        </div>
-        <div class="notif-item">
-          <div class="notif-icon notif-icon-blue">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/><path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
-          </div>
-          <div class="notif-body" style="display:flex;align-items:center;justify-content:space-between;">
-            <div>
-              <p class="notif-title" style="font-weight:500;color:var(--muted);">New event near you</p>
-              <p class="notif-time">3 days ago</p>
-            </div>
-            <svg class="notif-check" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
-          </div>
-        </div>
+      <div class="card notif-list" id="settingsNotifList">
+        <div style="padding: 20px; text-align: center; color: var(--muted); font-size: 14px;">Loading notifications...</div>
       </div>
 
       <div class="notif-load-more">
@@ -448,7 +390,7 @@
       </div>
     </section>
 
-    <!-- ════ SECURITY ════ -->
+    <!-- â•â•â•â• SECURITY â•â•â•â• -->
     <section class="content-section" id="section-security">
       <h1 class="section-title">Security Settings</h1>
       <p class="section-subtitle">Secure your account by updating your password and managing sessions.</p>
@@ -457,23 +399,24 @@
       <div class="card" style="margin-bottom:28px;">
         <div class="card-body">
           <h2 class="card-title">Update Password</h2>
-          <form style="max-width:520px;">
+          <form style="max-width:520px;" id="updatePasswordForm">
             <div class="form-group">
               <label class="form-label">Current Password</label>
-              <input class="form-input" type="password" value="••••••••"/>
+              <input class="form-input" type="password" id="currentPassword" required/>
             </div>
             <div class="form-group">
               <label class="form-label">New Password</label>
-              <input class="form-input" type="password" placeholder="Enter new password"/>
+              <input class="form-input" type="password" id="newPassword" placeholder="Enter new password" required/>
             </div>
             <div class="form-group">
               <label class="form-label">Confirm New Password</label>
-              <input class="form-input" type="password" placeholder="Confirm new password"/>
+              <input class="form-input" type="password" id="confirmNewPassword" placeholder="Confirm new password" required/>
               <p class="form-hint">Make sure your password is at least 6 characters.</p>
             </div>
+            <div id="passwordError" style="color:var(--danger);font-size:13px;margin-bottom:12px;display:none;"></div>
             <div class="btn-row">
               <button class="btn btn-primary" type="submit">Update Password</button>
-              <button class="btn btn-ghost" type="button">Cancel</button>
+              <button class="btn btn-ghost" type="reset">Cancel</button>
             </div>
           </form>
         </div>
@@ -481,61 +424,57 @@
 
       <!-- Active Sessions -->
       <div class="card sessions-list">
-        <div class="card-body" style="padding-bottom:16px;">
-          <h2 class="card-title" style="margin-bottom:4px;">Active Sessions</h2>
-          <p style="font-size:13px;color:var(--muted);">Manage where you are currently logged in.</p>
+        <div class="card-body" style="padding-bottom:16px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+          <div>
+            <h2 class="card-title" style="margin-bottom:4px;">Active Sessions</h2>
+            <p style="font-size:13px;color:var(--muted);">Manage where you are currently logged in.</p>
+          </div>
+          <button class="btn btn-outline-danger" id="logoutOtherDevicesBtn" style="font-size:13px; padding:8px 14px; height:auto; border-radius:8px;">Log out of other devices</button>
         </div>
         <hr class="card-divider"/>
-        <div class="session-item">
-          <div class="session-device">
-            <div class="session-icon">
-              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9.75 17L9 21h6l-.75-4M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
-            </div>
-            <div>
-              <p class="session-name">MacBook Pro — Chrome</p>
-              <p class="session-meta">London, UK &bull; Active now</p>
-            </div>
-          </div>
-          <span class="badge-this-device">This Device</span>
-        </div>
-        <div class="session-item">
-          <div class="session-device">
-            <div class="session-icon">
-              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
-            </div>
-            <div>
-              <p class="session-name">iPhone 15 Pro</p>
-              <p class="session-meta">London, UK &bull; 2 days ago</p>
-            </div>
-          </div>
-          <button class="btn-signout">Sign out</button>
+        <div id="activeSessionsContainer">
+          <!-- Active session dynamically injected -->
         </div>
       </div>
     </section>
 
-    <!-- ════ PRIVACY ════ -->
+    <!-- â•â•â•â• PRIVACY â•â•â•â• -->
     <section class="content-section" id="section-privacy">
       <h1 class="section-title">Privacy</h1>
       <p class="section-subtitle">Manage your profile visibility and privacy preferences.</p>
       <div class="card">
         <div class="card-body">
-          <label class="checkbox-label" style="margin-bottom:24px;">
-            <input type="checkbox"/>
+          <label class="checkbox-label" style="display:none;margin-bottom:20px;" id="privacyEmailContainer">
+            <input type="checkbox" id="privacyShowEmail" class="privacy-toggle"/>
             <div>
-              <div class="cb-text" style="font-size:15px;">Show my email on my profile (for organizers only)</div>
+              <div class="cb-text" style="font-size:15px;">Show my email on my profile</div>
               <div class="cb-subtext" style="font-size:13px;margin-top:4px;">Turning this on allows other users to contact you via email.</div>
+            </div>
+          </label>
+          <label class="checkbox-label" style="margin-bottom:20px;">
+            <input type="checkbox" id="privacySearchEngine" class="privacy-toggle"/>
+            <div>
+              <div class="cb-text" style="font-size:15px;">Allow search engines to index my profile</div>
+              <div class="cb-subtext" style="font-size:13px;margin-top:4px;">Your public profile may appear in search engine results.</div>
+            </div>
+          </label>
+          <label class="checkbox-label" style="margin-bottom:24px;">
+            <input type="checkbox" id="privacyActivityStatus" class="privacy-toggle"/>
+            <div>
+              <div class="cb-text" style="font-size:15px;">Show my activity status</div>
+              <div class="cb-subtext" style="font-size:13px;margin-top:4px;">Let others know when you are online.</div>
             </div>
           </label>
           <hr class="card-divider" style="margin-bottom:24px;"/>
           <div class="btn-row" style="padding-top:0;">
-            <button class="btn btn-primary">Save Changes</button>
-            <button class="btn btn-ghost">Cancel</button>
+            <button class="btn btn-primary" id="savePrivacyBtn">Save Changes</button>
+            <button class="btn btn-ghost" id="cancelPrivacyBtn">Cancel</button>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ════ DANGER ZONE ════ -->
+    <!-- â•â•â•â• DANGER ZONE â•â•â•â• -->
     <section class="content-section" id="section-danger">
       <h1 class="section-title">Danger Zone</h1>
       <p class="section-subtitle">Sensitive account operations and data management.</p>
@@ -557,7 +496,6 @@
                 </div>
               </div>
             </div>
-          </div>
         </div>
         <div class="danger-footer">
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
@@ -569,21 +507,20 @@
   </div><!-- /.content-area -->
 </main>
 
-<!-- ════════════════════════════════════════
-     FOOTER
-════════════════════════════════════════ -->
 <footer class="site-footer">
   <p>© 2026 Eventfy. All rights reserved.</p>
 </footer>
 
-<script src="../api.js"></script>
-  <script>
+<script>
     // Auth guard — redirect if not logged in
-    if (!isLoggedIn()) {
+    // Uses direct localStorage check so it works before api.js loads
+    if (!localStorage.getItem('eventfy_token')) {
       window.location.href = '../login/index.html';
     }
   </script>
-  <script src="script.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/ua-parser-js@1.0.35/src/ua-parser.min.js"></script>
+  <script src="../api.js"></script>
   <script src="../navbar.js"></script>
+  <script src="script.js" defer></script>
 </body>
 </html>

@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 from fastapi import HTTPException
 from app.models.event import Event
 from app.models.ticket import Ticket
-from app.schemas.user import update_password, UpdateUser
+from app.schemas.user import update_password, UpdateUser, UpdateProfile
 from app.models.user import User
 from app.services.auth_service import verifying_password, hashing_password
 
@@ -58,7 +58,26 @@ class userServices:
             "role": user_model.role,
             "is_verified": user_model.is_verified,
             "created_at": user_model.created_at,
+            "full_name": user_model.full_name,
+            "bio": user_model.bio,
+            "phone": user_model.phone,
+            "location": user_model.location,
+            "website": user_model.website,
         }
+
+    def update_profile(self, user, db, data: UpdateProfile):
+        """Partial update for extended profile fields only."""
+        user_model = self._get_active_user(user, db)
+
+        update_data = data.dict(exclude_unset=True)
+        for field, value in update_data.items():
+            if value is not None:
+                setattr(user_model, field, value)
+
+        db.add(user_model)
+        db.commit()
+        db.refresh(user_model)
+        return self.get_my_profile(user, db)
     
 
 

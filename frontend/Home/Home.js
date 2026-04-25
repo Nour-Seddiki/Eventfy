@@ -17,51 +17,12 @@
 document.addEventListener('DOMContentLoaded', () => {
 
   /* ── refs ── */
-  const nav          = document.getElementById('mainNav');
-  const hamburger    = document.getElementById('hamburgerBtn');
-  const drawer       = document.getElementById('navDrawer');
-  const overlay      = document.getElementById('overlay');
-  const drawerClose  = document.getElementById('drawerCloseBtn');
   const scrollTopBtn = document.getElementById('scrollTopBtn');
 
   /* ══════════════════════════════════════════
-     DRAWER — open / close
+     SCROLL — scroll-to-top button visibility
   ══════════════════════════════════════════ */
-  function openDrawer() {
-    drawer.classList.add('open');
-    overlay.classList.add('active');
-    hamburger.classList.add('open');
-    hamburger.setAttribute('aria-expanded', 'true');
-    drawer.setAttribute('aria-hidden', 'false');
-    document.body.style.overflow = 'hidden';
-  }
-
-  function closeDrawer() {
-    drawer.classList.remove('open');
-    overlay.classList.remove('active');
-    hamburger.classList.remove('open');
-    hamburger.setAttribute('aria-expanded', 'false');
-    drawer.setAttribute('aria-hidden', 'true');
-    document.body.style.overflow = '';
-  }
-
-  if (hamburger)   hamburger.addEventListener('click', () => drawer.classList.contains('open') ? closeDrawer() : openDrawer());
-  if (drawerClose) drawerClose.addEventListener('click', closeDrawer);
-  if (overlay)     overlay.addEventListener('click', closeDrawer);
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDrawer(); });
-  document.querySelectorAll('.drawer-links a').forEach(a => a.addEventListener('click', closeDrawer));
-
-  /* ══════════════════════════════════════════
-     NAV SCROLL — shadow + active link tracking
-  ══════════════════════════════════════════ */
-  const sections = [
-    { id:'hero-section', li: document.querySelector('.nav-item:nth-child(1)') },
-  ];
-
   function onScroll() {
-    /* shadow */
-    if (nav) nav.classList.toggle('scrolled', window.scrollY > 8);
-    /* scroll-to-top visibility */
     if (scrollTopBtn) scrollTopBtn.classList.toggle('visible', window.scrollY > 320);
   }
 
@@ -247,5 +208,80 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   });
+
+  /* ══════════════════════════════════════════
+     DYNAMIC EVENT FETCHING
+  ══════════════════════════════════════════ */
+  async function loadFeaturedEvents() {
+    const grid = document.getElementById('featuredEventsGrid');
+    if (!grid) return;
+
+    try {
+      // Use api.js function
+      const events = await fetchTrendingEvents(3);
+      
+      if (!events || events.length === 0) {
+        grid.innerHTML = '<p>No featured events at this time.</p>';
+        return;
+      }
+
+      grid.innerHTML = events.map(ev => {
+        const dateObj = ev.date ? new Date(ev.date) : new Date();
+        const month = dateObj.toLocaleString('en-US', { month: 'short' });
+        const day = dateObj.getDate();
+        
+        // Add random or default images if not provided
+        const imgUrl = ev.image 
+          ? (ev.image.startsWith('http') ? ev.image : `${API_BASE}${ev.image}`)
+          : 'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=600&q=80';
+
+        return `
+          <div class="event reveal-scale" onclick="window.location.href='../event Description/event-detail.html?id=${ev.id}'" style="cursor:pointer">
+            <div class="event-up" style="background-image:url(${imgUrl})">
+              <div class="event-type">${ev.category || 'General'}</div>
+              <button class="like-btn" aria-label="Like" onclick="event.stopPropagation();">❤</button>
+            </div>
+            <div class="event-down">
+              <div class="event-down-1">
+                <div class="event-date">
+                  <div class="event-month">${month}</div>
+                  <div class="event-day">${day}</div>
+                </div>
+                <div class="envent-desb">
+                  <div class="event-name">${ev.title || 'Untitled Event'}</div>
+                  <div class="event-map">${ev.location || 'TBA'}</div>
+                </div>
+              </div>
+              <div class="event-down-2">
+                <div class="event-member">
+                  <svg width="72" height="28" viewBox="0 0 72 28" fill="none">
+                    <circle cx="14" cy="14" r="13" fill="#c4b5fd" stroke="white" stroke-width="2"/>
+                    <text x="14" y="18" text-anchor="middle" font-size="10" fill="#4c1d95" font-family="sans-serif" font-weight="700">A</text>
+                    <circle cx="30" cy="14" r="13" fill="#a78bfa" stroke="white" stroke-width="2"/>
+                    <text x="30" y="18" text-anchor="middle" font-size="10" fill="#4c1d95" font-family="sans-serif" font-weight="700">B</text>
+                    <circle cx="46" cy="14" r="13" fill="#7c3aed" stroke="white" stroke-width="2"/>
+                    <text x="46" y="18" text-anchor="middle" font-size="10" fill="white" font-family="sans-serif" font-weight="700">+${ev.tickets_sold || 0}</text>
+                  </svg>
+                </div>
+                <div class="event-price">${ev.price > 0 ? '$' + ev.price : 'Free'}</div>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Observe the new elements for the reveal animation
+      const eventCards = document.querySelectorAll('.event.reveal-scale');
+      if (eventCards.length && revealIO) {
+        eventCards.forEach(el => revealIO.observe(el));
+      }
+
+    } catch (err) {
+      console.error(err);
+      grid.innerHTML = '<p>Failed to load events.</p>';
+    }
+  }
+
+  loadFeaturedEvents();
 
 }); // end DOMContentLoaded

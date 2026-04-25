@@ -170,9 +170,9 @@ async function fetchMyActivity() {
   return await res.json();
 }
 
-/** Update user profile */
+/** Update user profile (extended fields: full_name, bio, phone, location, website) */
 async function updateMyProfile(data) {
-  const res = await apiFetch('/users/update_me', {
+  const res = await apiFetch('/users/update_profile', {
     method: 'PUT',
     body: JSON.stringify(data),
   });
@@ -208,6 +208,13 @@ async function searchEvents(q = '', category = '', location = '') {
 
   const res = await fetch(`${API_BASE}/events/search?${params}`);
   if (!res.ok) throw new Error('Failed to search events');
+  return await res.json();
+}
+
+/** Fetch a single event by ID (no login needed) */
+async function fetchEventById(eventId) {
+  const res = await fetch(`${API_BASE}/events/public/${eventId}`);
+  if (!res.ok) throw new Error('Event not found');
   return await res.json();
 }
 

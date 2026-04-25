@@ -37,12 +37,9 @@
     if (events.length === 0) {
       list.innerHTML = `
         <div style="text-align:center;padding:60px 20px;color:#94a3b8;">
-          <div style="font-size:44px;margin-bottom:12px;">📅</div>
-          <h3 style="color:#64748b;font-weight:600;margin:0 0 8px;">No events yet</h3>
-          <p style="margin:0 0 20px;font-size:14px;">Create your first event and start building your community!</p>
-          <a href="../new Event/index.html" style="display:inline-block;background:#7f0df2;color:#fff;padding:10px 24px;border-radius:10px;text-decoration:none;font-weight:600;font-size:14px;">
-            ${plusSVG} Create Event
-          </a>
+          <div style="font-size:40px;margin-bottom:12px;">📅</div>
+          <h3 style="color:#64748b;font-weight:600;margin:0 0 8px;font-size:16px;">No events yet</h3>
+          <p style="margin:0 0 16px;font-size:13px;max-width:280px;margin-left:auto;margin-right:auto;line-height:1.5;">Click <strong style="color:#7f0df2;">+ Create Event</strong> above to get started and build your community!</p>
         </div>`;
       return;
     }
@@ -69,7 +66,7 @@
             </div>
             <div class="org-event-divider"></div>
             <div class="org-event-actions">
-              <a href="../event Description/event-detail.html?eventId=${ev.id}" class="btn-action btn-action-view">
+              <a href="../event Description/event-detail.html?id=${ev.id}" class="btn-action btn-action-view">
                 ${eyeSVG} View
               </a>
               <a href="../new Event/index.html?editId=${ev.id}" class="btn-action btn-action-edit">

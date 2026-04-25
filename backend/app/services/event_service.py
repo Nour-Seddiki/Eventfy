@@ -134,7 +134,11 @@ class EventService:
         if user is None:
             raise HTTPException(status_code=401, detail="Authentication failed")
 
-        event_models = db.query(Event).all()
+        if user.get("user_role") == "organizer":
+            event_models = db.query(Event).filter(Event.organizer_id == user.get("user_id")).all()
+        else:
+            event_models = db.query(Event).all()
+
         if not event_models:
             return []
 

@@ -4,6 +4,7 @@
    ================================================================ */
 
 /* ---- Google Fonts are imported in each HTML <head> ---- */
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0');
 
 /* ================================================================
    1. DESIGN TOKENS (CSS Variables)
@@ -187,11 +188,17 @@ ul { list-style: none; }
 .nav-notif-btn:hover { background: #f3f4f6; color: var(--text); }
 .nav-notif-btn svg { width: 20px; height: 20px; }
 .notif-dot {
-  position: absolute; top: 8px; right: 9px;
-  width: 8px; height: 8px;
-  border-radius: 50%;
-  background: var(--orange);
+  position: absolute; top: 2px; right: 2px;
+  min-width: 16px; height: 16px;
+  padding: 0 4px;
+  border-radius: 10px;
+  background: var(--red);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
   border: 1.5px solid #fff;
+  line-height: 1;
 }
 
 /* ---- User Avatar ---- */
@@ -510,13 +517,19 @@ ul { list-style: none; }
   justify-content: center;
   gap: 8px;
   width: 100%;
-  padding: 12px;
-  border-radius: var(--r-md);
+  height: 44px;
+  border-radius: 12px;
   background: var(--red-l);
   color: var(--red);
-  font-size: 14px; font-weight: 600;
+  font-size: 14px; 
+  font-weight: 700;
   border: 1.5px solid #fee2e2;
   transition: background var(--ease);
+}
+.btn-drawer-logout svg {
+  width: 18px;
+  height: 18px;
+  stroke-width: 2.5;
 }
 .btn-drawer-logout:hover { background: #fee2e2; }
 
