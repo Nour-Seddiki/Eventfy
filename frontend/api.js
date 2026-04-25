@@ -280,6 +280,13 @@ async function deleteEvent(eventId) {
   return await res.json();
 }
 
+/** Fetch a single event for editing (requires auth) */
+async function fetchEventForEdit(eventId) {
+  const res = await apiFetch(`/Event/get_event_by_id/${eventId}`);
+  if (!res.ok) throw new Error('Failed to fetch event for editing');
+  return await res.json();
+}
+
 /* ── Ticket API Calls ────────────────────── */
 
 /** Fetch user's tickets */

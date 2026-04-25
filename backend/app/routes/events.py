@@ -34,6 +34,25 @@ def _get_attendees(db, event_id, limit=5):
     return [{"username": r.username, "avatar_url": r.avatar_url} for r in rows]
 
 
+def _public_event_dict(e):
+    """Serialize an event for public endpoints."""
+    return {
+        "id": e.id,
+        "title": e.title,
+        "description": e.description,
+        "category": e.category,
+        "location": e.location,
+        "price": e.price,
+        "currency": e.currency or "DZD",
+        "start_date": e.start_date.isoformat() if e.start_date else None,
+        "end_date": e.end_date.isoformat() if e.end_date else None,
+        "registration_deadline": e.registration_deadline.isoformat() if e.registration_deadline else None,
+        "available_tickets": e.available_tickets,
+        "image": e.image,
+        "organizer_id": e.organizer_id,
+    }
+
+
 @public_router.get("/events/public", status_code=status.HTTP_200_OK)
 def list_public_events(db: db_dependency, limit: int = Query(20, ge=1, le=100)):
     """List all upcoming events with ticket sales count — no login required."""
@@ -41,22 +60,13 @@ def list_public_events(db: db_dependency, limit: int = Query(20, ge=1, le=100)):
         db.query(Event, func.count(Ticket.id).label("tickets_sold"))
         .outerjoin(Ticket, (Ticket.event_id == Event.id) & (Ticket.status != "cancelled"))
         .group_by(Event.id)
-        .order_by(Event.date.asc())
+        .order_by(Event.start_date.asc())
         .limit(limit)
         .all()
     )
     return [
         {
-            "id": e.id,
-            "title": e.title,
-            "description": e.description,
-            "category": e.category,
-            "location": e.location,
-            "price": e.price,
-            "date": e.date.isoformat() if e.date else None,
-            "available_tickets": e.available_tickets,
-            "image": e.image,
-            "organizer_id": e.organizer_id,
+            **_public_event_dict(e),
             "tickets_sold": tickets_sold,
             "attendees": _get_attendees(db, e.id),
         }
@@ -73,22 +83,13 @@ def trending_events(db: db_dependency, limit: int = Query(5, ge=1, le=50)):
         .outerjoin(Ticket, (Ticket.event_id == Event.id) & (Ticket.status != "cancelled"))
         .filter(Event.available_tickets > 0)
         .group_by(Event.id)
-        .order_by(func.count(Ticket.id).desc(), Event.date.asc())
+        .order_by(func.count(Ticket.id).desc(), Event.start_date.asc())
         .limit(limit)
         .all()
     )
     return [
         {
-            "id": event.id,
-            "title": event.title,
-            "description": event.description,
-            "category": event.category,
-            "location": event.location,
-            "price": event.price,
-            "date": event.date.isoformat() if event.date else None,
-            "available_tickets": event.available_tickets,
-            "image": event.image,
-            "organizer_id": event.organizer_id,
+            **_public_event_dict(event),
             "tickets_sold": tickets_sold,
         }
         for event, tickets_sold in rows
@@ -107,25 +108,11 @@ def similar_events(db: db_dependency, event_id: int = Path(gt=0), limit: int = Q
     similar = (
         db.query(Event)
         .filter(Event.category == base.category, Event.id != base.id)
-        .order_by(Event.date.asc())
+        .order_by(Event.start_date.asc())
         .limit(limit)
         .all()
     )
-    return [
-        {
-            "id": e.id,
-            "title": e.title,
-            "description": e.description,
-            "category": e.category,
-            "location": e.location,
-            "price": e.price,
-            "date": e.date.isoformat() if e.date else None,
-            "available_tickets": e.available_tickets,
-            "image": e.image,
-            "organizer_id": e.organizer_id,
-        }
-        for e in similar
-    ]
+    return [_public_event_dict(e) for e in similar]
 
 
 @public_router.get("/events/public/{event_id}", status_code=status.HTTP_200_OK)
@@ -134,18 +121,7 @@ def get_public_event(db: db_dependency, event_id: int = Path(gt=0)):
     e = db.query(Event).filter(Event.id == event_id).first()
     if not e:
         raise HTTPException(status_code=404, detail="Event not found")
-    return {
-        "id": e.id,
-        "title": e.title,
-        "description": e.description,
-        "category": e.category,
-        "location": e.location,
-        "price": e.price,
-        "date": e.date.isoformat() if e.date else None,
-        "available_tickets": e.available_tickets,
-        "image": e.image,
-        "organizer_id": e.organizer_id,
-    }
+    return _public_event_dict(e)
 
 
 @public_router.get("/events/search", status_code=status.HTTP_200_OK)
@@ -164,22 +140,8 @@ def search_events(
     if location:
         query = query.filter(Event.location.ilike(f"%{location}%"))
 
-    events = query.order_by(Event.date.asc()).limit(50).all()
-    return [
-        {
-            "id": e.id,
-            "title": e.title,
-            "description": e.description,
-            "category": e.category,
-            "location": e.location,
-            "price": e.price,
-            "date": e.date.isoformat() if e.date else None,
-            "available_tickets": e.available_tickets,
-            "image": e.image,
-            "organizer_id": e.organizer_id,
-        }
-        for e in events
-    ]
+    events = query.order_by(Event.start_date.asc()).limit(50).all()
+    return [_public_event_dict(e) for e in events]
 
 
 # ══════════════════════════════════════════

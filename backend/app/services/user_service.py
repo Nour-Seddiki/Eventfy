@@ -63,6 +63,7 @@ class userServices:
             "phone": user_model.phone,
             "location": user_model.location,
             "website": user_model.website,
+            "preferred_currency": user_model.preferred_currency or "DZD",
         }
 
     def update_profile(self, user, db, data: UpdateProfile):
@@ -123,7 +124,7 @@ class userServices:
                 {
                     "event_id": event.id,
                     "title": event.title,
-                    "date": event.date,
+                    "start_date": event.start_date,
                     "available_tickets": event.available_tickets,
                 }
                 for event in events

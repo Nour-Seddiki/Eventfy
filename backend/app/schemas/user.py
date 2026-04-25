@@ -46,6 +46,7 @@ class UpdateProfile(BaseModel):
     phone: Optional[str] = None
     location: Optional[str] = None
     website: Optional[str] = None
+    preferred_currency: Optional[str] = None
 
 class Token(BaseModel):
     access_token : str

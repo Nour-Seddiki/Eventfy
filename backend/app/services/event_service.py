@@ -16,7 +16,10 @@ def _event_to_dict(event):
         "category": event.category,
         "location": event.location,
         "price": event.price,
-        "date": event.date.isoformat() if event.date else None,
+        "currency": event.currency or "DZD",
+        "start_date": event.start_date.isoformat() if event.start_date else None,
+        "end_date": event.end_date.isoformat() if event.end_date else None,
+        "registration_deadline": event.registration_deadline.isoformat() if event.registration_deadline else None,
         "available_tickets": event.available_tickets,
         "image": event.image,
         "organizer_id": event.organizer_id,
@@ -48,8 +51,11 @@ class EventService:
             category=event_data.category,
             location=event_data.location,
             price=event_data.price,
+            currency=event_data.currency or "DZD",
             available_tickets=event_data.available_tickets,
-            date=event_data.date,
+            start_date=event_data.start_date,
+            end_date=event_data.end_date,
+            registration_deadline=event_data.registration_deadline,
             image=event_data.image,
             organizer_id=user.get("user_id"),
         )
@@ -140,7 +146,7 @@ class EventService:
                 .outerjoin(Ticket, (Ticket.event_id == Event.id) & (Ticket.status != "cancelled"))
                 .filter(Event.organizer_id == user.get("user_id"))
                 .group_by(Event.id)
-                .order_by(Event.date.desc())
+                .order_by(Event.start_date.desc())
                 .all()
             )
             return [
@@ -156,7 +162,7 @@ class EventService:
                 db.query(Event, func.count(Ticket.id).label("tickets_sold"))
                 .outerjoin(Ticket, (Ticket.event_id == Event.id) & (Ticket.status != "cancelled"))
                 .group_by(Event.id)
-                .order_by(Event.date.desc())
+                .order_by(Event.start_date.desc())
                 .all()
             )
             return [
@@ -211,9 +217,9 @@ class EventService:
                 Ticket,
                 (Ticket.event_id == Event.id) & (Ticket.status != "cancelled"),
             )
-            .filter(Event.date >= current_time, Event.available_tickets > 0)
+            .filter(Event.start_date >= current_time, Event.available_tickets > 0)
             .group_by(Event.id)
-            .order_by(func.count(Ticket.id).desc(), Event.date.asc())
+            .order_by(func.count(Ticket.id).desc(), Event.start_date.asc())
             .limit(safe_limit)
             .all()
         )
@@ -244,7 +250,7 @@ class EventService:
         similar_event_models = (
             db.query(Event)
             .filter(Event.category == base_event.category, Event.id != base_event.id)
-            .order_by(Event.date.asc())
+            .order_by(Event.start_date.asc())
             .limit(safe_limit)
             .all()
         )

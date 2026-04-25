@@ -22,3 +22,4 @@ class User(Base):
     location = Column(String, nullable=True)
     website = Column(String, nullable=True)
     avatar_url = Column(String, nullable=True)
+    preferred_currency = Column(String, default="DZD")

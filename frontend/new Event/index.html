@@ -340,13 +340,16 @@
           <div class="card-icon ci-orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><circle cx="8" cy="15" r="1"/><circle cx="12" cy="15" r="1"/><circle cx="16" cy="15" r="1"/></svg></div>
           <span class="card-section-label">Date & Time</span>
         </div>
+
+        <!-- Start Date & Time -->
+        <p style="font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:#888;margin:0 0 8px;font-weight:600">Event Start</p>
         <div class="fgrid three-col">
           <div class="fg">
-            <label for="eventDate">EVENT DATE</label>
+            <label for="startDate">START DATE</label>
             <div class="iw">
-              <input type="date" id="eventDate" />
+              <input type="date" id="startDate" />
             </div>
-            <p class="field-error" id="errDate"></p>
+            <p class="field-error" id="errStartDate"></p>
           </div>
           <div class="fg">
             <label for="startTime">START TIME</label>
@@ -355,6 +358,17 @@
             </div>
             <p class="field-error" id="errStart"></p>
           </div>
+        </div>
+
+        <!-- End Date & Time -->
+        <p style="font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:#888;margin:20px 0 8px;font-weight:600">Event End <span style="font-weight:400;opacity:.6">(optional)</span></p>
+        <div class="fgrid three-col">
+          <div class="fg">
+            <label for="endDate">END DATE</label>
+            <div class="iw">
+              <input type="date" id="endDate" />
+            </div>
+          </div>
           <div class="fg">
             <label for="endTime">END TIME</label>
             <div class="iw">
@@ -362,6 +376,24 @@
             </div>
           </div>
         </div>
+
+        <!-- Registration Deadline -->
+        <p style="font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:#888;margin:20px 0 8px;font-weight:600">Registration Deadline <span style="font-weight:400;opacity:.6">(optional)</span></p>
+        <div class="fgrid three-col">
+          <div class="fg">
+            <label for="regDeadlineDate">DEADLINE DATE</label>
+            <div class="iw">
+              <input type="date" id="regDeadlineDate" />
+            </div>
+          </div>
+          <div class="fg">
+            <label for="regDeadlineTime">DEADLINE TIME</label>
+            <div class="iw">
+              <input type="time" id="regDeadlineTime" />
+            </div>
+          </div>
+        </div>
+
         <div class="duration-pill hidden" id="durationDisplay">
           <span class="material-symbols-outlined">timelapse</span>
           <span id="durationText"></span>
@@ -467,7 +499,16 @@
             <label for="ticketPrice">TICKET PRICE</label>
             <div class="iw price-iw">
               <input type="number" id="ticketPrice" placeholder="0.00" min="0" step="0.01" />
-              <span class="price-cur">DZD</span>
+              <span class="price-cur" id="priceCurLabel">DZD</span>
+            </div>
+          </div>
+          <div class="fg">
+            <label for="currencySelect">CURRENCY</label>
+            <div class="iw sel-iw">
+              <select id="currencySelect">
+                <option value="DZD">DZD — Algerian Dinar</option>
+                <option value="USD">USD — US Dollar</option>
+              </select>
             </div>
           </div>
           <div class="free-card" id="freeToggleCard">
