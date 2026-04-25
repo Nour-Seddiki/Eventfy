@@ -135,14 +135,38 @@ class EventService:
             raise HTTPException(status_code=401, detail="Authentication failed")
 
         if user.get("user_role") == "organizer":
-            event_models = db.query(Event).filter(Event.organizer_id == user.get("user_id")).all()
+            rows = (
+                db.query(Event, func.count(Ticket.id).label("tickets_sold"))
+                .outerjoin(Ticket, (Ticket.event_id == Event.id) & (Ticket.status != "cancelled"))
+                .filter(Event.organizer_id == user.get("user_id"))
+                .group_by(Event.id)
+                .order_by(Event.date.desc())
+                .all()
+            )
+            return [
+                {
+                    **_event_to_dict(e),
+                    "tickets_sold": tickets_sold,
+                    "revenue": tickets_sold * e.price if e.price else 0.0,
+                }
+                for e, tickets_sold in rows
+            ]
         else:
-            event_models = db.query(Event).all()
-
-        if not event_models:
-            return []
-
-        return [_event_to_dict(e) for e in event_models]
+            rows = (
+                db.query(Event, func.count(Ticket.id).label("tickets_sold"))
+                .outerjoin(Ticket, (Ticket.event_id == Event.id) & (Ticket.status != "cancelled"))
+                .group_by(Event.id)
+                .order_by(Event.date.desc())
+                .all()
+            )
+            return [
+                {
+                    **_event_to_dict(e),
+                    "tickets_sold": tickets_sold,
+                    "revenue": tickets_sold * e.price if e.price else 0.0,
+                }
+                for e, tickets_sold in rows
+            ]
 
     def search_events_by_title(self, user, db, keyword):
         if user is None:

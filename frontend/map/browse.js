@@ -146,7 +146,7 @@ function addMarker(ev) {
     '<div class="popup-body"><div class="popup-name">' + ev.name + '</div>' +
     '<div class="popup-loc">📍 ' + ev.venue + ' · 📅 ' + ev.dateStr + ' • ' + ev.time + '</div>' +
     '<div class="popup-row"><span class="popup-price-lbl ' + priceClass + '">' + priceLabel + '</span>' +
-    '<span class="popup-view" onclick="activateCard(' + ev.id + ')">View →</span></div></div>',
+    '<a href="../event Description/event-detail.html?id=' + ev.id + '" class="popup-view" style="text-decoration:none;color:inherit;cursor:pointer;">View →</a></div></div>',
     { maxWidth: 230, minWidth: 230 }
   );
   marker.on('click', () => activateCard(ev.id));

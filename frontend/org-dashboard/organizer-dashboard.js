@@ -15,6 +15,7 @@
   const editSVG  = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`;
   const trashSVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>`;
   const plusSVG  = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`;
+  const settingSVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>`;
 
   function formatDate(iso) {
     if (!iso) return 'TBD';
@@ -33,6 +34,20 @@
     // Update header stats if they exist
     const totalEl = document.getElementById('orgTotalEvents');
     if (totalEl) totalEl.textContent = events.length;
+
+    // Calculate aggregate stats
+    const totalRevenueDisplay = document.getElementById('totalRevenueDisplay');
+    const totalRegistrationsDisplay = document.getElementById('totalRegistrationsDisplay');
+    let totalRevenue = 0;
+    let totalRegistrations = 0;
+    
+    events.forEach(ev => {
+      totalRevenue += (ev.revenue || 0);
+      totalRegistrations += (ev.tickets_sold || 0);
+    });
+
+    if (totalRevenueDisplay) totalRevenueDisplay.textContent = '$' + totalRevenue.toFixed(2);
+    if (totalRegistrationsDisplay) totalRegistrationsDisplay.textContent = totalRegistrations.toString();
 
     if (events.length === 0) {
       list.innerHTML = `
@@ -64,11 +79,18 @@
               <span class="org-event-meta-item">${calSVG} ${formatDate(ev.date)}</span>
               <span class="org-event-meta-item">${pinSVG} ${ev.location || 'Location TBD'}</span>
             </div>
+            <div class="org-event-stats" style="display:flex; gap:12px; margin-top:8px; font-size:13px; color:#64748b; font-weight:500;">
+              <span style="background:#f8fafc; padding:4px 8px; border-radius:6px; border:1px solid #e2e8f0;">Tickets Sold: <strong style="color:#1e293b;">${ev.tickets_sold || 0}</strong></span>
+              <span style="background:#f8fafc; padding:4px 8px; border-radius:6px; border:1px solid #e2e8f0;">Revenue: <strong style="color:#1e293b;">$${(ev.revenue || 0).toFixed(2)}</strong></span>
+            </div>
             <div class="org-event-divider"></div>
             <div class="org-event-actions">
               <a href="../event Description/event-detail.html?id=${ev.id}" class="btn-action btn-action-view">
                 ${eyeSVG} View
               </a>
+              <button class="btn-action btn-action-manage" data-id="${ev.id}" data-date="${ev.date || ''}" data-capacity="${ev.available_tickets || 0}">
+                ${settingSVG} Manage
+              </button>
               <a href="../new Event/index.html?editId=${ev.id}" class="btn-action btn-action-edit">
                 ${editSVG} Edit
               </a>
@@ -100,6 +122,16 @@
           showToast('Could not delete event. Please try again.', false);
           btn.disabled = false;
         }
+      });
+    });
+
+    // Wire manage buttons
+    list.querySelectorAll('.btn-action-manage').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const eventId = btn.dataset.id;
+        const eventDate = btn.dataset.date;
+        const capacity = btn.dataset.capacity;
+        openQuickManageModal(eventId, eventDate, capacity);
       });
     });
   }
@@ -167,6 +199,79 @@
   /* ── Create Event button ── */
   document.getElementById('createEventBtn')?.addEventListener('click', () => {
     window.location.href = '../new Event/index.html';
+  });
+
+  /* ── Quick Manage Modal Logic ── */
+  const qmModal = document.getElementById('quickManageModal');
+  const qmForm = document.getElementById('quickManageForm');
+  
+  function openQuickManageModal(eventId, dateStr, capacity) {
+    if (!qmModal) return;
+    document.getElementById('quickManageEventId').value = eventId;
+    
+    // Convert UTC/ISO date to local datetime-local format (YYYY-MM-DDThh:mm)
+    let formattedDate = '';
+    if (dateStr && dateStr !== 'undefined') {
+      try {
+        const d = new Date(dateStr);
+        // adjust for timezone offset
+        d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+        formattedDate = d.toISOString().slice(0, 16);
+      } catch (e) {}
+    }
+    
+    document.getElementById('qmDate').value = formattedDate;
+    document.getElementById('qmCapacity').value = capacity || '';
+    
+    qmModal.style.display = 'flex';
+  }
+
+  function closeQuickManageModal() {
+    if (qmModal) qmModal.style.display = 'none';
+  }
+
+  document.getElementById('closeQuickManageBtn')?.addEventListener('click', closeQuickManageModal);
+  document.getElementById('cancelQuickManageBtn')?.addEventListener('click', closeQuickManageModal);
+
+  // Close when clicking outside
+  window.addEventListener('click', (e) => {
+    if (e.target === qmModal) {
+      closeQuickManageModal();
+    }
+  });
+
+  qmForm?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const saveBtn = document.getElementById('saveQuickManageBtn');
+    saveBtn.disabled = true;
+    saveBtn.textContent = 'Saving...';
+    
+    const eventId = document.getElementById('quickManageEventId').value;
+    const dateInput = document.getElementById('qmDate').value;
+    const capacityInput = document.getElementById('qmCapacity').value;
+    
+    try {
+      // Need to format datetime-local string to ISO if necessary. 
+      // Input value format: "2026-04-25T14:30"
+      const isoDate = dateInput ? new Date(dateInput).toISOString() : null;
+      
+      const payload = {
+        date: isoDate,
+        available_tickets: parseInt(capacityInput, 10)
+      };
+
+      await updateEvent(eventId, payload);
+      showToast('Event updated successfully!');
+      closeQuickManageModal();
+      
+      // Reload events to show fresh stats and updated info
+      loadOrgEvents();
+    } catch (err) {
+      showToast(err.message || 'Failed to update event', false);
+    } finally {
+      saveBtn.disabled = false;
+      saveBtn.textContent = 'Save Changes';
+    }
   });
 
   loadOrgEvents();

@@ -238,6 +238,39 @@ async function createEvent(eventData) {
   return await res.json();
 }
 
+/** Upload event image */
+async function uploadEventImage(eventId, file) {
+  const formData = new FormData();
+  formData.append('image', file);
+  
+  const token = localStorage.getItem('eventfy_token');
+  const res = await fetch(`${API_BASE}/Event/event/${eventId}/image`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`
+    },
+    body: formData
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || 'Failed to upload image');
+  }
+  return await res.json();
+}
+
+/** Update an event (requires auth, organizer role) */
+async function updateEvent(eventId, eventData) {
+  const res = await apiFetch(`/Event/update_event/${eventId}`, {
+    method: 'PUT',
+    body: JSON.stringify(eventData),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || 'Failed to update event');
+  }
+  return await res.json();
+}
+
 /** Delete an event (requires auth, organizer role) */
 async function deleteEvent(eventId) {
   const res = await apiFetch(`/Event/delete_event/${eventId}`, {

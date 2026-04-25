@@ -33,6 +33,10 @@ class Settings:
     chargily_key: str | None
     chargily_secret: str | None
     chargily_url: str
+    stripe_secret_key: str | None
+    stripe_publishable_key: str | None
+    stripe_webhook_secret: str | None
+    frontend_url: str
 
 
 settings = Settings(
@@ -54,4 +58,8 @@ settings = Settings(
     chargily_key=os.getenv("CHARGILY_KEY"),
     chargily_secret=os.getenv("CHARGILY_SECRET"),
     chargily_url=os.getenv("CHARGILY_URL", "https://pay.chargily.net/test/api/v2/"),
+    stripe_secret_key=os.getenv("STRIPE_SECRET_KEY"),
+    stripe_publishable_key=os.getenv("STRIPE_PUBLISHABLE_KEY"),
+    stripe_webhook_secret=os.getenv("STRIPE_WEBHOOK_SECRET"),
+    frontend_url=os.getenv("FRONTEND_URL", "http://localhost:8080"),
 )

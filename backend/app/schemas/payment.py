@@ -14,13 +14,14 @@ class PaymentStatus(str, Enum):
 
 
 class PaymentMethodEnum(str, Enum):
+    stripe = "stripe"
     edahabia = "edahabia"
     cib = "cib"
 
 
 class CheckoutSessionResponse(BaseModel):
     checkout_url: str
-    checkout_id: str
+    session_id: str
     payment_id: str
 
 

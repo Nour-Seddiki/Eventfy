@@ -114,9 +114,10 @@ function renderEventHTML(ev, container) {
             </div>
           </div>
           <button class="btn-register" id="buyTicketBtn">
-            Buy Ticket
+            ${isFree ? 'Get Free Ticket' : 'Buy Ticket — $' + ev.price}
             <svg class="btn-register-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17 8l4 4m0 0l-4 4m4-4H3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
           </button>
+          ${!isFree ? '<p style="text-align:center;font-size:11px;color:#94a3b8;margin-top:8px;">🔒 Secure payment via Stripe</p>' : ''}
           <button class="btn-save" id="saveEventBtn" style="width:100%;margin-top:12px;padding:14px;border-radius:12px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px;background:#f8fafc;color:#64748b;border:1px solid #e2e8f0;cursor:pointer;transition:all 0.2s;">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="20" height="20"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" stroke-width="2"/></svg>
             Save Event
@@ -126,8 +127,10 @@ function renderEventHTML(ev, container) {
     </div>
   `;
 
-  // Buy Ticket — real purchase flow
+  // Buy Ticket — branches between free and paid events
   const buyBtn = container.querySelector('#buyTicketBtn');
+  const isFreeEvent = !ev.price || ev.price <= 0;
+
   buyBtn?.addEventListener('click', async () => {
     if (!isLoggedIn()) {
       window.location.href = '../login/index.html';
@@ -140,37 +143,60 @@ function renderEventHTML(ev, container) {
     buyBtn.innerHTML = 'Processing…';
 
     try {
-      const res = await apiFetch(`/ticket/purchase_ticket/${ev.id}`, { method: 'POST' });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.detail || 'Purchase failed');
+      if (isFreeEvent) {
+        // ── FREE EVENT: direct ticket purchase ──
+        const res = await apiFetch(`/ticket/purchase_ticket/${ev.id}`, { method: 'POST' });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.detail || 'Purchase failed');
+        }
+
+        showEventToast('🎫 Ticket purchased successfully!');
+
+        // Update seats count in sidebar
+        const seatsBadge = container.querySelector('.seats-badge');
+        if (seatsBadge && ev.available_tickets > 0) {
+          ev.available_tickets--;
+          const seatsText = ev.available_tickets > 0
+            ? ev.available_tickets + ' Seats Left'
+            : 'Sold Out';
+          seatsBadge.innerHTML = `
+            <svg class="seats-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path d="M12 6v6l4 2" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+            ${seatsText}
+          `;
+        }
+
+        buyBtn.innerHTML = '✓ Purchased';
+        buyBtn.style.opacity = '1';
+        buyBtn.style.background = '#10b981';
+        buyBtn.style.borderColor = '#10b981';
+        buyBtn.style.color = '#fff';
+        // Keep button disabled after successful purchase
+
+      } else {
+        // ── PAID EVENT: Stripe Checkout ──
+        const res = await apiFetch(`/payment/checkout/${ev.id}`, { method: 'POST' });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.detail || 'Failed to create checkout session');
+        }
+
+        const data = await res.json();
+        if (data.checkout_url) {
+          // Redirect to Stripe hosted checkout
+          window.location.href = data.checkout_url;
+          return;
+        } else {
+          throw new Error('No checkout URL returned');
+        }
       }
-
-      showEventToast('🎫 Ticket purchased successfully!');
-
-      // Update seats count in sidebar
-      const seatsBadge = container.querySelector('.seats-badge');
-      if (seatsBadge && ev.available_tickets > 0) {
-        ev.available_tickets--;
-        const seatsText = ev.available_tickets > 0
-          ? ev.available_tickets + ' Seats Left'
-          : 'Sold Out';
-        seatsBadge.innerHTML = `
-          <svg class="seats-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path d="M12 6v6l4 2" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
-          ${seatsText}
-        `;
-      }
-
-      buyBtn.innerHTML = '✓ Purchased';
-      buyBtn.style.opacity = '1';
-      // Keep button disabled after successful purchase
 
     } catch (err) {
       console.error('Ticket purchase error:', err);
       showEventToast(`❌ ${err.message || 'Failed to purchase ticket.'}`);
       buyBtn.disabled = false;
       buyBtn.style.opacity = '1';
-      buyBtn.innerHTML = `Buy Ticket <svg class="btn-register-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17 8l4 4m0 0l-4 4m4-4H3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>`;
+      buyBtn.innerHTML = `${isFreeEvent ? 'Get Free Ticket' : 'Buy Ticket'} <svg class="btn-register-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17 8l4 4m0 0l-4 4m4-4H3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>`;
     }
   });
 

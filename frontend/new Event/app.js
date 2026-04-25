@@ -405,7 +405,9 @@ document.addEventListener('click', e => {
    OPEN MAP BUTTON
 ══════════════════════════════════════════ */
 $('mapViewBtn').addEventListener('click', () => {
+  hide($('mapViewBtn'));
   unlockMap();
+  setTimeout(() => { if(S.map) S.map.invalidateSize(); }, 100);
   if (S.city) {
     flyToAlgeria(S.city.lat, S.city.lng, 13);
   } else {
@@ -769,21 +771,80 @@ $('saveDraftBtn').addEventListener('click', () => {
       savedAt: new Date().toISOString()
     }));
   } catch(e) {}
-  openModal('💾','Draft Saved!',`"${t.value}" has been saved.`,false);
+  openModal('💾','Draft Saved!',`"${t.value}" has been saved.`,false, false);
 });
 
 /* ══ PUBLISH ══ */
-$('publishBtn').addEventListener('click', () => {
+$('publishBtn').addEventListener('click', async () => {
   const errs=validate();
   if(errs.length){toast(`Fix ${errs.length} field${errs.length>1?'s':''} before publishing.`,'error');scrollToErr();return;}
-  openModal('🚀','Event Published!',`"${$('eventTitle').value}" is now live in Algeria 🇩🇿`,true);
+
+  const publishBtn = $('publishBtn');
+  const origText = publishBtn.textContent;
+  publishBtn.disabled = true;
+  publishBtn.textContent = 'Publishing…';
+  publishBtn.style.opacity = '0.6';
+
+  try {
+    // Build the datetime string from date + startTime
+    const dateVal = $('eventDate').value;
+    const timeVal = $('startTime').value || '00:00';
+    const eventDateTime = new Date(`${dateVal}T${timeVal}`).toISOString();
+
+    // Build location string from city + venue
+    const cityName = $('eventCity').value.trim();
+    const venueName = $('venueName').value.trim();
+    const locationStr = venueName + (cityName ? ', ' + cityName : '');
+
+    // Get price
+    const isFree = $('freeEventToggle').checked;
+    const price = isFree ? 0 : (parseFloat($('ticketPrice').value) || 0);
+
+    // Get capacity
+    const capacity = parseInt($('availableSeats')?.value) || 100;
+
+    const eventPayload = {
+      title: $('eventTitle').value.trim(),
+      description: $('eventDesc').value.trim(),
+      category: $('eventCategory').value,
+      location: locationStr,
+      price: price,
+      available_tickets: capacity,
+      date: eventDateTime,
+      image: null,
+    };
+
+    // Create the event via API
+    const created = await createEvent(eventPayload);
+
+    // Upload image if present
+    if (S.image && created && created.id) {
+      try {
+        await uploadEventImage(created.id, S.image);
+      } catch (imgErr) {
+        console.warn('Image upload failed:', imgErr);
+        toast('Event created, but image upload failed.', 'warn');
+      }
+    }
+
+    openModal('🚀','Event Published!',`"${$('eventTitle').value}" is now live in Algeria 🇩🇿`,true, true);
+
+  } catch (err) {
+    console.error('Publish error:', err);
+    toast(err.message || 'Failed to publish event. Please try again.', 'error');
+  } finally {
+    publishBtn.disabled = false;
+    publishBtn.textContent = origText;
+    publishBtn.style.opacity = '1';
+  }
 });
 
 $('discardBtn').addEventListener('click', () => { if(confirm('Discard all changes?')) location.reload(); });
 
 /* ══ MODAL ══ */
-function openModal(emoji,title,msg,confetti){
+function openModal(emoji,title,msg,confetti,showShare=true){
   $('modalEmoji').textContent=emoji; $('modalTitle').textContent=title; $('modalMsg').textContent=msg;
+  if(!showShare) hide($('modalShare')); else show($('modalShare'));
   if(confetti) spawnConfetti(); show($('modalBackdrop'));
 }
 $('modalClose').addEventListener('click',()=>hide($('modalBackdrop')));
