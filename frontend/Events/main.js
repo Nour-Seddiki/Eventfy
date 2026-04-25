@@ -83,19 +83,23 @@ function renderEvents(eventsList) {
     const total = sold + avail;
     let availabilityHtml = '';
 
-    // Generate deterministic pseudo-random avatars for social proof
-    const seed = ev.title ? ev.title.length : 5;
-    const avatar1 = `https://i.pravatar.cc/100?img=${(seed % 70) + 1}`;
-    const avatar2 = `https://i.pravatar.cc/100?img=${((seed * 2) % 70) + 1}`;
-    const avatar3 = `https://i.pravatar.cc/100?img=${((seed * 3) % 70) + 1}`;
+    // Build attendee avatars from real API data
+    const attendees = ev.attendees || [];
 
     let attendeesHtml = '';
     if (sold > 0) {
       let avatars = '';
-      if (sold >= 1) avatars += `<img src="${avatar1}" style="width:24px; height:24px; border-radius:50%; border:2px solid #fff; position:relative; z-index:3; object-fit:cover;">`;
-      if (sold >= 2) avatars += `<img src="${avatar2}" style="width:24px; height:24px; border-radius:50%; border:2px solid #fff; position:relative; z-index:2; margin-left:-8px; object-fit:cover;">`;
-      if (sold >= 3) avatars += `<img src="${avatar3}" style="width:24px; height:24px; border-radius:50%; border:2px solid #fff; position:relative; z-index:1; margin-left:-8px; object-fit:cover;">`;
-      
+      attendees.slice(0, 3).forEach((att, i) => {
+        const zIndex = 3 - i;
+        const ml = i > 0 ? 'margin-left:-8px;' : '';
+        if (att.avatar_url) {
+          avatars += `<img src="${att.avatar_url}" alt="${att.username}" style="width:24px; height:24px; border-radius:50%; border:2px solid #fff; position:relative; z-index:${zIndex}; ${ml} object-fit:cover;">`;
+        } else {
+          const initial = (att.username || 'U').charAt(0).toUpperCase();
+          avatars += `<div style="width:24px; height:24px; border-radius:50%; border:2px solid #fff; background:linear-gradient(135deg,#7f0df2,#a855f7); display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:800; color:#fff; position:relative; z-index:${zIndex}; ${ml}">${initial}</div>`;
+        }
+      });
+
       const plusMore = sold > 3 ? `<div style="width:24px; height:24px; border-radius:50%; background:#f1f5f9; border:2px solid #fff; display:flex; align-items:center; justify-content:center; font-size:9px; font-weight:800; color:#64748b; position:relative; z-index:0; margin-left:-8px;">+${sold - 3}</div>` : '';
 
       attendeesHtml = `

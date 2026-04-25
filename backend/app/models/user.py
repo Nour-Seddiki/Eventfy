@@ -21,3 +21,4 @@ class User(Base):
     phone = Column(String, nullable=True)
     location = Column(String, nullable=True)
     website = Column(String, nullable=True)
+    avatar_url = Column(String, nullable=True)

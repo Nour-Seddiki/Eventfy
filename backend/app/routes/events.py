@@ -10,6 +10,7 @@ from app.services.event_service import EventService
 from app.schemas.event import eventRequest, eventUpdate
 from app.models.event import Event
 from app.models.ticket import Ticket
+from app.models.user import User
 
 
 router = APIRouter(prefix="/Event", tags=['Event'])
@@ -19,6 +20,19 @@ public_router = APIRouter(tags=['Public Events'])
 # ══════════════════════════════════════════
 # PUBLIC ENDPOINTS (no auth needed)
 # ══════════════════════════════════════════
+
+def _get_attendees(db, event_id, limit=5):
+    """Return the first `limit` ticket-holders for an event (social proof)."""
+    rows = (
+        db.query(User.username, User.avatar_url)
+        .join(Ticket, Ticket.user_id == User.id)
+        .filter(Ticket.event_id == event_id, Ticket.status != "cancelled")
+        .group_by(User.id)
+        .limit(limit)
+        .all()
+    )
+    return [{"username": r.username, "avatar_url": r.avatar_url} for r in rows]
+
 
 @public_router.get("/events/public", status_code=status.HTTP_200_OK)
 def list_public_events(db: db_dependency, limit: int = Query(20, ge=1, le=100)):
@@ -44,6 +58,7 @@ def list_public_events(db: db_dependency, limit: int = Query(20, ge=1, le=100)):
             "image": e.image,
             "organizer_id": e.organizer_id,
             "tickets_sold": tickets_sold,
+            "attendees": _get_attendees(db, e.id),
         }
         for e, tickets_sold in rows
     ]

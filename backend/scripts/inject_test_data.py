@@ -20,6 +20,59 @@ from app.services.auth_service import hashing_password
 import uuid
 
 
+# ── Mock attendee users with avatar URLs ──
+MOCK_ATTENDEES = [
+    {
+        "username": "amira_b",
+        "email": "amira.b@demo.com",
+        "full_name": "Amira Benali",
+        "avatar_url": "https://ui-avatars.com/api/?name=Amira+Benali&background=7f0df2&color=fff&size=100&bold=true",
+    },
+    {
+        "username": "youcef_k",
+        "email": "youcef.k@demo.com",
+        "full_name": "Youcef Khelifi",
+        "avatar_url": "https://ui-avatars.com/api/?name=Youcef+Khelifi&background=ef4444&color=fff&size=100&bold=true",
+    },
+    {
+        "username": "sarah_m",
+        "email": "sarah.m@demo.com",
+        "full_name": "Sarah Mebarki",
+        "avatar_url": "https://ui-avatars.com/api/?name=Sarah+Mebarki&background=10b981&color=fff&size=100&bold=true",
+    },
+    {
+        "username": "karim_d",
+        "email": "karim.d@demo.com",
+        "full_name": "Karim Djelloul",
+        "avatar_url": "https://ui-avatars.com/api/?name=Karim+Djelloul&background=f59e0b&color=fff&size=100&bold=true",
+    },
+    {
+        "username": "lina_h",
+        "email": "lina.h@demo.com",
+        "full_name": "Lina Hamidi",
+        "avatar_url": "https://ui-avatars.com/api/?name=Lina+Hamidi&background=3b82f6&color=fff&size=100&bold=true",
+    },
+    {
+        "username": "mehdi_r",
+        "email": "mehdi.r@demo.com",
+        "full_name": "Mehdi Rahmani",
+        "avatar_url": "https://ui-avatars.com/api/?name=Mehdi+Rahmani&background=8b5cf6&color=fff&size=100&bold=true",
+    },
+    {
+        "username": "nadia_z",
+        "email": "nadia.z@demo.com",
+        "full_name": "Nadia Ziani",
+        "avatar_url": "https://ui-avatars.com/api/?name=Nadia+Ziani&background=ec4899&color=fff&size=100&bold=true",
+    },
+    {
+        "username": "amine_t",
+        "email": "amine.t@demo.com",
+        "full_name": "Amine Touati",
+        "avatar_url": "https://ui-avatars.com/api/?name=Amine+Touati&background=14b8a6&color=fff&size=100&bold=true",
+    },
+]
+
+
 def inject():
     db = SessionLocal()
 
@@ -37,6 +90,11 @@ def inject():
                 organizer.website = "https://eventfy.demo"
                 db.commit()
                 print(f"  [+] Updated organizer profile fields")
+            # Set avatar if missing
+            if not organizer.avatar_url:
+                organizer.avatar_url = "https://ui-avatars.com/api/?name=Demo+Organizer&background=0f172a&color=fff&size=100&bold=true"
+                db.commit()
+                print(f"  [+] Updated organizer avatar_url")
         else:
             organizer = User(
                 username="test_organizer",
@@ -49,6 +107,7 @@ def inject():
                 phone="+213 555 123 456",
                 location="Algiers, Algeria",
                 website="https://eventfy.demo",
+                avatar_url="https://ui-avatars.com/api/?name=Demo+Organizer&background=0f172a&color=fff&size=100&bold=true",
             )
             db.add(organizer)
             db.flush()
@@ -65,6 +124,10 @@ def inject():
                 attendee.location = "Oran, Algeria"
                 db.commit()
                 print(f"  [+] Updated attendee profile fields")
+            if not attendee.avatar_url:
+                attendee.avatar_url = "https://ui-avatars.com/api/?name=Demo+Attendee&background=6366f1&color=fff&size=100&bold=true"
+                db.commit()
+                print(f"  [+] Updated attendee avatar_url")
         else:
             attendee = User(
                 username="test_attendee",
@@ -76,10 +139,38 @@ def inject():
                 bio="Love discovering local events!",
                 phone="+213 555 789 012",
                 location="Oran, Algeria",
+                avatar_url="https://ui-avatars.com/api/?name=Demo+Attendee&background=6366f1&color=fff&size=100&bold=true",
             )
             db.add(attendee)
             db.flush()
             print(f"  [+] Created attendee: {attendee.username} (id={attendee.id})")
+
+        # -- Create mock attendee users with avatars --
+        mock_user_ids = []
+        for att_data in MOCK_ATTENDEES:
+            existing = db.query(User).filter(User.username == att_data["username"]).first()
+            if existing:
+                print(f"  [=] Mock attendee already exists: {existing.username} (id={existing.id})")
+                # Update avatar if missing
+                if not existing.avatar_url:
+                    existing.avatar_url = att_data["avatar_url"]
+                    db.commit()
+                    print(f"  [+] Updated avatar for {existing.username}")
+                mock_user_ids.append(existing.id)
+            else:
+                new_user = User(
+                    username=att_data["username"],
+                    email=att_data["email"],
+                    hashed_password=hashing_password("Demo1234!"),
+                    role="attendee",
+                    is_verified=True,
+                    full_name=att_data["full_name"],
+                    avatar_url=att_data["avatar_url"],
+                )
+                db.add(new_user)
+                db.flush()
+                mock_user_ids.append(new_user.id)
+                print(f"  [+] Created mock attendee: {new_user.username} (id={new_user.id})")
 
         # -- 3. Create sample events --
         events_data = [
@@ -143,29 +234,49 @@ def inject():
                 created_events.append(event)
                 print(f"  [+] Created event: {event.title} (id={event.id})")
 
-        # -- 4. Create tickets (simulate real sales) --
-        ticket_counts = [12, 5, 28, 8, 15]  # tickets sold per event
-        for event, count in zip(created_events, ticket_counts):
+        # -- 4. Create tickets from DIVERSE mock users (real attendee avatars) --
+        # Each event gets tickets from different mock attendees for social proof
+        # Map: event index -> list of (mock_user_index, ticket_count) pairs
+        event_attendee_map = [
+            # AI Summit: 5 different attendees
+            [(0, 3), (1, 2), (2, 4), (3, 1), (4, 2)],
+            # Startup Weekend: 3 attendees
+            [(2, 2), (5, 1), (6, 2)],
+            # Music Festival: 6 attendees (big event)
+            [(0, 5), (1, 3), (3, 4), (5, 6), (6, 5), (7, 5)],
+            # Gaming Tournament: 4 attendees
+            [(1, 2), (3, 3), (4, 1), (7, 2)],
+            # Street Food: 5 attendees
+            [(0, 2), (2, 3), (4, 2), (6, 4), (7, 4)],
+        ]
+
+        for event, attendee_pairs in zip(created_events, event_attendee_map):
             existing_tickets = db.query(Ticket).filter(Ticket.event_id == event.id).count()
             if existing_tickets > 0:
                 print(f"  [=] {existing_tickets} tickets already exist for: {event.title}")
                 continue
-            for i in range(count):
-                ticket = Ticket(
-                    id=str(uuid.uuid4()),
-                    user_id=attendee.id,
-                    event_id=event.id,
-                    qr_code=f"QR-{event.id}-{uuid.uuid4().hex[:8]}",
-                    status="active",
-                )
-                db.add(ticket)
-            print(f"  [+] Created {count} tickets for: {event.title}")
+
+            total_created = 0
+            for mock_idx, count in attendee_pairs:
+                user_id = mock_user_ids[mock_idx]
+                for _ in range(count):
+                    ticket = Ticket(
+                        id=str(uuid.uuid4()),
+                        user_id=user_id,
+                        event_id=event.id,
+                        qr_code=f"QR-{event.id}-{uuid.uuid4().hex[:8]}",
+                        status="active",
+                    )
+                    db.add(ticket)
+                    total_created += 1
+            print(f"  [+] Created {total_created} tickets from {len(attendee_pairs)} attendees for: {event.title}")
 
         db.commit()
         print("\n[OK] Test data injected successfully!")
         print(f"\nLogin credentials:")
         print(f"   Organizer: organizer@test.com / Test1234!")
         print(f"   Attendee:  attendee@test.com  / Test1234!")
+        print(f"   Mock users: *@demo.com        / Demo1234!")
 
     except Exception as e:
         db.rollback()
