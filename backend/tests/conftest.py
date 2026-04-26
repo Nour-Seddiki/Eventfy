@@ -19,6 +19,12 @@ from app.models.review import Review
 
 @pytest.fixture()
 def db_session():
+    """In-memory SQLite session for fast unit tests.
+
+    Note: The production database is Supabase PostgreSQL.
+    This in-memory session is only used for isolated model-level unit tests
+    that don't need PostgreSQL-specific features.
+    """
     engine = create_engine(
         "sqlite://",
         connect_args={"check_same_thread": False},

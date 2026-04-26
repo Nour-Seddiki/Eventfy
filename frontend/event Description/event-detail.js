@@ -33,16 +33,49 @@ async function loadEventDetails() {
 }
 
 function renderEventHTML(ev, container) {
-  const dateObj = ev.date ? new Date(ev.date) : new Date();
-  const dateStr = dateObj.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
-  const timeStr = dateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+  const CURRENCY_SYMBOLS = { DZD: 'د.ج', USD: '$', EUR: '€', GBP: '£' };
+  const evCurrency = ev.currency || localStorage.getItem('eventfy_currency') || 'DZD';
+  const sym = CURRENCY_SYMBOLS[evCurrency] || evCurrency;
+
+  // Date handling — prefer start_date, fallback to date
+  const startDateObj = ev.start_date ? new Date(ev.start_date) : (ev.date ? new Date(ev.date) : new Date());
+  const dateStr = startDateObj.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+  const timeStr = startDateObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+
+  // End date (if available)
+  let endDateStr = '';
+  if (ev.end_date) {
+    const endObj = new Date(ev.end_date);
+    endDateStr = ' — ' + endObj.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
+      + ' ' + endObj.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+  }
   
   const imgUrl = ev.image 
       ? (ev.image.startsWith('http') ? ev.image : `${API_BASE}${ev.image}`)
       : 'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=600&q=80';
 
   const isFree = !ev.price || ev.price <= 0;
-  const priceDisplay = isFree ? 'Free' : '$' + ev.price;
+  const priceDisplay = isFree ? 'Free' : (evCurrency === 'DZD' ? ev.price + ' ' + sym : sym + ev.price);
+
+  // Registration deadline check
+  let deadlineExpired = false;
+  let deadlineHTML = '';
+  if (ev.registration_deadline) {
+    const dlDate = new Date(ev.registration_deadline);
+    const now = new Date();
+    deadlineExpired = dlDate < now;
+    const dlStr = dlDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+      + ' ' + dlDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    if (deadlineExpired) {
+      deadlineHTML = `<p style="text-align:center;font-size:12px;color:#dc2626;font-weight:600;margin-top:8px;">⏰ Registration closed on ${dlStr}</p>`;
+    } else {
+      deadlineHTML = `<p style="text-align:center;font-size:12px;color:#15803d;font-weight:600;margin-top:8px;">📋 Register before ${dlStr}</p>`;
+    }
+  }
+
+  const buyBtnDisabled = deadlineExpired || ev.available_tickets <= 0;
+  const buyBtnText = deadlineExpired ? 'Registration Closed' : (isFree ? 'Get Free Ticket' : `Buy Ticket — ${priceDisplay}`);
+  const buyBtnStyle = buyBtnDisabled ? 'opacity:0.5; cursor:not-allowed; pointer-events:none;' : '';
 
   container.innerHTML = `
     <!-- Hero -->
@@ -56,7 +89,7 @@ function renderEventHTML(ev, container) {
         <div class="hero-meta">
           <div class="hero-meta-item">
             <svg class="hero-meta-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
-            ${dateStr} • ${timeStr}
+            ${dateStr} • ${timeStr}${endDateStr}
           </div>
           <div class="hero-meta-item">
             <svg class="hero-meta-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/><path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
@@ -113,11 +146,12 @@ function renderEventHTML(ev, container) {
               </div>
             </div>
           </div>
-          <button class="btn-register" id="buyTicketBtn">
-            ${isFree ? 'Get Free Ticket' : 'Buy Ticket — $' + ev.price}
+          <button class="btn-register" id="buyTicketBtn" style="${buyBtnStyle}" ${buyBtnDisabled ? 'disabled' : ''}>
+            ${buyBtnText}
             <svg class="btn-register-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17 8l4 4m0 0l-4 4m4-4H3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
           </button>
-          ${!isFree ? '<p style="text-align:center;font-size:11px;color:#94a3b8;margin-top:8px;">🔒 Secure payment via Stripe</p>' : ''}
+          ${deadlineHTML}
+          ${!isFree && !deadlineExpired ? '<p style="text-align:center;font-size:11px;color:#94a3b8;margin-top:8px;">🔒 Secure payment via Stripe</p>' : ''}
           <button class="btn-save" id="saveEventBtn" style="width:100%;margin-top:12px;padding:14px;border-radius:12px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px;background:#f8fafc;color:#64748b;border:1px solid #e2e8f0;cursor:pointer;transition:all 0.2s;">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="20" height="20"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" stroke-width="2"/></svg>
             Save Event

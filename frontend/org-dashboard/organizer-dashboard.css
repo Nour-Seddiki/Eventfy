@@ -317,3 +317,17 @@
 .btn-primary:hover {
   background: var(--purple-d);
 }
+
+/* Registration Deadline Badges */
+.badge-open {
+  background: #dcfce7;
+  color: #15803d;
+}
+.badge-closing {
+  background: #fef3c7;
+  color: #b45309;
+}
+.badge-closed {
+  background: #fee2e2;
+  color: #dc2626;
+}

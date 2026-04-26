@@ -26,6 +26,30 @@
     } catch { return iso; }
   }
 
+  /* ── Currency formatter ── */
+  const CURRENCY_SYMBOLS = { DZD: 'د.ج', USD: '$', EUR: '€', GBP: '£' };
+  function getUserCurrency() {
+    return localStorage.getItem('eventfy_currency') || 'DZD';
+  }
+  function fmtMoney(amount, currency) {
+    const cur = currency || getUserCurrency();
+    const sym = CURRENCY_SYMBOLS[cur] || cur;
+    const val = (amount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    // Symbol before for USD/EUR/GBP, after for DZD
+    return cur === 'DZD' ? `${val} ${sym}` : `${sym}${val}`;
+  }
+
+  /* ── Deadline status ── */
+  function getDeadlineStatus(deadline) {
+    if (!deadline) return null;
+    const now = new Date();
+    const dl = new Date(deadline);
+    if (dl < now) return { label: 'Registration Closed', cls: 'badge-closed' };
+    const hoursLeft = (dl - now) / 3600000;
+    if (hoursLeft < 24) return { label: `Closes in ${Math.ceil(hoursLeft)}h`, cls: 'badge-closing' };
+    return { label: 'Registration Open', cls: 'badge-open' };
+  }
+
   /* ── Render event list ── */
   function renderEvents(events) {
     const list = document.getElementById('orgEventsList');
@@ -46,7 +70,7 @@
       totalRegistrations += (ev.tickets_sold || 0);
     });
 
-    if (totalRevenueDisplay) totalRevenueDisplay.textContent = '$' + totalRevenue.toFixed(2);
+    if (totalRevenueDisplay) totalRevenueDisplay.textContent = fmtMoney(totalRevenue);
     if (totalRegistrationsDisplay) totalRegistrationsDisplay.textContent = totalRegistrations.toString();
 
     if (events.length === 0) {
@@ -64,6 +88,19 @@
       const badgeClass = status === 'approved' ? 'badge-approved' : 'badge-pending';
       const badgeText  = status === 'approved' ? 'Approved' : 'Pending';
 
+      // Date display — prefer start_date, fallback to date
+      const displayDate = ev.start_date || ev.date;
+      const endDateStr = ev.end_date ? ` — ${formatDate(ev.end_date)}` : '';
+
+      // Deadline badge
+      const dlStatus = getDeadlineStatus(ev.registration_deadline);
+      const dlBadgeHTML = dlStatus
+        ? `<span class="${dlStatus.cls}" style="font-size:11px;padding:2px 8px;border-radius:6px;font-weight:600;">${dlStatus.label}</span>`
+        : '';
+
+      // Currency-aware revenue
+      const evCurrency = ev.currency || getUserCurrency();
+
       return `
         <article class="org-event-card" data-id="${ev.id}">
           <img class="org-event-thumb"
@@ -76,19 +113,20 @@
               <span class="${badgeClass}">${badgeText}</span>
             </div>
             <div class="org-event-meta">
-              <span class="org-event-meta-item">${calSVG} ${formatDate(ev.date)}</span>
+              <span class="org-event-meta-item">${calSVG} ${formatDate(displayDate)}${endDateStr}</span>
               <span class="org-event-meta-item">${pinSVG} ${ev.location || 'Location TBD'}</span>
             </div>
-            <div class="org-event-stats" style="display:flex; gap:12px; margin-top:8px; font-size:13px; color:#64748b; font-weight:500;">
+            <div class="org-event-stats" style="display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; font-size:13px; color:#64748b; font-weight:500;">
               <span style="background:#f8fafc; padding:4px 8px; border-radius:6px; border:1px solid #e2e8f0;">Tickets Sold: <strong style="color:#1e293b;">${ev.tickets_sold || 0}</strong></span>
-              <span style="background:#f8fafc; padding:4px 8px; border-radius:6px; border:1px solid #e2e8f0;">Revenue: <strong style="color:#1e293b;">$${(ev.revenue || 0).toFixed(2)}</strong></span>
+              <span style="background:#f8fafc; padding:4px 8px; border-radius:6px; border:1px solid #e2e8f0;">Revenue: <strong style="color:#1e293b;">${fmtMoney(ev.revenue || 0, evCurrency)}</strong></span>
+              ${dlBadgeHTML}
             </div>
             <div class="org-event-divider"></div>
             <div class="org-event-actions">
               <a href="../event Description/event-detail.html?id=${ev.id}" class="btn-action btn-action-view">
                 ${eyeSVG} View
               </a>
-              <button class="btn-action btn-action-manage" data-id="${ev.id}" data-date="${ev.date || ''}" data-capacity="${ev.available_tickets || 0}">
+              <button class="btn-action btn-action-manage" data-id="${ev.id}" data-date="${displayDate || ''}" data-capacity="${ev.available_tickets || 0}">
                 ${settingSVG} Manage
               </button>
               <a href="../new Event/index.html?editId=${ev.id}" class="btn-action btn-action-edit">
@@ -256,7 +294,7 @@
       const isoDate = dateInput ? new Date(dateInput).toISOString() : null;
       
       const payload = {
-        date: isoDate,
+        start_date: isoDate,
         available_tickets: parseInt(capacityInput, 10)
       };
 

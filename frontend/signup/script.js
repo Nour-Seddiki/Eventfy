@@ -105,11 +105,11 @@ function showNotification(message) {
 
 // Add input focus effects
 document.querySelectorAll('.form-input').forEach(input => {
-    input.addEventListener('focus', function() {
+    input.addEventListener('focus', function () {
         this.parentElement.style.transform = 'scale(1.02)';
     });
 
-    input.addEventListener('blur', function() {
+    input.addEventListener('blur', function () {
         this.parentElement.style.transform = 'scale(1)';
     });
 });

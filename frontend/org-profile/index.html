@@ -482,6 +482,15 @@
               </div>
             </div>
             <div class="contact-item">
+              <div class="contact-icon" style="background:#fef3c7;color:#d97706;">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="8"/><path d="M12 6v12M9 9h4.5a1.5 1.5 0 010 3H9M9 12h5a1.5 1.5 0 010 3H9"/></svg>
+              </div>
+              <div>
+                <div class="contact-label">Currency</div>
+                <div class="contact-value" id="profileCurrency">DZD</div>
+              </div>
+            </div>
+            <div class="contact-item">
               <div class="contact-icon" style="background:#e0f2fe;color:#0284c7;">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="3" stroke-width="2"/><path d="M16 2v4M8 2v4M3 10h18" stroke-width="2"/></svg>
               </div>
@@ -541,6 +550,15 @@
       <div class="form-group">
         <label class="form-label">Website / Social Link</label>
         <input class="form-input" type="url" id="editWebsite" placeholder="https://yoursite.com"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Preferred Currency</label>
+        <select class="form-input" id="editCurrency">
+          <option value="DZD">DZD — Algerian Dinar</option>
+          <option value="USD">USD — US Dollar</option>
+          <option value="EUR">EUR — Euro</option>
+          <option value="GBP">GBP — British Pound</option>
+        </select>
       </div>
       <div class="modal-footer">
         <button class="btn-cancel" id="cancelEditBtn">Cancel</button>
@@ -611,7 +629,11 @@
       document.getElementById('profilePhone').textContent = u.phone || 'Not provided';
       document.getElementById('profileLocation').textContent = u.location || 'Not provided';
       document.getElementById('profileWebsite').textContent = u.website || u.socials || 'Not provided';
+      document.getElementById('profileCurrency').textContent = u.preferred_currency || 'DZD';
       document.getElementById('profileJoined').textContent = formatDate(u.created_at);
+
+      // Store currency in localStorage for other pages (dashboard, etc.)
+      localStorage.setItem('eventfy_currency', u.preferred_currency || 'DZD');
 
       // Organizer banner
       if (role === 'organizer' || role === 'admin') {
@@ -626,6 +648,8 @@
       
       const websiteField = document.getElementById('editWebsite');
       websiteField.value = u.website || u.socials || '';
+
+      document.getElementById('editCurrency').value = u.preferred_currency || 'DZD';
       
       if (role === 'attendee') {
         document.getElementById('profileWebsite').parentElement.parentElement.style.display = 'none';
@@ -720,6 +744,7 @@
         phone: document.getElementById('editPhone').value.trim() || undefined,
         location: document.getElementById('editLocation').value.trim() || undefined,
         website: document.getElementById('editWebsite').value.trim() || undefined,
+        preferred_currency: document.getElementById('editCurrency').value,
       };
       // Remove undefined keys
       Object.keys(updates).forEach(k => updates[k] === undefined && delete updates[k]);

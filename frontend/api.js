@@ -242,7 +242,7 @@ async function createEvent(eventData) {
 async function uploadEventImage(eventId, file) {
   const formData = new FormData();
   formData.append('image', file);
-  
+
   const token = localStorage.getItem('eventfy_token');
   const res = await fetch(`${API_BASE}/Event/event/${eventId}/image`, {
     method: 'POST',

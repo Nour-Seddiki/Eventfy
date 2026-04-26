@@ -84,7 +84,11 @@ class PaymentService:
         if not event.price or event.price <= 0:
             raise HTTPException(status_code=400, detail="This is a free event. Use /ticket/purchase_ticket instead")
 
-        # Convert price to cents (USD). Event price is stored as a float (e.g. 25.00)
+        # Use the event's currency (lowercase for Stripe). Defaults to "dzd" if not set.
+        checkout_currency = (event.currency or "DZD").lower()
+
+        # Convert price to smallest currency unit (cents/centimes).
+        # Event price is stored as a float (e.g. 25.00)
         amount_cents = int(round(event.price * 100))
 
         try:
@@ -92,7 +96,7 @@ class PaymentService:
                 payment_method_types=["card"],
                 line_items=[{
                     "price_data": {
-                        "currency": "usd",
+                        "currency": checkout_currency,
                         "product_data": {
                             "name": f"Ticket: {event.title}",
                             "description": event.description[:200] if event.description else f"Event ticket for {event.title}",
@@ -119,7 +123,7 @@ class PaymentService:
             user_id=user_model.id,
             event_id=event.id,
             amount=event.price,
-            currency="usd",
+            currency=checkout_currency,
             payment_method="stripe",
             payment_intent_id=checkout_session.id,
             status=PaymentStatus.pending,
