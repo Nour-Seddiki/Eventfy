@@ -75,6 +75,13 @@ body {
   color: var(--text);
   -webkit-font-smoothing: antialiased;
   line-height: 1.6;
+  animation: pageEnter .3s ease-out;
+}
+
+/* ── Page entrance fade-in ── */
+@keyframes pageEnter {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 button { cursor: pointer; border: none; background: none; font-family: inherit; }
@@ -708,3 +715,131 @@ ul { list-style: none; }
 .text-sm     { font-size: 13px; }
 .fw-600      { font-weight: 600; }
 .fw-700      { font-weight: 700; }
+
+/* ================================================================
+   8. SKELETON LOADERS
+   ================================================================ */
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 37%, #f0f0f0 63%);
+  background-size: 800px 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+  border-radius: var(--r-md);
+}
+
+/* ── Events grid skeleton card ── */
+.skeleton-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.skeleton-card .skel-img {
+  width: 100%;
+  height: 200px;
+}
+.skeleton-card .skel-body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.skeleton-card .skel-badge {
+  width: 70px;
+  height: 20px;
+  border-radius: var(--r-pill);
+}
+.skeleton-card .skel-title {
+  width: 80%;
+  height: 18px;
+}
+.skeleton-card .skel-text {
+  width: 60%;
+  height: 14px;
+}
+.skeleton-card .skel-btn {
+  width: 100%;
+  height: 40px;
+  margin-top: 12px;
+  border-radius: var(--r-sm);
+}
+
+/* ── Map / browse sidebar skeleton card ── */
+.skeleton-ev-card {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  background: #fff;
+  border-radius: 16px;
+  border: 1.5px solid var(--border);
+  margin-bottom: 8px;
+}
+.skeleton-ev-card .skel-thumb {
+  width: 84px;
+  height: 68px;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+.skeleton-ev-card .skel-ev-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.skeleton-ev-card .skel-ev-badge {
+  width: 60px;
+  height: 16px;
+  border-radius: var(--r-pill);
+}
+.skeleton-ev-card .skel-ev-name {
+  width: 85%;
+  height: 14px;
+}
+.skeleton-ev-card .skel-ev-meta {
+  width: 70%;
+  height: 12px;
+}
+
+/* ── Dashboard skeleton row ── */
+.skeleton-dash-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  margin-bottom: 12px;
+}
+.skeleton-dash-row .skel-dash-thumb {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--r-md);
+  flex-shrink: 0;
+}
+.skeleton-dash-row .skel-dash-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.skeleton-dash-row .skel-dash-title {
+  width: 60%;
+  height: 16px;
+}
+.skeleton-dash-row .skel-dash-meta {
+  width: 45%;
+  height: 12px;
+}
+.skeleton-dash-row .skel-dash-btn {
+  width: 90px;
+  height: 36px;
+  border-radius: var(--r-sm);
+  flex-shrink: 0;
+}

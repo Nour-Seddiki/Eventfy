@@ -7,18 +7,64 @@ function selectRole(element, role) {
     element.querySelector('input[type="radio"]').checked = true;
 }
 
-function handleGoogleSignUp() {
+async function handleGoogleSignUp() {
     const btn = document.querySelector('.google-btn');
+    const errorDiv = document.getElementById('errorMessage');
     const originalHTML = btn.innerHTML;
+
+    // Check if Google Client ID is configured
+    if (!window.GOOGLE_CLIENT_ID || GOOGLE_CLIENT_ID.includes('YOUR_GOOGLE_CLIENT_ID')) {
+        showNotification('Google sign-up is not yet configured. Please set your Google Client ID.');
+        return;
+    }
+
+    // Check if Google Identity Services library is loaded
+    if (typeof google === 'undefined' || !google.accounts) {
+        showNotification('Google library is still loading. Please try again in a moment.');
+        return;
+    }
 
     btn.innerHTML = '<span style="display: inline-block; width: 20px; height: 20px; border: 2px solid #e5e7eb; border-top-color: #ff8c42; border-radius: 50%; animation: spin 0.8s linear infinite;"></span> Connecting...';
     btn.style.pointerEvents = 'none';
 
-    setTimeout(() => {
-        showNotification('Google sign-up is not yet configured for this deployment.');
+    try {
+        // Initialize Google Sign-In
+        google.accounts.id.initialize({
+            client_id: GOOGLE_CLIENT_ID,
+            callback: async (response) => {
+                try {
+                    // The backend /auth/google auto-creates the user if they don't exist
+                    await apiGoogleLogin(response.credential);
+                    showNotification('Account created! Redirecting...');
+                    setTimeout(() => {
+                        const user = getCachedUser();
+                        if (user && (user.role === 'organizer' || user.role === 'admin')) {
+                            window.location.href = '../org-dashboard/index.html';
+                        } else {
+                            window.location.href = '../dashboard/index.html';
+                        }
+                    }, 800);
+                } catch (err) {
+                    errorDiv.textContent = err.message || 'Google sign-up failed.';
+                    errorDiv.style.display = 'block';
+                    btn.innerHTML = originalHTML;
+                    btn.style.pointerEvents = 'auto';
+                }
+            },
+        });
+
+        // Prompt the Google sign-in popup
+        google.accounts.id.prompt((notification) => {
+            if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+                google.accounts.id.prompt();
+            }
+        });
+
+    } catch (err) {
+        showNotification(err.message || 'Google sign-up failed. Please try again.');
         btn.innerHTML = originalHTML;
         btn.style.pointerEvents = 'auto';
-    }, 1500);
+    }
 }
 
 async function handleSubmit(e) {

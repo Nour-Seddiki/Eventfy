@@ -56,17 +56,17 @@
 
   /* Page paths – always relative from any subdir under /frontend/ */
   const PATHS = {
-    home       : relPath('Home/index.html'),
-    events     : relPath('Events/index.html'),
-    about      : relPath('About/index.html'),
-    login      : relPath('login/index.html'),
-    signup     : relPath('signup/index.html'),
-    dashboard  : relPath('dashboard/index.html'),
-    orgDash    : relPath('org-dashboard/index.html'),
+    home: relPath('Home/index.html'),
+    events: relPath('Events/index.html'),
+    about: relPath('About/index.html'),
+    login: relPath('login/index.html'),
+    signup: relPath('signup/index.html'),
+    dashboard: relPath('dashboard/index.html'),
+    orgDash: relPath('org-dashboard/index.html'),
     savedEvents: relPath('saved-events/saved-events.html'),
-    profile    : relPath('org-profile/index.html'),
-    settings   : relPath('setting/index.html'),
-    newEvent   : relPath('new Event/index.html'),
+    profile: relPath('org-profile/index.html'),
+    settings: relPath('setting/index.html'),
+    newEvent: relPath('new Event/index.html'),
     notifications: relPath('notifications/index.html'),
   };
 
@@ -99,7 +99,7 @@
       // Only mark active when there is NO hash fragment (or the base path
       // is different from the current page so the hash doesn't cause a false match)
       if (url.hash && abs === currentPath) return; // same page + hash = skip
-      if (abs === currentPath || (abs.endsWith('index.html') && currentPath.endsWith(abs.replace('index.html','')))) {
+      if (abs === currentPath || (abs.endsWith('index.html') && currentPath.endsWith(abs.replace('index.html', '')))) {
         linkEl.classList.add('active');
       }
     } catch (_) { /* ignore */ }
@@ -107,14 +107,54 @@
 
   document.querySelectorAll('.nav-link, .drawer-link').forEach(markActive);
 
+  /* ── Scroll-spy for #how-it-works on the Home page ──
+     When the how-it-works section is visible, highlight its nav link
+     and un-highlight the Home link (so only one is active at a time).  */
+  const howSection = document.getElementById('how-it-works');
+  if (howSection) {
+    // Gather the relevant links
+    const howLinks  = document.querySelectorAll('[data-section="how-it-works"]');
+    const homeLinks = document.querySelectorAll('.nav-link, .drawer-link');
+
+    // Find home links by resolving their href
+    const homeNavLinks = [];
+    homeLinks.forEach(link => {
+      const href = (link.getAttribute('href') || '').toLowerCase();
+      if (href.startsWith('#') || link.hasAttribute('data-section')) return;
+      try {
+        const url = new URL(href, window.location.href);
+        const abs = url.pathname.toLowerCase();
+        if (abs === currentPath || (abs.endsWith('index.html') && currentPath.endsWith(abs.replace('index.html','')))) {
+          homeNavLinks.push(link);
+        }
+      } catch (_) { /* skip */ }
+    });
+
+    const howObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          // How it Works is in view → activate it, deactivate Home
+          howLinks.forEach(l => l.classList.add('active'));
+          homeNavLinks.forEach(l => l.classList.remove('active'));
+        } else {
+          // How it Works is out of view → deactivate it, reactivate Home
+          howLinks.forEach(l => l.classList.remove('active'));
+          homeNavLinks.forEach(l => l.classList.add('active'));
+        }
+      });
+    }, { threshold: 0.25, rootMargin: '-60px 0px 0px 0px' });
+
+    howObserver.observe(howSection);
+  }
+
   /* ─────────────────────────────────────────────────────────────────
      3. AUTH STATE — show/hide logged-in vs logged-out sections
   ───────────────────────────────────────────────────────────────── */
   const loggedIn = typeof isLoggedIn === 'function' ? isLoggedIn() : !!localStorage.getItem('eventfy_token');
 
   // Toggle visibility helpers
-  function showEl(el)  { if (el) el.style.display = ''; }
-  function hideEl(el)  { if (el) el.style.display = 'none'; }
+  function showEl(el) { if (el) el.style.display = ''; }
+  function hideEl(el) { if (el) el.style.display = 'none'; }
 
   document.querySelectorAll('.nav-logged-in,.drawer-logged-in').forEach(el => {
     loggedIn ? showEl(el) : hideEl(el);
@@ -132,8 +172,8 @@
     const cached = (typeof getCachedUser === 'function') ? getCachedUser() : null;
     if (cached) {
       const fullName = cached.user_name || cached.username || cached.name || 'User';
-      const role     = cached.role ? (cached.role.charAt(0).toUpperCase() + cached.role.slice(1)) : 'Member';
-      const parts    = fullName.trim().split(/\s+/);
+      const role = cached.role ? (cached.role.charAt(0).toUpperCase() + cached.role.slice(1)) : 'Member';
+      const parts = fullName.trim().split(/\s+/);
       const initials = parts.length >= 2
         ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
         : fullName.charAt(0).toUpperCase();
@@ -151,18 +191,18 @@
      5. BUILD USER POPUP (dynamic HTML with correct links)
   ───────────────────────────────────────────────────────────────── */
   const ic = {
-    person  : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`,
+    person: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`,
     calendar: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>`,
-    heart   : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>`,
+    heart: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>`,
     settings: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>`,
-    logout  : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>`,
-    dash    : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>`,
+    logout: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>`,
+    dash: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>`,
   };
 
   function buildUserPopupHTML() {
     const isOrgPage = currentPath.includes('org-dashboard') || currentPath.includes('org-profile');
-    const isDash    = currentPath.includes('/dashboard/');
-    const isSaved   = currentPath.includes('saved-events');
+    const isDash = currentPath.includes('/dashboard/');
+    const isSaved = currentPath.includes('saved-events');
 
     return `
       <div class="popup-header">
@@ -174,10 +214,10 @@
           </div>
         </div>
       </div>
-      <a href="${PATHS.profile}"      class="popup-item ${currentPath.includes('org-profile')    ? 'active' : ''}">${ic.person}   Profile Settings</a>
-      <a href="${PATHS.dashboard}"    class="popup-item ${isDash                                  ? 'active' : ''}">${ic.dash}     My Dashboard</a>
-      ${user.role.toLowerCase() !== 'attendee' ? `<a href="${PATHS.orgDash}"      class="popup-item ${currentPath.includes('org-dashboard')  ? 'active' : ''}">${ic.calendar} My Events</a>` : ''}
-      <a href="${PATHS.savedEvents}"  class="popup-item ${isSaved                                 ? 'active' : ''}">${ic.heart}    Saved Events</a>
+      <a href="${PATHS.profile}"      class="popup-item ${currentPath.includes('org-profile') ? 'active' : ''}">${ic.person}   Profile Settings</a>
+      <a href="${PATHS.dashboard}"    class="popup-item ${isDash ? 'active' : ''}">${ic.dash}     My Dashboard</a>
+      ${user.role.toLowerCase() !== 'attendee' ? `<a href="${PATHS.orgDash}"      class="popup-item ${currentPath.includes('org-dashboard') ? 'active' : ''}">${ic.calendar} My Events</a>` : ''}
+      <a href="${PATHS.savedEvents}"  class="popup-item ${isSaved ? 'active' : ''}">${ic.heart}    Saved Events</a>
       <a href="${PATHS.settings}"     class="popup-item">${ic.settings} Settings</a>
       <div class="popup-sep"></div>
       <button class="popup-item danger btn-do-logout">${ic.logout} Log out</button>
@@ -229,7 +269,7 @@
         } else {
           dots.forEach(dot => dot.style.display = 'none');
         }
-      }).catch(() => {});
+      }).catch(() => { });
     }
 
     // ── Full notification list: lazy-loaded on first bell click ──
@@ -316,9 +356,9 @@
   /* ─────────────────────────────────────────────────────────────────
      8. MOBILE DRAWER
   ───────────────────────────────────────────────────────────────── */
-  const hamburger      = document.getElementById('hamburgerBtn');
-  const drawer         = document.getElementById('navDrawer');
-  const overlay        = document.getElementById('drawerOverlay');
+  const hamburger = document.getElementById('hamburgerBtn');
+  const drawer = document.getElementById('navDrawer');
+  const overlay = document.getElementById('drawerOverlay');
   const closeDrawerBtn = document.getElementById('drawerCloseBtn');
 
   function openDrawer() {
@@ -361,9 +401,9 @@
   }
 
   document.getElementById('desktopAvatarBtn')?.addEventListener('click', e => { e.stopPropagation(); togglePopup('userPopup'); });
-  document.getElementById('mobAvatarBtn')?.addEventListener('click',     e => { e.stopPropagation(); togglePopup('userPopupMob'); });
-  document.getElementById('desktopNotifBtn')?.addEventListener('click',  e => { e.stopPropagation(); togglePopup('notifPopupDesktop'); });
-  document.getElementById('mobNotifBtn')?.addEventListener('click',      e => { e.stopPropagation(); togglePopup('notifPopupMob'); });
+  document.getElementById('mobAvatarBtn')?.addEventListener('click', e => { e.stopPropagation(); togglePopup('userPopupMob'); });
+  document.getElementById('desktopNotifBtn')?.addEventListener('click', e => { e.stopPropagation(); togglePopup('notifPopupDesktop'); });
+  document.getElementById('mobNotifBtn')?.addEventListener('click', e => { e.stopPropagation(); togglePopup('notifPopupMob'); });
 
   // Close on outside click
   document.addEventListener('click', e => {

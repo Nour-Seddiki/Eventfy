@@ -252,6 +252,25 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  /* ── Preferred Currency ── */
+  const CURRENCY_KEY = 'eventfy_currency';
+  const currencySelect = document.getElementById('settingsCurrency');
+  const saveCurrencyBtn = document.getElementById('saveCurrencyBtn');
+
+  // Load saved currency on page load
+  if (currencySelect) {
+    const saved = localStorage.getItem(CURRENCY_KEY) || 'DZD';
+    currencySelect.value = saved;
+  }
+
+  if (saveCurrencyBtn) {
+    saveCurrencyBtn.addEventListener('click', () => {
+      const chosen = currencySelect ? currencySelect.value : 'DZD';
+      localStorage.setItem(CURRENCY_KEY, chosen);
+      showSettingsToast('✅ Currency set to ' + chosen);
+    });
+  }
+
   /* ── Privacy Preferences ── */
   const PRIVACY_KEY = 'eventfy_privacy_prefs';
   const showEmailCb = document.getElementById('privacyShowEmail');

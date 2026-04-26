@@ -263,7 +263,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <text x="46" y="18" text-anchor="middle" font-size="10" fill="white" font-family="sans-serif" font-weight="700">+${ev.tickets_sold || 0}</text>
                   </svg>
                 </div>
-                <div class="event-price">${ev.price > 0 ? '$' + ev.price : 'Free'}</div>
+                <div class="event-price">${ev.price > 0 ? ev.price + ' ' + (localStorage.getItem('eventfy_currency') || 'DZD') : 'Free'}</div>
               </div>
             </div>
           </div>

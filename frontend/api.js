@@ -154,6 +154,36 @@ async function apiSignup(userData) {
   return await res.json();
 }
 
+/**
+ * Login / register via Google One Tap.
+ * Sends the Google ID token to the backend, which verifies it,
+ * creates the user if needed, and returns a JWT.
+ * @param {string} idToken - Google credential JWT
+ */
+async function apiGoogleLogin(idToken) {
+  const res = await fetch(`${API_BASE}/auth/google`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id_token: idToken }),
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || 'Google sign-in failed');
+  }
+
+  const data = await res.json();
+  setToken(data.access_token);
+
+  // Fetch & cache user profile right after login
+  try {
+    const profile = await fetchMyProfile();
+    setCachedUser(profile);
+  } catch { /* non-critical */ }
+
+  return data;
+}
+
 /* ── User API Calls ──────────────────────── */
 
 /** @returns {Promise<object>} User profile */
@@ -352,6 +382,23 @@ async function markNotificationRead(notifId) {
 async function markAllNotificationsRead() {
   const res = await apiFetch('/notifications/mark-all-as-read', { method: 'PUT' });
   if (!res.ok) throw new Error('Failed to mark all notifications as read');
+  return await res.json();
+}
+
+/* ── Payment Verification ────────────────── */
+
+/**
+ * Verify a Stripe checkout session and fulfill the order.
+ * Called from the payment success page to create the ticket
+ * + notification without relying on the Stripe webhook.
+ * @param {string} sessionId - Stripe checkout session ID
+ */
+async function verifyPayment(sessionId) {
+  const res = await apiFetch(`/payment/verify/${sessionId}`, { method: 'POST' });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || 'Payment verification failed');
+  }
   return await res.json();
 }
 

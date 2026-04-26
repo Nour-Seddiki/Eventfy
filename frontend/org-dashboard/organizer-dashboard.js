@@ -27,7 +27,7 @@
   }
 
   /* ── Currency formatter ── */
-  const CURRENCY_SYMBOLS = { DZD: 'د.ج', USD: '$', EUR: '€', GBP: '£' };
+  const CURRENCY_SYMBOLS = { DZD: 'DZD', USD: '$', EUR: '€', GBP: '£' };
   function getUserCurrency() {
     return localStorage.getItem('eventfy_currency') || 'DZD';
   }

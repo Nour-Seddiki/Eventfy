@@ -115,6 +115,7 @@ class userServices:
                 {
                     "ticket_id": str(ticket.id),
                     "event_id": ticket.event_id,
+                    "qr_code": ticket.qr_code,
                     "status": ticket.status,
                     "purchased_at": ticket.purchased_at,
                 }

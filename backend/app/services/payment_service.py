@@ -273,6 +273,85 @@ class PaymentService:
         }
 
     # ─────────────────────────────────────────────
+    #  VERIFY STRIPE SESSION (for localhost / no-webhook fallback)
+    # ─────────────────────────────────────────────
+    @staticmethod
+    def verify_stripe_session(user: dict, db: Session, session_id: str, background_tasks: BackgroundTasks) -> dict:
+        """
+        Verify a Stripe checkout session and fulfill the order if paid.
+        Called from the frontend success page as a fallback when
+        the Stripe webhook can't reach localhost.
+        Idempotent: won't create a duplicate ticket if the webhook already ran.
+        """
+        if not STRIPE_AVAILABLE:
+            raise HTTPException(status_code=501, detail="Stripe not configured")
+
+        if user is None:
+            raise HTTPException(status_code=401, detail="Authentication failed")
+
+        # Look up the payment record
+        payment = db.query(Payment).filter(
+            Payment.payment_intent_id == session_id,
+            Payment.user_id == user.get("user_id"),
+        ).first()
+
+        if not payment:
+            raise HTTPException(status_code=404, detail="Payment not found for this session")
+
+        # If already fully processed (paid + ticket created), return success immediately
+        if payment.status == PaymentStatus.paid and payment.ticket_id:
+            return {
+                "status": "already_fulfilled",
+                "payment_id": str(payment.id),
+                "ticket_id": str(payment.ticket_id),
+                "event_id": payment.event_id,
+            }
+
+        # Verify with Stripe that the session is actually paid
+        try:
+            session = stripe.checkout.Session.retrieve(session_id)
+        except stripe.StripeError as e:
+            logger.error(f"Stripe session retrieval failed: {e}")
+            raise HTTPException(status_code=400, detail="Could not verify payment session")
+
+        if session.payment_status != "paid":
+            return {
+                "status": "not_paid",
+                "payment_status": session.payment_status,
+            }
+
+        # Mark payment as paid
+        payment.status = PaymentStatus.paid
+
+        # Create ticket if not already created (idempotent)
+        if not payment.ticket_id:
+            user_dict = {"user_id": payment.user_id}
+            try:
+                ticket_result = TickectService().purchase_ticket(
+                    user_dict, db, payment.event_id, background_tasks
+                )
+                payment.ticket_id = ticket_result["id"]
+            except HTTPException as e:
+                if e.status_code == 409:
+                    # Ticket already exists (duplicate purchase guard)
+                    logger.info(f"Ticket already exists for user {payment.user_id}, event {payment.event_id}")
+                else:
+                    logger.error(f"Ticket creation failed: {e.detail}")
+                    payment.status = "paid_ticket_error"
+
+        db.commit()
+        db.refresh(payment)
+
+        logger.info(f"Payment {payment.id} verified and fulfilled for event {payment.event_id}")
+
+        return {
+            "status": "fulfilled",
+            "payment_id": str(payment.id),
+            "ticket_id": str(payment.ticket_id) if payment.ticket_id else None,
+            "event_id": payment.event_id,
+        }
+
+    # ─────────────────────────────────────────────
     #  SHARED METHODS
     # ─────────────────────────────────────────────
     @staticmethod

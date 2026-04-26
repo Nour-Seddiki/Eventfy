@@ -304,6 +304,24 @@
         <!-- Will be injected by script.js -->
       </div>
 
+      <!-- ── Preferred Currency ── -->
+      <div class="card" style="margin-bottom:28px;">
+        <div class="card-body">
+          <h2 class="card-title" style="margin-bottom:4px;">Preferred Currency</h2>
+          <p style="font-size:13px;color:var(--muted);margin-bottom:18px;">Choose the currency used across the platform for displaying event prices.</p>
+          <div class="form-group" style="max-width:340px;margin-bottom:18px;">
+            <label class="form-label" for="settingsCurrency">Currency</label>
+            <select class="form-input" id="settingsCurrency">
+              <option value="DZD">DZD — Algerian Dinar</option>
+              <option value="USD">USD — US Dollar</option>
+              <option value="EUR">EUR — Euro</option>
+              <option value="GBP">GBP — British Pound</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" id="saveCurrencyBtn" style="padding:8px 20px;font-size:13px;">Save Currency</button>
+        </div>
+      </div>
+
       <!-- â”€â”€ Edit Profile Modal â”€â”€ -->
       <div class="profile-edit-overlay" id="profileEditOverlay" onclick="closeEditProfile(event)">
         <div class="profile-edit-modal">

@@ -35,6 +35,23 @@ function getFilteredCards() {
   });
 }
 
+/* ── Skeleton placeholder for Events grid ── */
+function showEventSkeletons(count = 6) {
+  const grid = document.getElementById('eventsGrid');
+  if (!grid) return;
+  grid.innerHTML = Array.from({ length: count }, () => `
+    <div class="skeleton-card">
+      <div class="skel-img skeleton"></div>
+      <div class="skel-body">
+        <div class="skel-badge skeleton"></div>
+        <div class="skel-title skeleton"></div>
+        <div class="skel-text skeleton"></div>
+        <div class="skel-btn skeleton"></div>
+      </div>
+    </div>
+  `).join('');
+}
+
 function renderEvents(eventsList) {
   const grid = document.getElementById('eventsGrid');
   if (!grid) return;
@@ -153,7 +170,7 @@ function renderEvents(eventsList) {
     return `
       <article class="event-card" data-cat="${(ev.category || '').toLowerCase()}" data-city="${ev.location || ''}" data-month="${dateObj.getMonth()}" data-price="${ev.price || 0}" style="animation-delay:${delay}s; cursor:pointer; display:flex; flex-direction:column;" onclick="window.location.href='../event Description/event-detail.html?id=${ev.id}'">
         <div class="card-img-wrap" style="flex-shrink:0;">
-          <img alt="${ev.title || 'Event'}" src="${imgUrl}"/>
+          <img alt="${ev.title || 'Event'}" src="${imgUrl}" loading="lazy"/>
           <span class="badge ${badgeClass}">${catName}</span>
           <button class="fav-btn" onclick="event.stopPropagation(); this.classList.toggle('liked');"><svg class="icon-sm" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path></svg></button>
         </div>
@@ -180,6 +197,7 @@ function applyFilters() {
 }
 
 async function loadInitialEvents() {
+  showEventSkeletons(6);
   try {
     if (typeof fetchPublicEvents === 'function') {
       allEvents = await fetchPublicEvents(50);

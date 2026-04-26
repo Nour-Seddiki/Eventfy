@@ -1,11 +1,11 @@
-﻿/* ================================================================
+/* ================================================================
    MY DASHBOARD — Content-Specific Styles Only
    Navbar, drawer, and popup styles are provided by ../common.css
    ================================================================ */
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ══════════════════════════════════
    PAGE CONTENT
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+══════════════════════════════════ */
 .page-container {
   max-width: 900px;
   margin: 0 auto;
@@ -48,7 +48,7 @@
 }
 .btn-primary svg { flex-shrink: 0; }
 
-/* â”€â”€ Dashboard page specific  â”€â”€ */
+/* -- Dashboard page specific -- */
 .dash-header {
   display: flex;
   align-items: center;
@@ -182,7 +182,145 @@
   color: var(--purple);
 }
 
-/* â”€â”€ Responsive â”€â”€ */
+/* ══════════════════════════════════
+   TICKET CODE SECTION
+══════════════════════════════════ */
+.ticket-code-section {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--border, #e5e7eb);
+}
+.ticket-code-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--muted, #94a3b8);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-bottom: 6px;
+}
+.ticket-code-label svg {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+}
+.ticket-code-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f8fafc;
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: 10px;
+  padding: 8px 10px;
+}
+.ticket-code-value {
+  flex: 1;
+  font-family: 'JetBrains Mono', 'SF Mono', 'Consolas', monospace;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text, #1e293b);
+  letter-spacing: 0.4px;
+  word-break: break-all;
+  line-height: 1.4;
+  user-select: all;
+}
+.btn-copy-code {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border-radius: 8px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--purple, #7c3aed);
+  background: #ede9fe;
+  border: 1px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+.btn-copy-code svg {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+}
+.btn-copy-code:hover {
+  background: #ddd6fe;
+  border-color: var(--purple, #7c3aed);
+  transform: translateY(-1px);
+}
+.btn-copy-code:active {
+  transform: translateY(0);
+}
+.btn-copy-code.copied {
+  background: #d1fae5;
+  color: #059669;
+  border-color: #059669;
+}
+
+/* ══════════════════════════════════
+   STATUS BADGE VARIANTS
+══════════════════════════════════ */
+.badge-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: var(--r-pill, 99px);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+.badge-status::before {
+  content: '';
+  display: block;
+  width: 5px; height: 5px;
+  border-radius: 50%;
+}
+.badge-used {
+  background: #e0e7ff;
+  color: #4338ca;
+}
+.badge-used::before { background: #4338ca; }
+.badge-cancelled {
+  background: #fee2e2;
+  color: #dc2626;
+}
+.badge-cancelled::before { background: #dc2626; }
+.badge-organized {
+  background: #fef3c7;
+  color: #d97706;
+}
+.badge-organized::before { background: #d97706; }
+
+/* ══════════════════════════════════
+   EMPTY STATE
+══════════════════════════════════ */
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+}
+.empty-state-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+}
+.empty-state-title {
+  margin: 0 0 6px;
+  font-weight: 600;
+}
+.empty-state-text {
+  margin: 0;
+  font-size: 14px;
+  color: var(--muted, #94a3b8);
+}
+
+/* ══════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════ */
 @media (max-width: 640px) {
   .event-row-card { flex-wrap: wrap; }
   .event-thumb { width: 72px; height: 72px; }
@@ -190,4 +328,6 @@
   .event-title { font-size: 14px; }
   .page-title { font-size: 22px; }
   .dash-header { flex-direction: column; align-items: flex-start; }
+  .ticket-code-row { flex-wrap: wrap; }
+  .ticket-code-value { font-size: 11px; }
 }

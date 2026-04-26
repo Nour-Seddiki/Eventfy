@@ -38,6 +38,22 @@ document.querySelectorAll('.drawer-link').forEach(l => l.addEventListener('click
 
 let EVENTS = [];
 
+/* ── Skeleton for browse sidebar ── */
+function showBrowseSkeletons(count = 5) {
+  const list = document.getElementById('eventList');
+  if (!list) return;
+  list.innerHTML = Array.from({ length: count }, () => `
+    <div class="skeleton-ev-card">
+      <div class="skel-thumb skeleton"></div>
+      <div class="skel-ev-body">
+        <div class="skel-ev-badge skeleton"></div>
+        <div class="skel-ev-name skeleton"></div>
+        <div class="skel-ev-meta skeleton"></div>
+      </div>
+    </div>
+  `).join('');
+}
+
 let map, markers = {}, activeId = null;
 const filters = { date: 'all', category: 'all', location: 'all', price: 'all' };
 let activeCat = 'all';
@@ -55,6 +71,9 @@ const CITY_COORDS = {
 };
 
 document.addEventListener('DOMContentLoaded', async () => {
+  /* Show skeletons immediately while data loads */
+  showBrowseSkeletons(5);
+
   map = L.map('map', { center: [28.0339, 1.6596], zoom: 5, zoomControl: false, attributionControl: false });
   L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { maxZoom: 19 }).addTo(map);
   L.control.attribution({ prefix: false, position: 'bottomright' })
@@ -195,7 +214,7 @@ function renderList() {
       ? '<span class="ev-price free">Free</span>'
       : '<span class="ev-price paid">' + ev.price.toLocaleString() + ' DZD</span>';
     return '<div class="ev-card' + (activeId === ev.id ? ' active' : '') + '" id="card-' + ev.id + '" onclick="activateCard(' + ev.id + ',true)">' +
-      '<div class="ev-thumb"><img src="' + ev.img + '" alt="' + ev.name + '" onerror="this.style.display=\'none\'"/></div>' +
+      '<div class="ev-thumb"><img src="' + ev.img + '" alt="' + ev.name + '" loading="lazy" onerror="this.style.display=\'none\'"/></div>' +
       '<div class="ev-body"><div class="ev-tags"><span class="ev-badge ' + ev.badge + '">' + (labels[ev.catKey] || ev.catKey) + '</span></div>' +
       '<div class="ev-name">' + ev.name + '</div>' +
       '<div class="ev-meta"><div class="ev-meta-row">📅 ' + ev.dateStr + ' · ' + ev.time + '</div>' +

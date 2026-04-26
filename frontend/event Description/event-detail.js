@@ -33,7 +33,7 @@ async function loadEventDetails() {
 }
 
 function renderEventHTML(ev, container) {
-  const CURRENCY_SYMBOLS = { DZD: 'د.ج', USD: '$', EUR: '€', GBP: '£' };
+  const CURRENCY_SYMBOLS = { DZD: 'DZD', USD: '$', EUR: '€', GBP: '£' };
   const evCurrency = ev.currency || localStorage.getItem('eventfy_currency') || 'DZD';
   const sym = CURRENCY_SYMBOLS[evCurrency] || evCurrency;
 

@@ -311,6 +311,7 @@
     Back to Home
   </a>
 
+  <script src="../api.js"></script>
   <script>
     // ── Show transaction ID if present ──
     const params = new URLSearchParams(window.location.search);
@@ -324,6 +325,34 @@
         ? sessionId.substring(0, 36) + '…'
         : sessionId;
     }
+
+    // ── Verify payment & create ticket + notification ──
+    async function verifyAndFulfill() {
+      if (!sessionId || !isLoggedIn()) return;
+
+      try {
+        const result = await verifyPayment(sessionId);
+        console.log('Payment verification result:', result);
+
+        // Show ticket code if available
+        if (result.status === 'fulfilled' || result.status === 'already_fulfilled') {
+          // Update subtitle text
+          const subtitle = document.querySelector('.subtitle');
+          if (subtitle) {
+            subtitle.innerHTML = `
+              Your ticket has been <strong>confirmed</strong> and saved to your
+              <a href="../dashboard/index.html" style="color:#7c3aed;font-weight:700;text-decoration:underline;">dashboard</a>.
+              Show your <strong>QR code</strong> at the door and enjoy the event!
+            `;
+          }
+        }
+      } catch (err) {
+        console.warn('Payment verify fallback:', err.message);
+        // Non-critical — webhook may handle it, or user can check dashboard
+      }
+    }
+
+    verifyAndFulfill();
 
     // ── Confetti burst (brand colors) ──
     function launchConfetti() {
@@ -374,3 +403,4 @@
   </script>
 </body>
 </html>
+

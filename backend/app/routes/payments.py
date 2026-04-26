@@ -31,6 +31,18 @@ async def stripe_webhook(
     return PaymentService.handle_stripe_webhook(db, payload, sig_header, background_tasks)
 
 
+# ── Verify Stripe Session (frontend success page calls this) ──
+@router.post("/verify/{session_id}", status_code=status.HTTP_200_OK)
+def verify_stripe_session(
+    user: user_dependency,
+    db: db_dependency,
+    background_tasks: BackgroundTasks,
+    session_id: str = Path(),
+):
+    """Verify a Stripe checkout session and fulfill the order (ticket + notification)."""
+    return PaymentService.verify_stripe_session(user, db, session_id, background_tasks)
+
+
 # ── My Payments ──────────────────────────────────────
 @router.get("/my_payments", status_code=status.HTTP_200_OK)
 def get_my_payments(user: user_dependency, db: db_dependency):
