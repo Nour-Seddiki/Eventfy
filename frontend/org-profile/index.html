@@ -640,7 +640,8 @@
       const websiteField = document.getElementById('editWebsite');
       websiteField.value = u.website || u.socials || '';
 
-      document.getElementById('editCurrency').value = u.preferred_currency || 'DZD';
+      const editCurrencyEl = document.getElementById('editCurrency');
+      if (editCurrencyEl) editCurrencyEl.value = u.preferred_currency || 'DZD';
       
       if (role === 'attendee') {
         document.getElementById('profileWebsite').parentElement.parentElement.style.display = 'none';
@@ -735,7 +736,7 @@
         phone: document.getElementById('editPhone').value.trim() || undefined,
         location: document.getElementById('editLocation').value.trim() || undefined,
         website: document.getElementById('editWebsite').value.trim() || undefined,
-        preferred_currency: document.getElementById('editCurrency').value,
+        preferred_currency: document.getElementById('editCurrency')?.value || localStorage.getItem('eventfy_currency') || 'DZD',
       };
       // Remove undefined keys
       Object.keys(updates).forEach(k => updates[k] === undefined && delete updates[k]);
