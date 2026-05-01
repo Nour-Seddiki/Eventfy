@@ -41,9 +41,9 @@ class TickectService:
 
         # Validate event date
         current_time = datetime.now(timezone.utc)
-        if event_model.date is None:
+        if event_model.start_date is None:
             raise HTTPException(status_code=400, detail="Event date is missing")
-        event_time = event_model.date
+        event_time = event_model.start_date
         if event_time.tzinfo is None:
             event_time = event_time.replace(tzinfo=timezone.utc)
         if event_time < current_time:
@@ -92,7 +92,7 @@ class TickectService:
             user_id=user_model.id,
             type=NotificationType.BOOKING_CONFIRMED,
             title="Booking Confirmed",
-            message=f"Your ticket for '{event_model.title}' has been confirmed. Event date: {event_model.date.strftime('%B %d, %Y at %I:%M %p')}",
+            message=f"Your ticket for '{event_model.title}' has been confirmed. Event date: {event_model.start_date.strftime('%B %d, %Y at %I:%M %p')}",
             related_object_id=str(new_ticket.id),
             related_object_type="ticket"
         )
@@ -102,7 +102,7 @@ class TickectService:
             send_ticket_email,
             user_email=user_model.email,
             event_name=event_model.title,
-            event_date=str(event_model.date),
+            event_date=str(event_model.start_date),
             qr_image=new_ticket.qr_image
         )
 
@@ -120,9 +120,9 @@ class TickectService:
 
         # Prevent cancelling after event started
         current_time = datetime.now(timezone.utc)
-        if event_model.date is None:
+        if event_model.start_date is None:
             raise HTTPException(status_code=400, detail="Event date is missing")
-        event_time = event_model.date
+        event_time = event_model.start_date
         if event_time.tzinfo is None:
             event_time = event_time.replace(tzinfo=timezone.utc)
         if event_time < current_time:
@@ -159,7 +159,7 @@ class TickectService:
             user_id=user_model.id,
             type=NotificationType.BOOKING_CANCELLED,
             title="Booking Cancelled",
-            message=f"Your ticket for '{event_model.title}' has been cancelled. Event date: {event_model.date.strftime('%B %d, %Y at %I:%M %p')}",
+            message=f"Your ticket for '{event_model.title}' has been cancelled. Event date: {event_model.start_date.strftime('%B %d, %Y at %I:%M %p')}",
             related_object_id=str(ticket_model.id),
             related_object_type="ticket"
         )
@@ -186,9 +186,9 @@ class TickectService:
         if event is None:
             raise HTTPException(status_code=404, detail="event not found")
         current_time = datetime.now(timezone.utc)
-        if event.date is None:
+        if event.start_date is None:
             raise HTTPException(status_code=400, detail="Event date is missing")
-        event_time = event.date
+        event_time = event.start_date
         if event_time.tzinfo is None:
             event_time = event_time.replace(tzinfo=timezone.utc)
         if event_time < current_time:

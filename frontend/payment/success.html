@@ -79,19 +79,34 @@
     .icon-ring {
       width: 88px; height: 88px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
       display: flex; align-items: center; justify-content: center;
       margin: 0 auto 28px;
       position: relative;
+      transition: all 0.5s ease;
+    }
+    .icon-ring.verifying {
+      background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+      animation: ringSpin 1.5s linear infinite;
+    }
+    .icon-ring.success {
+      background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
       animation: ringPulse 2s ease-in-out infinite;
+    }
+    .icon-ring.error {
+      background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+      animation: none;
     }
     @keyframes ringPulse {
       0%, 100% { box-shadow: 0 0 0 0 rgba(16,185,129,0.25); }
       50%      { box-shadow: 0 0 0 14px rgba(16,185,129,0); }
     }
+    @keyframes ringSpin {
+      0% { box-shadow: 0 0 0 0 rgba(99,102,241,0.3); }
+      50% { box-shadow: 0 0 0 10px rgba(99,102,241,0); }
+      100% { box-shadow: 0 0 0 0 rgba(99,102,241,0.3); }
+    }
     .icon-ring svg {
       width: 42px; height: 42px;
-      color: #059669;
     }
     .icon-ring .check-path {
       stroke-dasharray: 30;
@@ -102,6 +117,17 @@
       to { stroke-dashoffset: 0; }
     }
 
+    /* ── Spinner icon ── */
+    .spinner-icon {
+      width: 42px; height: 42px;
+      color: #6366f1;
+      animation: spin 1.2s linear infinite;
+    }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
     /* ── Typography ── */
     .success-card h1 {
       font-family: 'Plus Jakarta Sans', sans-serif;
@@ -110,12 +136,14 @@
       color: #111827;
       letter-spacing: -0.5px;
       margin-bottom: 10px;
+      transition: all 0.3s;
     }
     .subtitle {
       font-size: 15px;
       color: #6b7280;
       line-height: 1.65;
       margin-bottom: 28px;
+      transition: all 0.3s;
     }
     .subtitle strong {
       color: #111827;
@@ -219,6 +247,16 @@
       color: #7c3aed;
     }
 
+    .btn-retry {
+      background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(249,115,22,0.25);
+    }
+    .btn-retry:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(249,115,22,0.35);
+    }
+
     /* ── Confetti canvas ── */
     .confetti-piece {
       position: fixed;
@@ -258,17 +296,26 @@
 <body>
 
   <div class="success-card">
-    <!-- Animated check icon -->
-    <div class="icon-ring">
-      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5">
+    <!-- Animated icon — starts as spinner, becomes check on verification -->
+    <div class="icon-ring verifying" id="iconRing">
+      <!-- Spinner shown while verifying -->
+      <svg class="spinner-icon" id="spinnerIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+      </svg>
+      <!-- Check icon (hidden until verified) -->
+      <svg id="checkIcon" fill="none" stroke="#059669" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" style="display:none; width:42px; height:42px;">
         <path class="check-path" d="M5 13l4 4L19 7"/>
+      </svg>
+      <!-- Error icon (hidden until error) -->
+      <svg id="errorIcon" fill="none" stroke="#dc2626" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" style="display:none; width:42px; height:42px;">
+        <circle cx="12" cy="12" r="10"/>
+        <path d="M15 9l-6 6M9 9l6 6"/>
       </svg>
     </div>
 
-    <h1>You're All Set!</h1>
-    <p class="subtitle">
-      Your ticket has been <strong>confirmed</strong>. We've sent a confirmation email
-      with your <strong>QR code</strong> — show it at the door and enjoy the event!
+    <h1 id="mainTitle">Verifying Your Payment…</h1>
+    <p class="subtitle" id="subtitle">
+      Please wait while we confirm your payment with Stripe and generate your ticket.
     </p>
 
     <!-- Transaction info -->
@@ -279,7 +326,7 @@
         </svg>
       </div>
       <div class="ticket-info">
-        <div class="ticket-label">Transaction ID</div>
+        <div class="ticket-label" id="stubLabel">Transaction ID</div>
         <div class="ticket-value" id="txnId"></div>
       </div>
     </div>
@@ -287,7 +334,7 @@
     <div class="divider"></div>
 
     <!-- Actions -->
-    <div class="actions">
+    <div class="actions" id="actionsContainer">
       <a href="../Events/index.html" class="btn btn-primary" id="browseBtn">
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
@@ -313,45 +360,199 @@
 
   <script src="../api.js"></script>
   <script>
-    // ── Show transaction ID if present ──
-    const params = new URLSearchParams(window.location.search);
-    const sessionId = params.get('session_id');
-    const stubEl = document.getElementById('ticketStub');
-    const txnEl  = document.getElementById('txnId');
+    // ── DOM refs ──
+    const params      = new URLSearchParams(window.location.search);
+    const sessionId   = params.get('session_id');
+    const iconRing    = document.getElementById('iconRing');
+    const spinnerIcon = document.getElementById('spinnerIcon');
+    const checkIcon   = document.getElementById('checkIcon');
+    const errorIcon   = document.getElementById('errorIcon');
+    const mainTitle   = document.getElementById('mainTitle');
+    const subtitle    = document.getElementById('subtitle');
+    const stubEl      = document.getElementById('ticketStub');
+    const stubLabel   = document.getElementById('stubLabel');
+    const txnEl       = document.getElementById('txnId');
+    const actionsEl   = document.getElementById('actionsContainer');
 
-    if (sessionId && stubEl && txnEl) {
-      stubEl.style.display = 'flex';
-      txnEl.textContent = sessionId.length > 36
-        ? sessionId.substring(0, 36) + '…'
-        : sessionId;
+    // ── State transitions ──
+    function showSuccess(ticketCode) {
+      iconRing.className = 'icon-ring success';
+      spinnerIcon.style.display = 'none';
+      checkIcon.style.display = '';
+      errorIcon.style.display = 'none';
+
+      mainTitle.textContent = "You're All Set!";
+      subtitle.innerHTML = `
+        Your ticket has been <strong>confirmed</strong> and saved to your
+        <a href="../dashboard/index.html" style="color:#7c3aed;font-weight:700;text-decoration:underline;">dashboard</a>.
+        We've sent a confirmation email with your <strong>QR code</strong> — show it at the door!
+      `;
+
+      // Show ticket code if available
+      if (ticketCode && stubEl && txnEl) {
+        stubLabel.textContent = 'Ticket Code';
+        txnEl.textContent = ticketCode;
+        stubEl.style.display = 'flex';
+      } else if (sessionId && stubEl && txnEl) {
+        stubLabel.textContent = 'Transaction ID';
+        txnEl.textContent = sessionId.length > 36 ? sessionId.substring(0, 36) + '…' : sessionId;
+        stubEl.style.display = 'flex';
+      }
+
+      // Launch confetti on success
+      launchConfetti();
+    }
+
+    function showError(message) {
+      iconRing.className = 'icon-ring error';
+      spinnerIcon.style.display = 'none';
+      checkIcon.style.display = 'none';
+      errorIcon.style.display = '';
+
+      mainTitle.textContent = 'Verification Issue';
+      subtitle.innerHTML = `
+        <strong>${message}</strong><br>
+        <span style="font-size:13px;color:#9ca3af;margin-top:6px;display:inline-block;">
+          If you completed the payment, please try again or check your dashboard.
+          The ticket may appear shortly.
+        </span>
+      `;
+
+      // Add retry button
+      actionsEl.innerHTML = `
+        <button class="btn btn-retry" id="retryBtn" onclick="retryVerification()">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1 4v6h6M23 20v-6h-6"/>
+            <path d="M20.49 9A9 9 0 005.64 5.64L1 10M23 14l-4.64 4.36A9 9 0 013.51 15"/>
+          </svg>
+          Retry Verification
+        </button>
+        <a href="../dashboard/index.html" class="btn btn-secondary">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+            <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+          </svg>
+          Check Dashboard
+        </a>
+        <a href="../Events/index.html" class="btn btn-secondary">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+          </svg>
+          Browse Events
+        </a>
+      `;
+    }
+
+    function showNoSession() {
+      iconRing.className = 'icon-ring error';
+      spinnerIcon.style.display = 'none';
+      checkIcon.style.display = 'none';
+      errorIcon.style.display = '';
+
+      mainTitle.textContent = 'No Payment Session';
+      subtitle.innerHTML = `
+        No payment session was found. Please return to the event page and try purchasing again.
+      `;
     }
 
     // ── Verify payment & create ticket + notification ──
     async function verifyAndFulfill() {
-      if (!sessionId || !isLoggedIn()) return;
+      if (!sessionId) {
+        showNoSession();
+        return;
+      }
 
-      try {
-        const result = await verifyPayment(sessionId);
-        console.log('Payment verification result:', result);
+      if (!isLoggedIn()) {
+        showError('You need to be logged in to verify your payment.');
+        return;
+      }
 
-        // Show ticket code if available
-        if (result.status === 'fulfilled' || result.status === 'already_fulfilled') {
-          // Update subtitle text
-          const subtitle = document.querySelector('.subtitle');
-          if (subtitle) {
-            subtitle.innerHTML = `
-              Your ticket has been <strong>confirmed</strong> and saved to your
-              <a href="../dashboard/index.html" style="color:#7c3aed;font-weight:700;text-decoration:underline;">dashboard</a>.
-              Show your <strong>QR code</strong> at the door and enjoy the event!
-            `;
+      // Show the session ID while verifying
+      if (stubEl && txnEl) {
+        stubLabel.textContent = 'Session ID';
+        txnEl.textContent = sessionId.length > 36 ? sessionId.substring(0, 36) + '…' : sessionId;
+        stubEl.style.display = 'flex';
+      }
+
+      let retries = 3;
+      let delay = 2000; // Start with 2s, then 4s, then 8s
+
+      while (retries > 0) {
+        try {
+          console.log(`[Eventfy] Verifying payment (attempt ${4 - retries}/3)...`);
+          const result = await verifyPayment(sessionId);
+          console.log('[Eventfy] Payment verification result:', result);
+
+          if (result.status === 'fulfilled' || result.status === 'already_fulfilled') {
+            showSuccess(result.ticket_id || null);
+            return; // Done!
           }
+
+          if (result.status === 'not_paid') {
+            // Payment may still be processing on Stripe's side
+            retries--;
+            if (retries > 0) {
+              console.log(`[Eventfy] Payment not yet confirmed by Stripe, retrying in ${delay/1000}s...`);
+              mainTitle.textContent = 'Confirming Payment…';
+              subtitle.innerHTML = `Stripe is still processing your payment. Retrying in ${delay/1000} seconds…`;
+              await new Promise(r => setTimeout(r, delay));
+              delay *= 2; // Exponential backoff
+              continue;
+            }
+            showError('Payment has not been confirmed by Stripe yet. This can take a few moments.');
+            return;
+          }
+
+          // Unknown status
+          showError(`Unexpected status: ${result.status}`);
+          return;
+
+        } catch (err) {
+          console.error('[Eventfy] Payment verification error:', err);
+          retries--;
+          if (retries > 0) {
+            console.log(`[Eventfy] Retrying verification in ${delay/1000}s...`);
+            await new Promise(r => setTimeout(r, delay));
+            delay *= 2;
+            continue;
+          }
+          showError(err.message || 'Could not verify your payment. Please check your dashboard.');
+          return;
         }
-      } catch (err) {
-        console.warn('Payment verify fallback:', err.message);
-        // Non-critical — webhook may handle it, or user can check dashboard
       }
     }
 
+    // ── Retry button handler ──
+    function retryVerification() {
+      // Reset to verifying state
+      iconRing.className = 'icon-ring verifying';
+      spinnerIcon.style.display = '';
+      checkIcon.style.display = 'none';
+      errorIcon.style.display = 'none';
+      mainTitle.textContent = 'Retrying Verification…';
+      subtitle.innerHTML = 'Please wait while we check your payment status again.';
+
+      // Reset actions
+      actionsEl.innerHTML = `
+        <a href="../Events/index.html" class="btn btn-primary" id="browseBtn">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+          </svg>
+          Browse Events
+        </a>
+        <a href="../dashboard/index.html" class="btn btn-secondary" id="dashBtn">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+            <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+          </svg>
+          My Tickets
+        </a>
+      `;
+
+      verifyAndFulfill();
+    }
+
+    // ── Start verification on page load ──
     verifyAndFulfill();
 
     // ── Confetti burst (brand colors) ──
@@ -399,8 +600,6 @@
       }
     `;
     document.head.appendChild(confettiCSS);
-    launchConfetti();
   </script>
 </body>
 </html>
-
