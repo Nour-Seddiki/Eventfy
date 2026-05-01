@@ -1,2 +1,17 @@
 .agent/
 .chrome-debug/
+.env
+__pycache__/
+*.pyc
+uploads/
+*.db
+*.db-*
+.netlify/
+brain/
+.claude/
+.agents/
+skills/
+skills-lock.json
+.impeccable.md
+stripe.zip
+stripe-cli/
