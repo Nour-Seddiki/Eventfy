@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment Cancelled — Eventfy</title>
+  <meta name="description" content="Your Eventfy payment was cancelled. No charges were made. Try again anytime.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><rect x='3' y='4' width='18' height='18' rx='4' fill='%237f0df2' opacity='.15'/><path d='M8 2v4M16 2v4M3 10h18' stroke='%237f0df2' stroke-width='2' stroke-linecap='round'/><circle cx='8' cy='15' r='1.5' fill='%237f0df2'/><circle cx='12' cy='15' r='1.5' fill='%237f0df2'/><circle cx='16' cy='15' r='1.5' fill='%237f0df2'/></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ── Reset & Base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Manrope', 'Inter', sans-serif;
+      background: #f3f4f6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #111827;
+      -webkit-font-smoothing: antialiased;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* ── Ambient background orbs ── */
+    body::before,
+    body::after {
+      content: '';
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(100px);
+      opacity: 0.08;
+      z-index: 0;
+      pointer-events: none;
+    }
+    body::before {
+      width: 500px; height: 500px;
+      background: #7c3aed;
+      top: -150px; left: -100px;
+      animation: floatOrb 14s ease-in-out infinite alternate;
+    }
+    body::after {
+      width: 400px; height: 400px;
+      background: #f97316;
+      bottom: -120px; right: -80px;
+      animation: floatOrb 11s ease-in-out infinite alternate-reverse;
+    }
+    @keyframes floatOrb {
+      from { transform: translate(0, 0) scale(1); }
+      to   { transform: translate(25px, -25px) scale(1.08); }
+    }
+
+    /* ── Main card ── */
+    .cancel-card {
+      position: relative;
+      z-index: 1;
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 28px;
+      padding: 52px 44px 44px;
+      max-width: 500px;
+      width: 92%;
+      text-align: center;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+      animation: cardReveal 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    }
+    @keyframes cardReveal {
+      from { opacity: 0; transform: translateY(30px) scale(0.96); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* ── Cancel icon ── */
+    .icon-ring {
+      width: 88px; height: 88px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 28px;
+      position: relative;
+      animation: gentleShake 0.5s 0.3s ease both;
+    }
+    @keyframes gentleShake {
+      0%, 100% { transform: rotate(0); }
+      20%  { transform: rotate(-6deg); }
+      40%  { transform: rotate(6deg); }
+      60%  { transform: rotate(-4deg); }
+      80%  { transform: rotate(3deg); }
+    }
+    .icon-ring svg {
+      width: 38px; height: 38px;
+      color: #ea580c;
+    }
+    .icon-ring .x-line {
+      stroke-dasharray: 20;
+      stroke-dashoffset: 20;
+      animation: drawX 0.4s 0.5s ease forwards;
+    }
+    @keyframes drawX {
+      to { stroke-dashoffset: 0; }
+    }
+
+    /* ── Typography ── */
+    .cancel-card h1 {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 26px;
+      font-weight: 800;
+      color: #111827;
+      letter-spacing: -0.5px;
+      margin-bottom: 10px;
+    }
+    .subtitle {
+      font-size: 15px;
+      color: #6b7280;
+      line-height: 1.65;
+      margin-bottom: 12px;
+    }
+
+    /* ── Reassurance block ── */
+    .reassurance {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 14px;
+      padding: 16px 20px;
+      margin-bottom: 28px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      text-align: left;
+    }
+    .reassurance-icon {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      background: #dcfce7;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .reassurance-icon svg {
+      width: 20px; height: 20px;
+      color: #16a34a;
+    }
+    .reassurance-text {
+      font-size: 13.5px;
+      color: #374151;
+      font-weight: 500;
+      line-height: 1.5;
+    }
+    .reassurance-text strong {
+      color: #16a34a;
+      font-weight: 700;
+    }
+
+    /* ── Separator ── */
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, #e5e7eb, transparent);
+      margin-bottom: 28px;
+    }
+
+    /* ── Action buttons ── */
+    .actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 13px 26px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 700;
+      font-family: 'Manrope', sans-serif;
+      cursor: pointer;
+      border: none;
+      text-decoration: none;
+      transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .btn svg {
+      width: 17px; height: 17px;
+      flex-shrink: 0;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #f97316 0%, #fb923c 100%);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(249,115,22,0.25);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(249,115,22,0.35);
+    }
+    .btn-primary:active { transform: translateY(0); }
+
+    .btn-secondary {
+      background: #f3f4f6;
+      color: #374151;
+      border: 1.5px solid #e5e7eb;
+    }
+    .btn-secondary:hover {
+      background: #ede9fe;
+      border-color: #7c3aed;
+      color: #7c3aed;
+    }
+
+    /* ── Back link ── */
+    .back-link {
+      position: relative;
+      z-index: 1;
+      margin-top: 24px;
+      font-size: 13px;
+      color: #9ca3af;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .back-link:hover { color: #7c3aed; }
+    .back-link svg { width: 14px; height: 14px; }
+
+    /* ── Responsive ── */
+    @media (max-width: 540px) {
+      .cancel-card {
+        padding: 40px 24px 32px;
+        border-radius: 22px;
+      }
+      .cancel-card h1 { font-size: 22px; }
+      .actions { flex-direction: column; }
+      .btn { width: 100%; justify-content: center; }
+      .reassurance { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="cancel-card">
+    <!-- Animated X icon -->
+    <div class="icon-ring">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5">
+        <path class="x-line" d="M18 6L6 18"/>
+        <path class="x-line" d="M6 6l12 12"/>
+      </svg>
+    </div>
+
+    <h1>Payment Cancelled</h1>
+    <p class="subtitle">
+      No worries — your payment was not processed and you can try again whenever you're ready.
+    </p>
+
+    <!-- Reassurance block -->
+    <div class="reassurance">
+      <div class="reassurance-icon">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+      </div>
+      <div class="reassurance-text">
+        <strong>No charge was made.</strong> Your payment method was not billed. Your ticket reservation is safe until you decide.
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Actions -->
+    <div class="actions">
+      <a href="#" id="retryBtn" class="btn btn-primary">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+        </svg>
+        Try Again
+      </a>
+      <a href="../Events/index.html" class="btn btn-secondary">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        Browse Events
+      </a>
+    </div>
+  </div>
+
+  <a href="../Home/index.html" class="back-link">
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M19 12H5M12 19l-7-7 7-7"/>
+    </svg>
+    Back to Home
+  </a>
+
+  <script>
+    // If event_id is in the URL, link "Try Again" back to the event detail page
+    const params = new URLSearchParams(window.location.search);
+    const eventId = params.get('event_id');
+    const retryBtn = document.getElementById('retryBtn');
+
+    if (eventId) {
+      retryBtn.href = `../event Description/index.html?id=${eventId}`;
+    } else {
+      retryBtn.href = '../Events/index.html';
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eventfy — Discover Events That Move You</title>
+  <meta name="description" content="Find and host amazing events near you. From science clubs to city marathons — Eventfy connects people through passions.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><rect x='3' y='4' width='18' height='18' rx='4' fill='%237f0df2' opacity='.15'/><path d='M8 2v4M16 2v4M3 10h18' stroke='%237f0df2' stroke-width='2' stroke-linecap='round'/><circle cx='8' cy='15' r='1.5' fill='%237f0df2'/><circle cx='12' cy='15' r='1.5' fill='%237f0df2'/><circle cx='16' cy='15' r='1.5' fill='%237f0df2'/></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../common.css">
+  <link rel="stylesheet" href="Home.css">
+</head>
+
+<body>
+
+  <!-- ═══════════════════════════════════════
+       EVENTFY UNIFIED NAVBAR
+  ═══════════════════════════════════════ -->
+  <header class="site-header" id="siteHeader">
+    <div class="header-inner">
+
+      <!-- Logo -->
+      <a href="../Home/index.html" class="logo" aria-label="Eventfy home">
+        <div class="logo-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+            <rect x="3" y="4" width="18" height="18" rx="4" fill="#7f0df2" opacity="0.15"/>
+            <path d="M8 2v4M16 2v4M3 10h18" stroke="#7f0df2" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="8" cy="15" r="1.5" fill="#7f0df2"/>
+            <circle cx="12" cy="15" r="1.5" fill="#7f0df2"/>
+            <circle cx="16" cy="15" r="1.5" fill="#7f0df2"/>
+          </svg>
+        </div>
+        <span class="logo-text">Eventfy</span>
+      </a>
+
+      <!-- Desktop Nav -->
+      <nav class="header-nav" aria-label="Main navigation">
+        <a href="../Home/index.html" class="nav-link">
+          <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+          Home
+        </a>
+        <a href="../Events/index.html" class="nav-link">
+          <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+          Browse
+        </a>
+        <a href="../About/index.html" class="nav-link">
+          <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path d="M12 16v-4M12 8h.01" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+          About
+        </a>
+        <a href="#how-it-works" class="nav-link" data-section="how-it-works">
+          <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+          How it Works
+        </a>
+
+        <!-- LOGGED-OUT: Login + Register -->
+        <div class="nav-actions nav-logged-out" style="display:none">
+          <button class="btn-login btn-do-login">Login</button>
+          <button class="btn-register btn-do-register">Register</button>
+        </div>
+
+        <!-- LOGGED-IN: Notif + Avatar + Logout -->
+        <div class="nav-loggedin nav-logged-in" style="display:none">
+          <div class="notif-popup-wrap">
+            <button class="nav-notif-btn" id="desktopNotifBtn" aria-label="Notifications">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 00-9.33-4.997M13.73 21a2 2 0 01-3.46 0M6 11a6 6 0 016-6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+              <span class="notif-dot"></span>
+            </button>
+            <div class="notif-popup" id="notifPopupDesktop"></div>
+          </div>
+          <div class="user-popup-wrap">
+            <button class="nav-user-avatar-btn" id="desktopAvatarBtn" aria-label="My profile">
+              <span class="user-initials-text">U</span>
+            </button>
+            <div class="user-popup" id="userPopup"></div>
+          </div>
+          <button class="btn-nav-logout btn-do-logout">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+            Log out
+          </button>
+        </div>
+      </nav>
+
+      <!-- Mobile: Notif + Avatar (logged in) -->
+      <div class="mob-header-loggedin nav-logged-in" style="display:none">
+        <div class="notif-popup-wrap">
+          <button class="nav-notif-btn" id="mobNotifBtn" aria-label="Notifications">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 00-9.33-4.997M13.73 21a2 2 0 01-3.46 0M6 11a6 6 0 016-6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+            <span class="notif-dot"></span>
+          </button>
+          <div class="notif-popup" id="notifPopupMob"></div>
+        </div>
+        <div class="user-popup-wrap">
+          <button class="nav-user-avatar-btn" id="mobAvatarBtn" aria-label="My profile">
+            <span class="user-initials-text">U</span>
+          </button>
+          <div class="user-popup" id="userPopupMob"></div>
+        </div>
+      </div>
+
+      <!-- Hamburger -->
+      <button class="hamburger-btn" id="hamburgerBtn" aria-label="Open menu" aria-expanded="false">
+        <span class="ham-line"></span>
+        <span class="ham-line"></span>
+        <span class="ham-line"></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Drawer Overlay -->
+  <div class="drawer-overlay" id="drawerOverlay"></div>
+
+  <!-- Mobile Drawer -->
+  <div class="nav-drawer" id="navDrawer" aria-hidden="true">
+    <div class="drawer-inner">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <a href="../Home/index.html" class="logo">
+          <div class="logo-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+              <rect x="3" y="4" width="18" height="18" rx="4" fill="#7f0df2" opacity="0.15"/>
+              <path d="M8 2v4M16 2v4M3 10h18" stroke="#7f0df2" stroke-width="2" stroke-linecap="round"/>
+              <circle cx="8" cy="15" r="1.5" fill="#7f0df2"/><circle cx="12" cy="15" r="1.5" fill="#7f0df2"/><circle cx="16" cy="15" r="1.5" fill="#7f0df2"/>
+            </svg>
+          </div>
+          <span class="logo-text">Eventfy</span>
+        </a>
+        <button class="drawer-close-btn" id="drawerCloseBtn" aria-label="Close menu">✕</button>
+      </div>
+
+      <!-- User card (logged in only) -->
+      <div class="drawer-user-card drawer-logged-in" style="display:none">
+        <div class="drawer-user-avatar"><span class="user-initials-text">U</span></div>
+        <div>
+          <div class="drawer-user-name user-name-text">User</div>
+          <div class="drawer-user-role user-role-text">Member</div>
+        </div>
+      </div>
+
+      <nav class="drawer-nav">
+        <a href="../Home/index.html" class="drawer-link">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+          Home
+        </a>
+        <a href="../Events/index.html" class="drawer-link">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+          Browse
+        </a>
+        <a href="../About/index.html" class="drawer-link">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path d="M12 16v-4M12 8h.01" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+          About
+        </a>
+        <a href="#how-it-works" class="drawer-link" data-section="how-it-works">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+          How it Works
+        </a>
+        <!-- Logged-in links -->
+        <a href="../org-profile/index.html" class="drawer-link drawer-logged-in" style="display:none">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Profile Settings
+        </a>
+        <a href="../dashboard/index.html" class="drawer-link drawer-logged-in" style="display:none">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          My Dashboard
+        </a>
+        <a href="../saved-events/saved-events.html" class="drawer-link drawer-logged-in" style="display:none">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+          Saved Events
+        </a>
+      </nav>
+
+      <div class="drawer-bottom-menu">
+        <!-- Logged-out buttons -->
+        <div class="drawer-logged-out" style="display:none;flex-direction:column;gap:8px">
+          <button class="btn-register btn-do-register" style="width:100%;height:44px;border-radius:12px;font-size:14px">Register</button>
+          <button class="btn-login btn-do-login" style="width:100%;height:44px;border-radius:12px;font-size:14px;background:#f5f0ff;border:2px solid #7f0df2;color:#7f0df2">Login</button>
+        </div>
+        <!-- Logged-in logout -->
+        <button class="btn-drawer-logout btn-do-logout drawer-logged-in" style="display:none">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Log out
+        </button>
+      </div>
+    </div>
+  </div>
+  <!-- END NAVBAR -->
+
+  <section class="hero-section">
+    <div class="hero">
+      <div class="page1-1 reveal-left">
+        <div>
+          <div class="hero-badge">New Events Added Daily</div>
+          <div class="to-animate"></div>
+          <div class="hero-sub">
+            From scientific clubs to city marathons, find your next passion
+            project or challenge here. Connect with like-minded people in your city.
+          </div>
+          <div class="hero-btns">
+            <button class="btn-explore" id="btnExplore">Explore Events</button>
+            <button class="btn-host" id="btnHost">Host an Event</button>
+          </div>
+        </div>
+      </div>
+      <div class="page1-2 reveal-right">
+        <img src="Container.png" alt="Eventfy hero illustration" loading="lazy">
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ CATEGORY ══ -->
+  <section class="category">
+    <div class="section-head reveal">
+      <div class="section-title">Browse by Category</div>
+      <div class="section-sub">Find the tribe that fits your vibe.</div>
+    </div>
+    <div class="my-category">
+      <div class="cat-card reveal-scale" data-cat="science"><p>Science Clubs</p></div>
+      <div class="cat-card reveal-scale" data-cat="chess"><p>Chess</p></div>
+      <div class="cat-card reveal-scale" data-cat="sports"><p>Marathons</p></div>
+      <div class="cat-card reveal-scale" data-cat="business"><p>Workshops</p></div>
+      <div class="cat-card reveal-scale" data-cat="business"><p>Networking</p></div>
+      <div class="cat-card reveal-scale" data-cat="art"><p>Arts &amp; Culture</p></div>
+    </div>
+  </section>
+
+  <!-- ══ FEATURED EVENTS ══ -->
+  <section class="events">
+    <p class="section-title reveal">Featured Events</p>
+    <div class="events-grid" id="featuredEventsGrid">
+      <!-- Events will be loaded dynamically via Home.js -->
+    </div>
+  </section>
+
+  <!-- ══ HOW IT WORKS ══ -->
+  <section class="how-section" id="how-it-works">
+    <div class="section-head reveal" style="text-align:center">
+      <div class="section-title">How it Works</div>
+      <div class="section-sub">Three simple steps to your next unforgettable event.</div>
+    </div>
+    <div class="how-grid">
+      <div class="how-card reveal-scale">
+        <div class="how-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="32" height="32"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        </div>
+        <div class="how-step">Step 01</div>
+        <div class="how-title">Discover Events</div>
+        <div class="how-desc">Browse hundreds of curated events by category, city, or date — all in one place.</div>
+      </div>
+      <div class="how-card reveal-scale">
+        <div class="how-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="32" height="32"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <div class="how-step">Step 02</div>
+        <div class="how-title">Register Instantly</div>
+        <div class="how-desc">Sign up with one click. Free events are immediate — paid tickets are secured in seconds.</div>
+      </div>
+      <div class="how-card reveal-scale">
+        <div class="how-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="32" height="32"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2z"/></svg>
+        </div>
+        <div class="how-step">Step 03</div>
+        <div class="how-title">Attend &amp; Connect</div>
+        <div class="how-desc">Show up, network with like-minded people, and build experiences that last a lifetime.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ CTA ══ -->
+  <section class="plat-test">
+    <div class="test-conatainer reveal-scale">
+      <div>Ready to Find Your Next Event?</div>
+      <div>Join thousands of students and professionals discovering their passions every day.</div>
+      <div class="cta-btns">
+        <button class="btn-cta-primary" id="btnGetStarted">Get Started Now</button>
+        <button class="btn-cta-outline" id="btnBrowseCategories">Browse Categories</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ FOOTER ══ -->
+  <footer>
+    <div class="footer-grid">
+      <div class="end-box reveal">
+        <div class="end-inline">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+            <rect x="3" y="4" width="18" height="18" rx="4" fill="#7f0df2" opacity="0.25"/>
+            <path d="M8 2v4M16 2v4M3 10h18" stroke="#7f0df2" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="8" cy="15" r="1.5" fill="#7f0df2"/>
+            <circle cx="12" cy="15" r="1.5" fill="#7f0df2"/>
+            <circle cx="16" cy="15" r="1.5" fill="#7f0df2"/>
+          </svg>
+          <p>Eventfy</p>
+        </div>
+        <div class="footer-desc">Connecting people through passions. The #1 platform for student and professional events.</div>
+      </div>
+      <div class="end-box reveal">
+        <div class="footer-col-title">Discover</div>
+        <ul>
+          <li><a href="../Events/index.html?cat=science">Scientific Clubs</a></li>
+          <li><a href="../Events/index.html?cat=sports">Marathons</a></li>
+          <li><a href="../Events/index.html?cat=business">Workshops</a></li>
+          <li><a href="../Events/index.html?cat=art">Arts &amp; Culture</a></li>
+        </ul>
+      </div>
+      <div class="end-box reveal">
+        <div class="footer-col-title">Company</div>
+        <ul>
+          <li><a href="../About/index.html">About Us</a></li>
+          <li><a href="#">Careers</a></li>
+          <li><a href="#">Blog</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom reveal">
+      <span>© 2026 Eventfy Inc. All rights reserved.</span>
+    </div>
+  </footer>
+
+  <button class="scroll-top" id="scrollTopBtn" aria-label="Back to top">↑</button>
+
+<script>
+    /* ── Role-aware hero CTA + bottom CTA wiring ── */
+
+    /** Adapts #btnHost based on auth state & role */
+    function initHostBtn() {
+      const btn = document.getElementById('btnHost');
+      if (!btn) return;
+
+      if (typeof isLoggedIn === 'function' && isLoggedIn()) {
+        const user = typeof getCachedUser === 'function' ? getCachedUser() : null;
+        if (user && user.role === 'organizer') {
+          // Organizer → "Host an Event" (original dark-border style)
+          btn.textContent = 'Host an Event';
+          btn.className = 'btn-host';
+          btn.onclick = () => { window.location.href = '../new Event/index.html'; };
+        } else {
+          // Attendee → "My Dashboard" (purple variant)
+          btn.textContent = 'My Dashboard';
+          btn.className = 'btn-host btn-dashboard';
+          btn.onclick = () => { window.location.href = '../dashboard/index.html'; };
+        }
+      } else {
+        // Not logged in → "About Us" (amber variant)
+        btn.textContent = 'About Us';
+        btn.className = 'btn-host btn-about';
+        btn.onclick = () => { window.location.href = '../About/Index.html'; };
+      }
+    }
+
+    /** Adapts #btnGetStarted based on auth state & role */
+    function initCtaBtn() {
+      const btn = document.getElementById('btnGetStarted');
+      if (!btn) return;
+
+      if (typeof isLoggedIn === 'function' && isLoggedIn()) {
+        const user = typeof getCachedUser === 'function' ? getCachedUser() : null;
+        if (user && user.role === 'organizer') {
+          btn.textContent = 'Create an Event';
+          btn.className = 'btn-cta-primary btn-cta-host';
+          btn.onclick = () => { window.location.href = '../new Event/index.html'; };
+        } else {
+          btn.textContent = 'Browse Events';
+          btn.className = 'btn-cta-primary';
+          btn.onclick = () => { window.location.href = '../Events/index.html'; };
+        }
+      } else {
+        btn.textContent = 'Get Started Now';
+        btn.className = 'btn-cta-primary';
+        btn.onclick = () => { window.location.href = '../signup/index.html'; };
+      }
+    }
+
+    /* Run after api.js is loaded */
+    function initRoleButtons() {
+      initHostBtn();
+      initCtaBtn();
+    }
+
+    if (document.readyState === 'complete') {
+      initRoleButtons();
+    } else {
+      window.addEventListener('load', initRoleButtons);
+    }
+
+    /* ── Static button wiring ── */
+    document.getElementById('btnExplore')?.addEventListener('click', () => {
+      window.location.href = '../Events/index.html';
+    });
+    document.getElementById('btnBrowseCategories')?.addEventListener('click', () => {
+      window.location.href = '../Events/index.html';
+    });
+
+    /* ── Category card click → Events with filter ── */
+    document.querySelectorAll('.cat-card[data-cat]').forEach(card => {
+      card.style.cursor = 'pointer';
+      card.addEventListener('click', () => {
+        window.location.href = `../Events/index.html?cat=${card.dataset.cat}`;
+      });
+    });
+  </script>
+  <script src="../config.js?v=2"></script>
+
+  <script src="../api.js"></script>
+  <script src="Home.js"></script>
+  <script src="../navbar.js"></script>
+</body>
+
+</html>

@@ -73,8 +73,8 @@ function renderEvents(eventsList) {
   };
 
   grid.innerHTML = eventsList.map((ev, idx) => {
-    const deadlineRaw = ev.registration_deadline || ev.start_date || ev.date;
-    const dateObj = deadlineRaw ? new Date(deadlineRaw) : null;
+    const delay = (idx % 10) * 0.1;
+    const dateObj = ev.date ? new Date(ev.date) : new Date();
     const month = dateObj.toLocaleString('en-US', { month: 'short' }).toUpperCase();
     const day = String(dateObj.getDate()).padStart(2, '0');
     const time = dateObj.toLocaleString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
@@ -178,7 +178,7 @@ function renderEvents(eventsList) {
           <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px;">
             <p class="card-date" style="margin:0; display:flex; align-items:center;">
               ${freeBadgeHtml}
-              <span style="font-size:12px; font-weight:700; color:#ef4444;"><svg style="width:12px;height:12px;margin-right:3px;vertical-align:-1px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/><path d="M12 6v6l4 2" stroke-linecap="round" stroke-width="2"/></svg>Deadline: ${month} ${day} • ${time}</span>
+              <span style="font-size:12px; font-weight:700; color:#ef4444;">${month} ${day} • ${time}</span>
             </p>
           </div>
           <h3 class="card-title">${ev.title || 'Untitled Event'}</h3>

@@ -1,0 +1,89 @@
+[build]
+  publish = "."
+
+# ── Redirects ──────────────────────────────────
+# SPA-like fallback: serve index.html for directory roots
+[[redirects]]
+  from = "/"
+  to = "/Home/index.html"
+  status = 302
+
+# ── Headers ────────────────────────────────────
+
+# Security headers on every response
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+# HTML pages: never cache (they embed deploy-specific URLs)
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+    Pragma = "no-cache"
+
+[[headers]]
+  for = "/*/index.html"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+    Pragma = "no-cache"
+
+# Static assets: cache aggressively (CSS, images, fonts)
+[[headers]]
+  for = "*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "*.png"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "*.jpg"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "*.webp"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "*.svg"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "*.woff2"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# JS files: cache aggressively EXCEPT config.js
+# NOTE: *.js is intentionally REMOVED to avoid overriding config.js
+# Instead, navbar.js and api.js use a moderate cache
+[[headers]]
+  for = "/navbar.js"
+  [headers.values]
+    Cache-Control = "public, max-age=3600"
+
+[[headers]]
+  for = "/api.js"
+  [headers.values]
+    Cache-Control = "public, max-age=3600"
+
+# config.js — MUST NEVER be cached (holds live API base URL)
+[[headers]]
+  for = "/config.js"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+    Pragma = "no-cache"
+
+[[headers]]
+  for = "/env-config.js"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+    Pragma = "no-cache"

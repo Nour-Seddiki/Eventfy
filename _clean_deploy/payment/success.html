@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment Successful — Eventfy</title>
+  <meta name="description" content="Your Eventfy ticket purchase was successful. Check your email for confirmation.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><rect x='3' y='4' width='18' height='18' rx='4' fill='%237f0df2' opacity='.15'/><path d='M8 2v4M16 2v4M3 10h18' stroke='%237f0df2' stroke-width='2' stroke-linecap='round'/><circle cx='8' cy='15' r='1.5' fill='%237f0df2'/><circle cx='12' cy='15' r='1.5' fill='%237f0df2'/><circle cx='16' cy='15' r='1.5' fill='%237f0df2'/></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ── Reset & Base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Manrope', 'Inter', sans-serif;
+      background: #f3f4f6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #111827;
+      -webkit-font-smoothing: antialiased;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* ── Ambient background orbs ── */
+    body::before,
+    body::after {
+      content: '';
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(100px);
+      opacity: 0.12;
+      z-index: 0;
+      pointer-events: none;
+    }
+    body::before {
+      width: 500px; height: 500px;
+      background: #7c3aed;
+      top: -150px; right: -100px;
+      animation: floatOrb 12s ease-in-out infinite alternate;
+    }
+    body::after {
+      width: 400px; height: 400px;
+      background: #10b981;
+      bottom: -120px; left: -80px;
+      animation: floatOrb 10s ease-in-out infinite alternate-reverse;
+    }
+    @keyframes floatOrb {
+      from { transform: translate(0, 0) scale(1); }
+      to   { transform: translate(30px, -20px) scale(1.1); }
+    }
+
+    /* ── Main card ── */
+    .success-card {
+      position: relative;
+      z-index: 1;
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 28px;
+      padding: 52px 44px 44px;
+      max-width: 500px;
+      width: 92%;
+      text-align: center;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+      animation: cardReveal 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    }
+    @keyframes cardReveal {
+      from { opacity: 0; transform: translateY(30px) scale(0.96); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* ── Animated check icon ── */
+    .icon-ring {
+      width: 88px; height: 88px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 28px;
+      position: relative;
+      transition: all 0.5s ease;
+    }
+    .icon-ring.verifying {
+      background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+      animation: ringSpin 1.5s linear infinite;
+    }
+    .icon-ring.success {
+      background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+      animation: ringPulse 2s ease-in-out infinite;
+    }
+    .icon-ring.error {
+      background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+      animation: none;
+    }
+    @keyframes ringPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(16,185,129,0.25); }
+      50%      { box-shadow: 0 0 0 14px rgba(16,185,129,0); }
+    }
+    @keyframes ringSpin {
+      0% { box-shadow: 0 0 0 0 rgba(99,102,241,0.3); }
+      50% { box-shadow: 0 0 0 10px rgba(99,102,241,0); }
+      100% { box-shadow: 0 0 0 0 rgba(99,102,241,0.3); }
+    }
+    .icon-ring svg {
+      width: 42px; height: 42px;
+    }
+    .icon-ring .check-path {
+      stroke-dasharray: 30;
+      stroke-dashoffset: 30;
+      animation: drawCheck 0.6s 0.4s ease forwards;
+    }
+    @keyframes drawCheck {
+      to { stroke-dashoffset: 0; }
+    }
+
+    /* ── Spinner icon ── */
+    .spinner-icon {
+      width: 42px; height: 42px;
+      color: #6366f1;
+      animation: spin 1.2s linear infinite;
+    }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    /* ── Typography ── */
+    .success-card h1 {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 26px;
+      font-weight: 800;
+      color: #111827;
+      letter-spacing: -0.5px;
+      margin-bottom: 10px;
+      transition: all 0.3s;
+    }
+    .subtitle {
+      font-size: 15px;
+      color: #6b7280;
+      line-height: 1.65;
+      margin-bottom: 28px;
+      transition: all 0.3s;
+    }
+    .subtitle strong {
+      color: #111827;
+      font-weight: 600;
+    }
+
+    /* ── Ticket stub / transaction info ── */
+    .ticket-stub {
+      background: #f9fafb;
+      border: 1px dashed #e5e7eb;
+      border-radius: 14px;
+      padding: 18px 20px;
+      margin-bottom: 28px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .ticket-icon {
+      width: 42px; height: 42px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #ede9fe, #ddd6fe);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .ticket-icon svg {
+      width: 20px; height: 20px;
+      color: #7c3aed;
+    }
+    .ticket-info {
+      text-align: left;
+      min-width: 0;
+    }
+    .ticket-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #9ca3af;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 2px;
+    }
+    .ticket-value {
+      font-size: 13px;
+      font-weight: 600;
+      color: #374151;
+      font-family: 'JetBrains Mono', 'SF Mono', monospace;
+      word-break: break-all;
+      line-height: 1.4;
+    }
+
+    /* ── Separator ── */
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, #e5e7eb, transparent);
+      margin-bottom: 28px;
+    }
+
+    /* ── Action buttons ── */
+    .actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 13px 26px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 700;
+      font-family: 'Manrope', sans-serif;
+      cursor: pointer;
+      border: none;
+      text-decoration: none;
+      transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .btn svg {
+      width: 17px; height: 17px;
+      flex-shrink: 0;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #7c3aed 0%, #9333ea 100%);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(124,58,237,0.25);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(124,58,237,0.35);
+    }
+    .btn-primary:active { transform: translateY(0); }
+
+    .btn-secondary {
+      background: #f3f4f6;
+      color: #374151;
+      border: 1.5px solid #e5e7eb;
+    }
+    .btn-secondary:hover {
+      background: #ede9fe;
+      border-color: #7c3aed;
+      color: #7c3aed;
+    }
+
+    .btn-retry {
+      background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(249,115,22,0.25);
+    }
+    .btn-retry:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(249,115,22,0.35);
+    }
+
+    /* ── Confetti canvas ── */
+    .confetti-piece {
+      position: fixed;
+      z-index: 9999;
+      pointer-events: none;
+      border-radius: 2px;
+    }
+
+    /* ── Back link ── */
+    .back-link {
+      position: relative;
+      z-index: 1;
+      margin-top: 24px;
+      font-size: 13px;
+      color: #9ca3af;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .back-link:hover { color: #7c3aed; }
+    .back-link svg { width: 14px; height: 14px; }
+
+    /* ── Responsive ── */
+    @media (max-width: 540px) {
+      .success-card {
+        padding: 40px 24px 32px;
+        border-radius: 22px;
+      }
+      .success-card h1 { font-size: 22px; }
+      .actions { flex-direction: column; }
+      .btn { width: 100%; justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="success-card">
+    <!-- Animated icon — starts as spinner, becomes check on verification -->
+    <div class="icon-ring verifying" id="iconRing">
+      <!-- Spinner shown while verifying -->
+      <svg class="spinner-icon" id="spinnerIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+      </svg>
+      <!-- Check icon (hidden until verified) -->
+      <svg id="checkIcon" fill="none" stroke="#059669" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" style="display:none; width:42px; height:42px;">
+        <path class="check-path" d="M5 13l4 4L19 7"/>
+      </svg>
+      <!-- Error icon (hidden until error) -->
+      <svg id="errorIcon" fill="none" stroke="#dc2626" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" style="display:none; width:42px; height:42px;">
+        <circle cx="12" cy="12" r="10"/>
+        <path d="M15 9l-6 6M9 9l6 6"/>
+      </svg>
+    </div>
+
+    <h1 id="mainTitle">Verifying Your Payment…</h1>
+    <p class="subtitle" id="subtitle">
+      Please wait while we confirm your payment with Stripe and generate your ticket.
+    </p>
+
+    <!-- Transaction info -->
+    <div class="ticket-stub" id="ticketStub" style="display:none">
+      <div class="ticket-icon">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15 5v2M15 11v2M15 17v2M5 5h14a2 2 0 012 2v3a2 2 0 000 4v3a2 2 0 01-2 2H5a2 2 0 01-2-2v-3a2 2 0 000-4V7a2 2 0 012-2z"/>
+        </svg>
+      </div>
+      <div class="ticket-info">
+        <div class="ticket-label" id="stubLabel">Transaction ID</div>
+        <div class="ticket-value" id="txnId"></div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Actions -->
+    <div class="actions" id="actionsContainer">
+      <a href="../Events/index.html" class="btn btn-primary" id="browseBtn">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        Browse Events
+      </a>
+      <a href="../dashboard/index.html" class="btn btn-secondary" id="dashBtn">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+          <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+        </svg>
+        My Tickets
+      </a>
+    </div>
+  </div>
+
+  <a href="../Home/index.html" class="back-link">
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M19 12H5M12 19l-7-7 7-7"/>
+    </svg>
+    Back to Home
+  </a>
+
+  <script src="../config.js?v=2"></script>
+
+
+  <script src="../api.js"></script>
+  <script>
+    // ── DOM refs ──
+    const params      = new URLSearchParams(window.location.search);
+    const sessionId   = params.get('session_id');
+    const iconRing    = document.getElementById('iconRing');
+    const spinnerIcon = document.getElementById('spinnerIcon');
+    const checkIcon   = document.getElementById('checkIcon');
+    const errorIcon   = document.getElementById('errorIcon');
+    const mainTitle   = document.getElementById('mainTitle');
+    const subtitle    = document.getElementById('subtitle');
+    const stubEl      = document.getElementById('ticketStub');
+    const stubLabel   = document.getElementById('stubLabel');
+    const txnEl       = document.getElementById('txnId');
+    const actionsEl   = document.getElementById('actionsContainer');
+
+    // ── State transitions ──
+    function showSuccess(ticketCode) {
+      iconRing.className = 'icon-ring success';
+      spinnerIcon.style.display = 'none';
+      checkIcon.style.display = '';
+      errorIcon.style.display = 'none';
+
+      mainTitle.textContent = "You're All Set!";
+      subtitle.innerHTML = `
+        Your ticket has been <strong>confirmed</strong> and saved to your
+        <a href="../dashboard/index.html" style="color:#7c3aed;font-weight:700;text-decoration:underline;">dashboard</a>.
+        We've sent a confirmation email with your <strong>QR code</strong> — show it at the door!
+      `;
+
+      // Show ticket code if available
+      if (ticketCode && stubEl && txnEl) {
+        stubLabel.textContent = 'Ticket Code';
+        txnEl.textContent = ticketCode;
+        stubEl.style.display = 'flex';
+      } else if (sessionId && stubEl && txnEl) {
+        stubLabel.textContent = 'Transaction ID';
+        txnEl.textContent = sessionId.length > 36 ? sessionId.substring(0, 36) + '…' : sessionId;
+        stubEl.style.display = 'flex';
+      }
+
+      // Launch confetti on success
+      launchConfetti();
+    }
+
+    function showError(message) {
+      iconRing.className = 'icon-ring error';
+      spinnerIcon.style.display = 'none';
+      checkIcon.style.display = 'none';
+      errorIcon.style.display = '';
+
+      mainTitle.textContent = 'Verification Issue';
+      subtitle.innerHTML = `
+        <strong>${message}</strong><br>
+        <span style="font-size:13px;color:#9ca3af;margin-top:6px;display:inline-block;">
+          If you completed the payment, please try again or check your dashboard.
+          The ticket may appear shortly.
+        </span>
+      `;
+
+      // Add retry button
+      actionsEl.innerHTML = `
+        <button class="btn btn-retry" id="retryBtn" onclick="retryVerification()">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1 4v6h6M23 20v-6h-6"/>
+            <path d="M20.49 9A9 9 0 005.64 5.64L1 10M23 14l-4.64 4.36A9 9 0 013.51 15"/>
+          </svg>
+          Retry Verification
+        </button>
+        <a href="../dashboard/index.html" class="btn btn-secondary">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+            <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+          </svg>
+          Check Dashboard
+        </a>
+        <a href="../Events/index.html" class="btn btn-secondary">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+          </svg>
+          Browse Events
+        </a>
+      `;
+    }
+
+    function showNoSession() {
+      iconRing.className = 'icon-ring error';
+      spinnerIcon.style.display = 'none';
+      checkIcon.style.display = 'none';
+      errorIcon.style.display = '';
+
+      mainTitle.textContent = 'No Payment Session';
+      subtitle.innerHTML = `
+        No payment session was found. Please return to the event page and try purchasing again.
+      `;
+    }
+
+    // ── Verify payment & create ticket + notification ──
+    async function verifyAndFulfill() {
+      if (!sessionId) {
+        showNoSession();
+        return;
+      }
+
+      if (!isLoggedIn()) {
+        showError('You need to be logged in to verify your payment.');
+        return;
+      }
+
+      // Show the session ID while verifying
+      if (stubEl && txnEl) {
+        stubLabel.textContent = 'Session ID';
+        txnEl.textContent = sessionId.length > 36 ? sessionId.substring(0, 36) + '…' : sessionId;
+        stubEl.style.display = 'flex';
+      }
+
+      let retries = 3;
+      let delay = 2000; // Start with 2s, then 4s, then 8s
+
+      while (retries > 0) {
+        try {
+          console.log(`[Eventfy] Verifying payment (attempt ${4 - retries}/3)...`);
+          const result = await verifyPayment(sessionId);
+          console.log('[Eventfy] Payment verification result:', result);
+
+          if (result.status === 'fulfilled' || result.status === 'already_fulfilled') {
+            showSuccess(result.ticket_id || null);
+            return; // Done!
+          }
+
+          if (result.status === 'not_paid') {
+            // Payment may still be processing on Stripe's side
+            retries--;
+            if (retries > 0) {
+              console.log(`[Eventfy] Payment not yet confirmed by Stripe, retrying in ${delay/1000}s...`);
+              mainTitle.textContent = 'Confirming Payment…';
+              subtitle.innerHTML = `Stripe is still processing your payment. Retrying in ${delay/1000} seconds…`;
+              await new Promise(r => setTimeout(r, delay));
+              delay *= 2; // Exponential backoff
+              continue;
+            }
+            showError('Payment has not been confirmed by Stripe yet. This can take a few moments.');
+            return;
+          }
+
+          // Unknown status
+          showError(`Unexpected status: ${result.status}`);
+          return;
+
+        } catch (err) {
+          console.error('[Eventfy] Payment verification error:', err);
+          retries--;
+          if (retries > 0) {
+            console.log(`[Eventfy] Retrying verification in ${delay/1000}s...`);
+            await new Promise(r => setTimeout(r, delay));
+            delay *= 2;
+            continue;
+          }
+          showError(err.message || 'Could not verify your payment. Please check your dashboard.');
+          return;
+        }
+      }
+    }
+
+    // ── Retry button handler ──
+    function retryVerification() {
+      // Reset to verifying state
+      iconRing.className = 'icon-ring verifying';
+      spinnerIcon.style.display = '';
+      checkIcon.style.display = 'none';
+      errorIcon.style.display = 'none';
+      mainTitle.textContent = 'Retrying Verification…';
+      subtitle.innerHTML = 'Please wait while we check your payment status again.';
+
+      // Reset actions
+      actionsEl.innerHTML = `
+        <a href="../Events/index.html" class="btn btn-primary" id="browseBtn">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+          </svg>
+          Browse Events
+        </a>
+        <a href="../dashboard/index.html" class="btn btn-secondary" id="dashBtn">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+            <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+          </svg>
+          My Tickets
+        </a>
+      `;
+
+      verifyAndFulfill();
+    }
+
+    // ── Start verification on page load ──
+    verifyAndFulfill();
+
+    // ── Confetti burst (brand colors) ──
+    function launchConfetti() {
+      const colors = ['#7c3aed','#a78bfa','#10b981','#34d399','#f97316','#fbbf24','#ec4899','#818cf8'];
+      const shapes = ['circle','rect'];
+      const count = 80;
+
+      for (let i = 0; i < count; i++) {
+        const el = document.createElement('div');
+        el.className = 'confetti-piece';
+        const size = 5 + Math.random() * 7;
+        const shape = shapes[Math.floor(Math.random() * shapes.length)];
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        const left = 40 + Math.random() * 20; // center-ish burst
+        const angle = (Math.random() - 0.5) * 120;
+        const drift = (Math.random() - 0.5) * 200;
+        const duration = 2.2 + Math.random() * 1.8;
+        const delay = Math.random() * 0.4;
+
+        el.style.cssText = `
+          left: ${left}%;
+          top: 40%;
+          width: ${size}px;
+          height: ${shape === 'circle' ? size : size * 1.4}px;
+          background: ${color};
+          border-radius: ${shape === 'circle' ? '50%' : '2px'};
+          opacity: 1;
+          transform: rotate(0deg);
+          animation: confettiFall ${duration}s ${delay}s cubic-bezier(.2,.8,.4,1) forwards;
+          --drift: ${drift}px;
+          --angle: ${angle}deg;
+        `;
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), (duration + delay) * 1000 + 200);
+      }
+    }
+
+    // Inject confetti keyframes
+    const confettiCSS = document.createElement('style');
+    confettiCSS.textContent = `
+      @keyframes confettiFall {
+        0%   { opacity: 1; transform: translate(0, 0) rotate(0deg) scale(1); }
+        100% { opacity: 0; transform: translate(var(--drift), 120vh) rotate(720deg) scale(0.4); }
+      }
+    `;
+    document.head.appendChild(confettiCSS);
+  </script>
+</body>
+</html>

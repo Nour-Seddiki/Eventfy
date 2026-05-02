@@ -73,8 +73,8 @@ function renderEvents(eventsList) {
   };
 
   grid.innerHTML = eventsList.map((ev, idx) => {
-    const deadlineRaw = ev.registration_deadline || ev.start_date || ev.date;
-    const dateObj = deadlineRaw ? new Date(deadlineRaw) : null;
+    const deadlineRaw = ev.registration_deadline || ev.date;
+    const dateObj = deadlineRaw ? new Date(deadlineRaw) : new Date();
     const month = dateObj.toLocaleString('en-US', { month: 'short' }).toUpperCase();
     const day = String(dateObj.getDate()).padStart(2, '0');
     const time = dateObj.toLocaleString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
