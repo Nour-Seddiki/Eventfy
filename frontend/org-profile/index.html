@@ -568,7 +568,7 @@
   <script src="../config.js?v=2"></script>
 
 
-  <script src="../api.js"></script>
+  <script src="../api.js?v=3"></script>
   <script>
     // Auth guard — all logged-in users may access this page
     if (!isLoggedIn()) {
@@ -607,6 +607,16 @@
 
       // Avatar
       document.getElementById('profileAvatarInitials').textContent = initials;
+      const avatarImg = document.getElementById('profileAvatarImg');
+      const avatarInitials = document.getElementById('profileAvatarInitials');
+      if (u.avatar_url && avatarImg) {
+        avatarImg.src = u.avatar_url;
+        avatarImg.style.display = 'block';
+        if (avatarInitials) avatarInitials.style.display = 'none';
+      } else {
+        if (avatarImg) avatarImg.style.display = 'none';
+        if (avatarInitials) { avatarInitials.style.display = ''; avatarInitials.textContent = initials; }
+      }
 
       // Name + role badge
       document.getElementById('profileName').textContent = name;
@@ -765,10 +775,12 @@
       }
     });
 
-    /* ── Photo upload (local preview) ── */
-    document.getElementById('photoInput').addEventListener('change', e => {
+    /* ── Photo upload (preview + backend persist) ── */
+    document.getElementById('photoInput').addEventListener('change', async (e) => {
       const file = e.target.files[0];
       if (!file) return;
+
+      // Instant preview
       const reader = new FileReader();
       reader.onload = evt => {
         const img = document.getElementById('profileAvatarImg');
@@ -777,12 +789,24 @@
         document.getElementById('profileAvatarInitials').style.display = 'none';
       };
       reader.readAsDataURL(file);
+
+      // Upload to backend for persistence
+      try {
+        if (typeof uploadAvatar === 'function') {
+          const updated = await uploadAvatar(file);
+          setCachedUser(updated);
+          showToast('Photo saved ✓');
+        }
+      } catch (err) {
+        console.error('Avatar upload failed:', err);
+        showToast('Photo upload failed', false);
+      }
     });
 
     /* ── Start ── */
     loadProfile();
   })();
   </script>
-  <script src="../navbar.js"></script>
+  <script src="../navbar.js?v=3"></script>
 </body>
 </html>
