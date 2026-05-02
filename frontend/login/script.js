@@ -50,76 +50,39 @@ async function handleLogin(e) {
     }
 }
 
-async function handleGoogleLogin() {
-    const btn = document.querySelector('.google-btn');
-    const errorDiv = document.getElementById('errorMessage');
-    const originalHTML = btn.innerHTML;
-
-    // Check if Google Client ID is configured
-    if (!window.GOOGLE_CLIENT_ID || window.GOOGLE_CLIENT_ID.includes('YOUR_GOOGLE_CLIENT_ID')) {
-        showNotification('Google sign-in is not yet configured. Please set your Google Client ID.');
-        return;
-    }
-
-    // Check if Google Identity Services library is loaded
-    if (typeof google === 'undefined' || !google.accounts) {
-        showNotification('Google sign-in library is still loading. Please try again in a moment.');
-        return;
-    }
-
-    btn.innerHTML = '<span class="loading" style="border-color: #e5e7eb; border-top-color: var(--primary); margin: 0;"></span> Connecting...';
-    btn.disabled = true;
-
-    try {
-        // Use Google Identity Services to get an ID token
-        const client = google.accounts.oauth2.initCodeClient({
-            client_id: window.GOOGLE_CLIENT_ID,
-            scope: 'openid email profile',
-            ux_mode: 'popup',
-            callback: () => {}, // placeholder – we use the credential approach below
-        });
-
-        // Use the ID token credential flow (One Tap / Sign In With Google)
+// Initialize Google Sign-In button on load
+window.onload = function () {
+    if (typeof google !== 'undefined' && google.accounts && window.GOOGLE_CLIENT_ID) {
         google.accounts.id.initialize({
             client_id: window.GOOGLE_CLIENT_ID,
-            callback: async (response) => {
-                try {
-                    await apiGoogleLogin(response.credential);
-                    showNotification('Welcome! Redirecting...');
-                    setTimeout(() => {
-                        const user = getCachedUser();
-                        if (user && (user.role === 'organizer' || user.role === 'admin')) {
-                            window.location.href = '../org-dashboard/index.html';
-                        } else {
-                            window.location.href = '../dashboard/index.html';
-                        }
-                    }, 800);
-                } catch (err) {
-                    errorDiv.textContent = err.message || 'Google sign-in failed.';
-                    errorDiv.style.display = 'block';
-                    btn.innerHTML = originalHTML;
-                    btn.disabled = false;
-                }
-            },
+            callback: handleGoogleCredentialResponse
         });
+        
+        google.accounts.id.renderButton(
+            document.getElementById('googleBtnContainer'),
+            { theme: 'outline', size: 'large', width: '100%' }
+        );
+    }
+};
 
-        // Prompt the Google sign-in popup
-        google.accounts.id.prompt((notification) => {
-            if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-                // One Tap was blocked or dismissed – fall back to the button popup
-                google.accounts.id.renderButton(
-                    document.createElement('div'), // hidden element
-                    { type: 'icon', size: 'large' }
-                );
-                // Trigger the standard popup
-                google.accounts.id.prompt();
+async function handleGoogleCredentialResponse(response) {
+    const errorDiv = document.getElementById('errorMessage');
+    errorDiv.style.display = 'none';
+
+    try {
+        await apiGoogleLogin(response.credential);
+        showNotification('Welcome! Redirecting...');
+        setTimeout(() => {
+            const user = getCachedUser();
+            if (user && (user.role === 'organizer' || user.role === 'admin')) {
+                window.location.href = '../org-dashboard/index.html';
+            } else {
+                window.location.href = '../dashboard/index.html';
             }
-        });
-
+        }, 800);
     } catch (err) {
-        showNotification(err.message || 'Google sign-in failed. Please try again.');
-        btn.innerHTML = originalHTML;
-        btn.disabled = false;
+        errorDiv.textContent = err.message || 'Google sign-in failed.';
+        errorDiv.style.display = 'block';
     }
 }
 
