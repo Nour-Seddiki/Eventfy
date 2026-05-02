@@ -131,8 +131,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   try {
     const apiEvents = await fetchPublicEvents(100);
     EVENTS = apiEvents.map(ev => {
-      const d = new Date(ev.date || new Date());
+      const deadlineRaw = ev.registration_deadline || ev.start_date || ev.date || new Date();
+      const d = new Date(deadlineRaw);
       const m = d.getMonth();
+      const isExpired = d < new Date();
       const price = parseFloat(ev.price) || 0;
 
       let cat = (ev.category || 'all').toLowerCase();
@@ -176,6 +178,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         lat: rLat,
         lng: rLng,
         price: price,
+        isExpired: isExpired,
         img: ev.image ? (ev.image.startsWith('http') ? ev.image : `${API_BASE}${ev.image}`) : "https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=600&q=80"
       };
     });
@@ -261,7 +264,10 @@ function renderList() {
     const priceHtml = ev.price === 0
       ? '<span class="ev-price free">Free</span>'
       : '<span class="ev-price paid">' + ev.price.toLocaleString() + ' DZD</span>';
-    return '<div class="ev-card' + (activeId === ev.id ? ' active' : '') + '" id="card-' + ev.id + '" onclick="activateCard(' + ev.id + ',true)">' +
+      
+    const expiredStyle = ev.isExpired ? 'filter: grayscale(1); opacity: 0.6; pointer-events: none;' : '';
+    
+    return '<div class="ev-card' + (activeId === ev.id ? ' active' : '') + '" id="card-' + ev.id + '" style="' + expiredStyle + '" onclick="activateCard(' + ev.id + ',true)">' +
       '<div class="ev-thumb"><img src="' + ev.img + '" alt="' + ev.name + '" loading="lazy" onerror="this.style.display=\'none\'"/></div>' +
       '<div class="ev-body"><div class="ev-tags"><span class="ev-badge ' + ev.badge + '">' + (labels[ev.catKey] || ev.catKey) + '</span></div>' +
       '<div class="ev-name">' + ev.name + '</div>' +

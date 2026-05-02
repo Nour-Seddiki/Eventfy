@@ -73,8 +73,11 @@ function renderEventHTML(ev, container) {
     }
   }
 
-  const buyBtnDisabled = deadlineExpired || ev.available_tickets <= 0;
-  const buyBtnText = deadlineExpired ? 'Registration Closed' : (isFree ? 'Get Free Ticket' : `Buy Ticket — ${priceDisplay}`);
+  const user = typeof getCachedUser === 'function' ? getCachedUser() : null;
+  const isOwner = user && user.role === 'organizer' && ev.organizer_id === user.id;
+
+  const buyBtnDisabled = (deadlineExpired || ev.available_tickets <= 0) && !isOwner;
+  const buyBtnText = isOwner ? 'Manage My Event' : (deadlineExpired ? 'Registration Closed' : (isFree ? 'Get Free Ticket' : `Buy Ticket — ${priceDisplay}`));
   const buyBtnStyle = buyBtnDisabled ? 'opacity:0.5; cursor:not-allowed; pointer-events:none;' : '';
 
   container.innerHTML = `
@@ -166,6 +169,11 @@ function renderEventHTML(ev, container) {
   const isFreeEvent = !ev.price || ev.price <= 0;
 
   buyBtn?.addEventListener('click', async () => {
+    if (isOwner) {
+      window.location.href = '../org-dashboard/index.html';
+      return;
+    }
+
     if (!isLoggedIn()) {
       window.location.href = '../login/index.html';
       return;
@@ -205,7 +213,11 @@ function renderEventHTML(ev, container) {
         buyBtn.style.background = '#10b981';
         buyBtn.style.borderColor = '#10b981';
         buyBtn.style.color = '#fff';
-        // Keep button disabled after successful purchase
+        
+        // Redirect to dashboard after a short delay
+        setTimeout(() => {
+          window.location.href = '../dashboard/index.html';
+        }, 1200);
 
       } else {
         // ── PAID EVENT: Stripe Checkout ──
