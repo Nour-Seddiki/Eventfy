@@ -63,5 +63,5 @@ settings = Settings(
     stripe_publishable_key=os.getenv("STRIPE_PUBLISHABLE_KEY"),
     stripe_webhook_secret=os.getenv("STRIPE_WEBHOOK_SECRET"),
     frontend_url=os.getenv("FRONTEND_URL", "http://localhost:8080"),
-    resend_api_key=os.getenv("RESEND_API_KEY"),
+    resend_api_key=os.getenv("RESEND_API_KEY", "").strip() or None,
 )
