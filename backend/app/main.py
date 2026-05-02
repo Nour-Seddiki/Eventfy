@@ -52,10 +52,15 @@ _local_origins = [
     "http://127.0.0.1:8080",
     "http://localhost:8081",
     "http://127.0.0.1:8081",
+    # Production Netlify frontend
+    "https://eventfy-app.netlify.app",
 ]
+# FRONTEND_URL env can be a single URL or comma-separated list
 _frontend_url = os.getenv("FRONTEND_URL", "")
-if _frontend_url and _frontend_url not in _local_origins:
-    _local_origins.append(_frontend_url)
+for _url in _frontend_url.split(","):
+    _url = _url.strip()
+    if _url and _url not in _local_origins:
+        _local_origins.append(_url)
 
 app.add_middleware(
     CORSMiddleware,
