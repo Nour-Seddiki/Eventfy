@@ -56,7 +56,7 @@ async function handleGoogleLogin() {
     const originalHTML = btn.innerHTML;
 
     // Check if Google Client ID is configured
-    if (!window.GOOGLE_CLIENT_ID || GOOGLE_CLIENT_ID.includes('YOUR_GOOGLE_CLIENT_ID')) {
+    if (!window.GOOGLE_CLIENT_ID || window.GOOGLE_CLIENT_ID.includes('YOUR_GOOGLE_CLIENT_ID')) {
         showNotification('Google sign-in is not yet configured. Please set your Google Client ID.');
         return;
     }
@@ -73,7 +73,7 @@ async function handleGoogleLogin() {
     try {
         // Use Google Identity Services to get an ID token
         const client = google.accounts.oauth2.initCodeClient({
-            client_id: GOOGLE_CLIENT_ID,
+            client_id: window.GOOGLE_CLIENT_ID,
             scope: 'openid email profile',
             ux_mode: 'popup',
             callback: () => {}, // placeholder – we use the credential approach below
@@ -81,7 +81,7 @@ async function handleGoogleLogin() {
 
         // Use the ID token credential flow (One Tap / Sign In With Google)
         google.accounts.id.initialize({
-            client_id: GOOGLE_CLIENT_ID,
+            client_id: window.GOOGLE_CLIENT_ID,
             callback: async (response) => {
                 try {
                     await apiGoogleLogin(response.credential);

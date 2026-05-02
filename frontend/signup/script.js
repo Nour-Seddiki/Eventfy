@@ -13,7 +13,7 @@ async function handleGoogleSignUp() {
     const originalHTML = btn.innerHTML;
 
     // Check if Google Client ID is configured
-    if (!window.GOOGLE_CLIENT_ID || GOOGLE_CLIENT_ID.includes('YOUR_GOOGLE_CLIENT_ID')) {
+    if (!window.GOOGLE_CLIENT_ID || window.GOOGLE_CLIENT_ID.includes('YOUR_GOOGLE_CLIENT_ID')) {
         showNotification('Google sign-up is not yet configured. Please set your Google Client ID.');
         return;
     }
@@ -30,7 +30,7 @@ async function handleGoogleSignUp() {
     try {
         // Initialize Google Sign-In
         google.accounts.id.initialize({
-            client_id: GOOGLE_CLIENT_ID,
+            client_id: window.GOOGLE_CLIENT_ID,
             callback: async (response) => {
                 try {
                     // The backend /auth/google auto-creates the user if they don't exist
