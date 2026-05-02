@@ -60,7 +60,7 @@ window.onload = function () {
         
         google.accounts.id.renderButton(
             document.getElementById('googleBtnContainer'),
-            { theme: 'outline', size: 'large', width: '100%' }
+            { theme: 'outline', size: 'large' }
         );
     }
 };

@@ -78,6 +78,10 @@ body {
   animation: pageEnter .3s ease-out;
 }
 
+@view-transition {
+  navigation: auto;
+}
+
 /* ── Page entrance fade-in ── */
 @keyframes pageEnter {
   from { opacity: 0; }

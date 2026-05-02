@@ -480,4 +480,22 @@
     }
   });
 
+  /* ─────────────────────────────────────────────────────────────────
+     12. PREFETCHING (Intent to Navigate)
+  ───────────────────────────────────────────────────────────────── */
+  const preloadedUrls = new Set();
+  document.addEventListener('mouseover', (e) => {
+    const link = e.target.closest('a');
+    if (link && link.href && link.href.startsWith(window.location.origin)) {
+      const url = link.href;
+      if (!preloadedUrls.has(url) && !url.includes('#')) {
+        preloadedUrls.add(url);
+        const linkTag = document.createElement('link');
+        linkTag.rel = 'prefetch';
+        linkTag.href = url;
+        document.head.appendChild(linkTag);
+      }
+    }
+  }, { passive: true });
+
 })();

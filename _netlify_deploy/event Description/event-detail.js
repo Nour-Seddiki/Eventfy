@@ -169,6 +169,11 @@ function renderEventHTML(ev, container) {
   const isFreeEvent = !ev.price || ev.price <= 0;
 
   buyBtn?.addEventListener('click', async () => {
+    if (buyBtn.hasAttribute('data-purchased')) {
+      window.location.href = '../dashboard/index.html';
+      return;
+    }
+
     if (isOwner) {
       window.location.href = '../org-dashboard/index.html';
       return;
@@ -258,12 +263,13 @@ function renderEventHTML(ev, container) {
       const tickets = activity.tickets || [];
       if (tickets.some(t => t.event_id == ev.id)) {
         if (buyBtn) {
-          buyBtn.innerHTML = '✓ Purchased';
+          buyBtn.innerHTML = 'View in My Dashboard';
           buyBtn.style.opacity = '1';
           buyBtn.style.background = '#10b981';
           buyBtn.style.borderColor = '#10b981';
           buyBtn.style.color = '#fff';
-          buyBtn.disabled = true;
+          buyBtn.disabled = false;
+          buyBtn.setAttribute('data-purchased', 'true');
         }
       }
     }).catch(console.error);

@@ -72,7 +72,16 @@ function renderEvents(eventsList) {
     wellness: 'badge-teal'
   };
 
-  grid.innerHTML = eventsList.map((ev, idx) => {
+  const sortedEvents = [...eventsList].sort((a, b) => {
+    const aRaw = a.registration_deadline || a.start_date || a.date;
+    const bRaw = b.registration_deadline || b.start_date || b.date;
+    const aExpired = aRaw ? new Date(aRaw) < new Date() : false;
+    const bExpired = bRaw ? new Date(bRaw) < new Date() : false;
+    if (aExpired === bExpired) return 0;
+    return aExpired ? 1 : -1;
+  });
+
+  grid.innerHTML = sortedEvents.map((ev, idx) => {
     const delay = (idx % 10) * 0.1;
     const deadlineRaw = ev.registration_deadline || ev.start_date || ev.date;
     const dateObj = deadlineRaw ? new Date(deadlineRaw) : null;
@@ -132,7 +141,7 @@ function renderEvents(eventsList) {
     }
 
     const isExpired = dateObj && dateObj < new Date();
-    const expiredStyle = isExpired ? 'filter: grayscale(1); opacity: 0.6;' : '';
+    const expiredStyle = isExpired ? 'filter: grayscale(1) blur(0.5px); opacity: 0.6;' : '';
 
     if (total > 0) {
       availabilityHtml = `
@@ -149,7 +158,7 @@ function renderEvents(eventsList) {
                  </div>`
             }
           </div>
-          <button class="view-btn" style="width:100%; height:40px; border-radius:8px; font-size:13px; font-weight:800; background:#0f172a; color:white; border:none; cursor:pointer; transition:all 0.2s;">
+          <button class="view-btn" ${isExpired ? 'disabled' : ''} style="width:100%; height:40px; border-radius:8px; font-size:13px; font-weight:800; background:#0f172a; color:white; border:none; cursor:${isExpired ? 'not-allowed' : 'pointer'}; transition:all 0.2s; ${isExpired ? 'opacity:0.5;' : ''}">
             ${isExpired ? 'Registration Closed' : (avail === 0 ? 'Join Waitlist' : 'Get Tickets')}
           </button>
         </div>
@@ -164,7 +173,7 @@ function renderEvents(eventsList) {
               OPEN
             </div>
           </div>
-          <button class="view-btn" style="width:100%; height:40px; border-radius:8px; font-size:13px; font-weight:800; background:#0f172a; color:white; border:none; cursor:pointer; transition:all 0.2s;">
+          <button class="view-btn" ${isExpired ? 'disabled' : ''} style="width:100%; height:40px; border-radius:8px; font-size:13px; font-weight:800; background:#0f172a; color:white; border:none; cursor:${isExpired ? 'not-allowed' : 'pointer'}; transition:all 0.2s; ${isExpired ? 'opacity:0.5;' : ''}">
             ${isExpired ? 'Registration Closed' : 'View Details'}
           </button>
         </div>
