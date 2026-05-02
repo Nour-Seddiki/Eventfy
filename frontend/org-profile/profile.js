@@ -7,9 +7,17 @@
 window.EVENTFY_USER = (function() {
   try {
     const u = typeof getCachedUser === 'function' ? getCachedUser() : null;
-    if (u) return { name: u.username || 'User', initials: (u.username || 'U').substring(0, 2).toUpperCase(), role: u.role || 'Member' };
+    if (u) {
+      const name = u.full_name || u.username || 'User';
+      return {
+        name: name,
+        initials: name.substring(0, 2).toUpperCase(),
+        role: u.role || 'Member',
+        avatarUrl: u.avatar_url || ''
+      };
+    }
   } catch {}
-  return { name: 'User', initials: 'U', role: 'Member' };
+  return { name: 'User', initials: 'U', role: 'Member', avatarUrl: '' };
 })();
 window.EVENTFY_LINKS = {
   profile:     'index.html',
@@ -453,6 +461,11 @@ window.EVENTFY_LINKS = {
     resolveRefs();
     initPhotoUpload();
     buildModal();
+
+    // Load avatar from cached user data
+    if (refs.avatar && window.EVENTFY_USER && window.EVENTFY_USER.avatarUrl) {
+      refs.avatar.src = window.EVENTFY_USER.avatarUrl;
+    }
 
     refs.editBtn?.addEventListener('click', openModal);
   }

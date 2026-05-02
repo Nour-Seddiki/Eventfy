@@ -166,18 +166,18 @@
   /* ─────────────────────────────────────────────────────────────────
      4. USER DATA — populate from cache or api
   ───────────────────────────────────────────────────────────────── */
-  let user = { name: '', initials: '', role: 'Member' };
+  let user = { name: '', initials: '', role: 'Member', avatarUrl: '' };
 
   if (loggedIn) {
     const cached = (typeof getCachedUser === 'function') ? getCachedUser() : null;
     if (cached) {
-      const fullName = cached.user_name || cached.username || cached.name || 'User';
+      const fullName = cached.full_name || cached.user_name || cached.username || cached.name || 'User';
       const role = cached.role ? (cached.role.charAt(0).toUpperCase() + cached.role.slice(1)) : 'Member';
       const parts = fullName.trim().split(/\s+/);
       const initials = parts.length >= 2
         ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
         : fullName.charAt(0).toUpperCase();
-      user = { name: fullName, initials, role };
+      user = { name: fullName, initials, role, avatarUrl: cached.avatar_url || '' };
     }
 
     // Seed all initials/name/role placeholders
@@ -185,6 +185,37 @@
     document.querySelectorAll('.user-name-text,.drawer-user-name').forEach(el => el.textContent = user.name || 'User');
     document.querySelectorAll('.user-role-text,.drawer-user-role').forEach(el => el.textContent = user.role || 'Member');
     document.querySelectorAll('.drawer-avatar-text').forEach(el => el.textContent = user.initials || 'U');
+
+    // Show avatar image in navbar buttons if avatar_url exists
+    if (user.avatarUrl) {
+      document.querySelectorAll('.nav-user-avatar-btn').forEach(btn => {
+        const initSpan = btn.querySelector('.user-initials-text');
+        if (initSpan) initSpan.style.display = 'none';
+        let img = btn.querySelector('.nav-avatar-img');
+        if (!img) {
+          img = document.createElement('img');
+          img.className = 'nav-avatar-img';
+          img.style.cssText = 'width:100%;height:100%;border-radius:50%;object-fit:cover;';
+          img.alt = 'Avatar';
+          btn.appendChild(img);
+        }
+        img.src = user.avatarUrl;
+      });
+      // Drawer avatar
+      document.querySelectorAll('.drawer-user-avatar').forEach(el => {
+        const initSpan = el.querySelector('.user-initials-text');
+        if (initSpan) initSpan.style.display = 'none';
+        let img = el.querySelector('.drawer-avatar-img');
+        if (!img) {
+          img = document.createElement('img');
+          img.className = 'drawer-avatar-img';
+          img.style.cssText = 'width:100%;height:100%;border-radius:50%;object-fit:cover;';
+          img.alt = 'Avatar';
+          el.appendChild(img);
+        }
+        img.src = user.avatarUrl;
+      });
+    }
   }
 
   /* ─────────────────────────────────────────────────────────────────
@@ -204,10 +235,13 @@
     const isDash = currentPath.includes('/dashboard/');
     const isSaved = currentPath.includes('saved-events');
 
+    const avatarContent = user.avatarUrl
+      ? `<img src="${user.avatarUrl}" alt="Avatar" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`
+      : (user.initials || 'U');
     return `
       <div class="popup-header">
         <div class="popup-user-row">
-          <div class="popup-avatar">${user.initials || 'U'}</div>
+          <div class="popup-avatar">${avatarContent}</div>
           <div>
             <div class="popup-user-name">${user.name || 'User'}</div>
             <div class="popup-user-role">${user.role || 'Member'}</div>
