@@ -131,6 +131,9 @@ function renderEvents(eventsList) {
       attendeesHtml = `<span style="font-size:11px; font-weight:600; color:#94a3b8;">Be the first to join</span>`;
     }
 
+    const isExpired = dateObj && dateObj < new Date();
+    const expiredStyle = isExpired ? 'filter: grayscale(1); opacity: 0.6;' : '';
+
     if (total > 0) {
       availabilityHtml = `
         <div style="margin-top:auto; padding-top:16px; border-top:1px solid #f1f5f9;">
@@ -147,7 +150,7 @@ function renderEvents(eventsList) {
             }
           </div>
           <button class="view-btn" style="width:100%; height:40px; border-radius:8px; font-size:13px; font-weight:800; background:#0f172a; color:white; border:none; cursor:pointer; transition:all 0.2s;">
-            ${avail === 0 ? 'Join Waitlist' : 'Get Tickets'}
+            ${isExpired ? 'Registration Closed' : (avail === 0 ? 'Join Waitlist' : 'Get Tickets')}
           </button>
         </div>
       `;
@@ -162,14 +165,14 @@ function renderEvents(eventsList) {
             </div>
           </div>
           <button class="view-btn" style="width:100%; height:40px; border-radius:8px; font-size:13px; font-weight:800; background:#0f172a; color:white; border:none; cursor:pointer; transition:all 0.2s;">
-            View Details
+            ${isExpired ? 'Registration Closed' : 'View Details'}
           </button>
         </div>
       `;
     }
 
     return `
-      <article class="event-card" data-cat="${(ev.category || '').toLowerCase()}" data-city="${ev.location || ''}" data-month="${dateObj.getMonth()}" data-price="${ev.price || 0}" style="animation-delay:${delay}s; cursor:pointer; display:flex; flex-direction:column;" onclick="window.location.href='../event Description/event-detail.html?id=${ev.id}'">
+      <article class="event-card" data-cat="${(ev.category || '').toLowerCase()}" data-city="${ev.location || ''}" data-month="${dateObj.getMonth()}" data-price="${ev.price || 0}" style="animation-delay:${delay}s; cursor:pointer; display:flex; flex-direction:column; ${expiredStyle}" onclick="window.location.href='../event Description/event-detail.html?id=${ev.id}'">
         <div class="card-img-wrap" style="flex-shrink:0;">
           <img alt="${ev.title || 'Event'}" src="${imgUrl}" loading="lazy"/>
           <span class="badge ${badgeClass}">${catName}</span>

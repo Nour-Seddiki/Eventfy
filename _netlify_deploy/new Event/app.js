@@ -317,7 +317,7 @@ function flyToAlgeria(lat, lng, zoom) {
    NOMINATIM — Algeria-only geocoding
    countrycodes=dz  forces results to Algeria
 ══════════════════════════════════════════ */
-const NOM_HEADERS = { 'Accept-Language': 'ar,fr,en', 'User-Agent': 'Eventfy/2.0' };
+const NOM_HEADERS = { 'Accept-Language': 'en,fr,ar', 'User-Agent': 'Eventfy/2.0' };
 
 async function fwdGeocodeAlgeria(q) {
   try {

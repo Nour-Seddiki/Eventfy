@@ -58,17 +58,66 @@ let map, markers = {}, activeId = null;
 const filters = { date: 'all', category: 'all', location: 'all', price: 'all' };
 let activeCat = 'all';
 
-const CITY_COORDS = {
-  "Algiers": {lat: 36.7372, lng: 3.15},
-  "Oran": {lat: 35.6976, lng: -0.6337},
-  "Constantine": {lat: 36.365, lng: 6.6147},
-  "Tlemcen": {lat: 34.8839, lng: -1.3151},
-  "Batna": {lat: 35.5556, lng: 6.1744},
-  "Bejaia": {lat: 36.7515, lng: 5.0564},
-  "Annaba": {lat: 36.9, lng: 7.7667},
-  "Tizi Ouzou": {lat: 36.7118, lng: 4.0459},
-  "Tamanrasset": {lat: 22.785, lng: 5.5228}
-};
+const ALGERIA_CITIES = [
+  { code: '01', name: 'Adrar', lat: 27.8742, lng: -0.2939 },
+  { code: '02', name: 'Chlef', lat: 36.1647, lng: 1.3317 },
+  { code: '03', name: 'Laghouat', lat: 33.8003, lng: 2.8653 },
+  { code: '04', name: 'Oum El Bouaghi', lat: 35.8782, lng: 7.1133 },
+  { code: '05', name: 'Batna', lat: 35.5547, lng: 6.1736 },
+  { code: '06', name: 'Béjaïa', lat: 36.7519, lng: 5.0564 },
+  { code: '07', name: 'Biskra', lat: 34.8500, lng: 5.7333 },
+  { code: '08', name: 'Béchar', lat: 31.6111, lng: -2.2167 },
+  { code: '09', name: 'Blida', lat: 36.4722, lng: 2.8294 },
+  { code: '10', name: 'Bouira', lat: 36.3700, lng: 3.9000 },
+  { code: '11', name: 'Tamanrasset', lat: 22.7853, lng: 5.5228 },
+  { code: '12', name: 'Tébessa', lat: 35.4042, lng: 8.1189 },
+  { code: '13', name: 'Tlemcen', lat: 34.8786, lng: -1.3158 },
+  { code: '14', name: 'Tiaret', lat: 35.3706, lng: 1.3217 },
+  { code: '15', name: 'Tizi Ouzou', lat: 36.7169, lng: 4.0497 },
+  { code: '16', name: 'Alger', lat: 36.7372, lng: 3.0869 },
+  { code: '17', name: 'Djelfa', lat: 34.6736, lng: 3.2631 },
+  { code: '18', name: 'Jijel', lat: 36.8211, lng: 5.7667 },
+  { code: '19', name: 'Sétif', lat: 36.1900, lng: 5.4100 },
+  { code: '20', name: 'Saïda', lat: 34.8317, lng: 0.1517 },
+  { code: '21', name: 'Skikda', lat: 36.8760, lng: 6.9078 },
+  { code: '22', name: 'Sidi Bel Abbès', lat: 35.1897, lng: -0.6306 },
+  { code: '23', name: 'Annaba', lat: 36.9000, lng: 7.7667 },
+  { code: '24', name: 'Guelma', lat: 36.4611, lng: 7.4275 },
+  { code: '25', name: 'Constantine', lat: 36.3650, lng: 6.6147 },
+  { code: '26', name: 'Médéa', lat: 36.2636, lng: 2.7508 },
+  { code: '27', name: 'Mostaganem', lat: 35.9333, lng: 0.0833 },
+  { code: '28', name: 'M\'Sila', lat: 35.7058, lng: 4.5408 },
+  { code: '29', name: 'Mascara', lat: 35.3956, lng: 0.1400 },
+  { code: '30', name: 'Ouargla', lat: 31.9539, lng: 5.3242 },
+  { code: '31', name: 'Oran', lat: 35.6911, lng: -0.6417 },
+  { code: '32', name: 'El Bayadh', lat: 33.6833, lng: 1.0167 },
+  { code: '33', name: 'Illizi', lat: 26.5000, lng: 8.4833 },
+  { code: '34', name: 'Bordj Bou Arréridj', lat: 36.0731, lng: 4.7631 },
+  { code: '35', name: 'Boumerdès', lat: 36.7667, lng: 3.4667 },
+  { code: '36', name: 'El Tarf', lat: 36.7676, lng: 8.3131 },
+  { code: '37', name: 'Tindouf', lat: 27.6740, lng: -8.1380 },
+  { code: '38', name: 'Tissemsilt', lat: 35.6072, lng: 1.8119 },
+  { code: '39', name: 'El Oued', lat: 33.3564, lng: 6.8631 },
+  { code: '40', name: 'Khenchela', lat: 35.4333, lng: 7.1333 },
+  { code: '41', name: 'Souk Ahras', lat: 36.2869, lng: 7.9514 },
+  { code: '42', name: 'Tipaza', lat: 36.5878, lng: 2.4483 },
+  { code: '43', name: 'Mila', lat: 36.4500, lng: 6.2667 },
+  { code: '44', name: 'Aïn Defla', lat: 36.2642, lng: 1.9656 },
+  { code: '45', name: 'Naâma', lat: 33.2667, lng: -0.3000 },
+  { code: '46', name: 'Aïn Témouchent', lat: 35.2964, lng: -1.1400 },
+  { code: '47', name: 'Ghardaïa', lat: 32.4903, lng: 3.6667 },
+  { code: '48', name: 'Relizane', lat: 35.7333, lng: 0.5544 },
+  { code: '49', name: 'Timimoun', lat: 29.2636, lng: 0.2306 },
+  { code: '50', name: 'Bordj Badji Mokhtar', lat: 21.3258, lng: 0.9564 },
+  { code: '51', name: 'Ouled Djellal', lat: 34.4183, lng: 5.0681 },
+  { code: '52', name: 'Béni Abbès', lat: 30.1281, lng: -2.1644 },
+  { code: '53', name: 'In Salah', lat: 27.1972, lng: 2.4758 },
+  { code: '54', name: 'In Guezzam', lat: 19.5667, lng: 5.7667 },
+  { code: '55', name: 'Touggourt', lat: 33.0994, lng: 6.0658 },
+  { code: '56', name: 'Djanet', lat: 24.5558, lng: 9.4844 },
+  { code: '57', name: 'El M\'Ghair', lat: 33.9500, lng: 5.9167 },
+  { code: '58', name: 'El Meniaa', lat: 30.5833, lng: 2.8833 }
+];
 
 document.addEventListener('DOMContentLoaded', async () => {
   /* Show skeletons immediately while data loads */
@@ -95,21 +144,20 @@ document.addEventListener('DOMContentLoaded', async () => {
       else if (cat.includes('art')) badgeColor = 'amber';
       else if (cat.includes('music')) badgeColor = 'blue';
 
-      let city = "Algiers";
+      let city = "Alger"; // default
+      let coords = { lat: 36.7372, lng: 3.0869 }; // default Alger
+      
       if (ev.location) {
          let locLower = ev.location.toLowerCase();
-         if (locLower.includes("oran")) city = "Oran";
-         else if (locLower.includes("constantine")) city = "Constantine";
-         else if (locLower.includes("tlemcen")) city = "Tlemcen";
-         else if (locLower.includes("batna")) city = "Batna";
-         else if (locLower.includes("bejaia")) city = "Bejaia";
-         else if (locLower.includes("annaba")) city = "Annaba";
-         else if (locLower.includes("tizi")) city = "Tizi Ouzou";
-         else if (locLower.includes("tamanrasset")) city = "Tamanrasset";
-         else city = ev.location.split(',')[0].trim();
+         // Try to find matching wilaya
+         const found = ALGERIA_CITIES.find(c => locLower.includes(c.name.toLowerCase()) || (c.name === 'Alger' && locLower.includes('algiers')));
+         if (found) {
+            city = found.name;
+            coords = { lat: found.lat, lng: found.lng };
+         } else {
+            city = ev.location.split(',')[0].trim();
+         }
       }
-
-      let coords = CITY_COORDS[city] || CITY_COORDS["Algiers"];
       
       // Random offset so markers don't overlap perfectly
       let rLat = coords.lat + (Math.random() - 0.5) * 0.04;

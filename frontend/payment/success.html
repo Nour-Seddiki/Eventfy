@@ -404,6 +404,11 @@
 
       // Launch confetti on success
       launchConfetti();
+      
+      // Auto-redirect to dashboard after viewing success page
+      setTimeout(() => {
+        window.location.href = '../dashboard/index.html';
+      }, 3500);
     }
 
     function showError(message) {
