@@ -1,5 +1,4 @@
 from fastapi import APIRouter, Path, UploadFile, File, HTTPException, Query
-from uuid import uuid4
 from pathlib import Path as SysPath
 from datetime import datetime, timezone
 from sqlalchemy import func
@@ -11,6 +10,7 @@ from app.schemas.event import eventRequest, eventUpdate
 from app.models.event import Event
 from app.models.ticket import Ticket
 from app.models.user import User
+from app.utils.supabase_storage import upload_file as supabase_upload
 
 
 router = APIRouter(prefix="/Event", tags=['Event'])
@@ -195,16 +195,14 @@ async def upload_event_image(
     if file_suffix not in allowed_extensions:
         raise HTTPException(status_code=400, detail="Unsupported image type")
 
-    uploads_dir = SysPath("uploads") / "events"
-    uploads_dir.mkdir(parents=True, exist_ok=True)
-    file_name = f"{uuid4().hex}{file_suffix}"
-    file_path = uploads_dir / file_name
+    file_bytes = await image.read()
 
-    with file_path.open("wb") as buffer:
-        buffer.write(await image.read())
+    try:
+        public_url = supabase_upload("event-images", file_bytes, image.filename or "image.jpg")
+    except RuntimeError as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
 
-    public_path = f"/uploads/events/{file_name}"
-    return EventService().upload_event_image(user, db, event_id, public_path)
+    return EventService().upload_event_image(user, db, event_id, public_url)
 
 
 @router.delete("/delete_event/{event_id}", status_code=status.HTTP_202_ACCEPTED)

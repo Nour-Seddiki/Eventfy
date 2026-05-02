@@ -288,6 +288,26 @@ async function uploadEventImage(eventId, file) {
   return await res.json();
 }
 
+/** Upload user avatar */
+async function uploadAvatar(file) {
+  const formData = new FormData();
+  formData.append('image', file);
+
+  const token = localStorage.getItem('eventfy_token');
+  const res = await fetch(`${API_BASE}/users/avatar`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`
+    },
+    body: formData
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || 'Failed to upload avatar');
+  }
+  return await res.json();
+}
+
 /** Update an event (requires auth, organizer role) */
 async function updateEvent(eventId, eventData) {
   const res = await apiFetch(`/Event/update_event/${eventId}`, {

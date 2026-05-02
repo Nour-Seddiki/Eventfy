@@ -63,6 +63,7 @@ class userServices:
             "phone": user_model.phone,
             "location": user_model.location,
             "website": user_model.website,
+            "avatar_url": user_model.avatar_url,
             "preferred_currency": user_model.preferred_currency or "DZD",
         }
 
@@ -75,6 +76,15 @@ class userServices:
             if value is not None:
                 setattr(user_model, field, value)
 
+        db.add(user_model)
+        db.commit()
+        db.refresh(user_model)
+        return self.get_my_profile(user, db)
+
+    def update_avatar(self, user, db, avatar_url: str):
+        """Save a new avatar URL for the current user."""
+        user_model = self._get_active_user(user, db)
+        user_model.avatar_url = avatar_url
         db.add(user_model)
         db.commit()
         db.refresh(user_model)

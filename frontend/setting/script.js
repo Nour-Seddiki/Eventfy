@@ -50,11 +50,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const email = user.email || '—';
     const initials = name.substring(0,2).toUpperCase();
 
+    // Display avatar from API if available
+    const avatarImg = document.getElementById('profileAvatarImg');
+    const avatarInitials = document.getElementById('profileAvatarInitials');
+    if (user.avatar_url && avatarImg) {
+      avatarImg.src = user.avatar_url;
+      avatarImg.style.display = 'block';
+      if (avatarInitials) avatarInitials.style.display = 'none';
+    } else {
+      if (avatarImg) avatarImg.style.display = 'none';
+      if (avatarInitials) { avatarInitials.style.display = ''; avatarInitials.textContent = initials; }
+    }
+
     // Profile card
     const nameEl = document.getElementById('profileName');
     if (nameEl) nameEl.textContent = name;
-    const initialsEl = document.getElementById('profileAvatarInitials');
-    if (initialsEl) initialsEl.textContent = initials;
     const emailEl = document.getElementById('profileEmail');
     if (emailEl) emailEl.textContent = email;
 
@@ -318,9 +328,11 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ── Photo upload ── */
   const photoInput = document.getElementById('photoInput');
   if (photoInput) {
-    photoInput.addEventListener('change', e => {
+    photoInput.addEventListener('change', async (e) => {
       const file = e.target.files[0];
       if (!file) return;
+
+      // Instant preview
       const reader = new FileReader();
       reader.onload = evt => {
         const img = document.getElementById('profileAvatarImg');
@@ -329,6 +341,18 @@ document.addEventListener('DOMContentLoaded', () => {
         if (initials) initials.style.display = 'none';
       };
       reader.readAsDataURL(file);
+
+      // Upload to backend
+      try {
+        if (typeof uploadAvatar === 'function') {
+          const updated = await uploadAvatar(file);
+          setCachedUser(updated);
+          showSettingsToast('✅ Photo uploaded successfully!');
+        }
+      } catch (err) {
+        console.error('Avatar upload failed:', err);
+        showSettingsToast('❌ Photo upload failed. Please try again.');
+      }
     });
   }
 });
