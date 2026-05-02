@@ -73,11 +73,12 @@ function renderEvents(eventsList) {
   };
 
   grid.innerHTML = eventsList.map((ev, idx) => {
+    const delay = (idx % 10) * 0.1;
     const deadlineRaw = ev.registration_deadline || ev.start_date || ev.date;
     const dateObj = deadlineRaw ? new Date(deadlineRaw) : null;
-    const month = dateObj.toLocaleString('en-US', { month: 'short' }).toUpperCase();
-    const day = String(dateObj.getDate()).padStart(2, '0');
-    const time = dateObj.toLocaleString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+    const month = dateObj ? dateObj.toLocaleString('en-US', { month: 'short' }).toUpperCase() : 'TBD';
+    const day = dateObj ? String(dateObj.getDate()).padStart(2, '0') : '--';
+    const time = dateObj ? dateObj.toLocaleString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }) : 'TBD';
 
     const badgeClass = badges[(ev.category || '').toLowerCase()] || 'badge-sky';
     const catName = ev.category || 'General';
