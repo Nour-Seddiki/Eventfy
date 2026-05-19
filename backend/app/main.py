@@ -57,6 +57,7 @@ _local_origins = [
     "https://eventfy-pro.netlify.app",
     "https://starlit-hummingbird-2ef9a1.netlify.app",
     "https://fluffy-souffle-91d360.netlify.app",
+    "https://eventfy-live.netlify.app",
 ]
 # FRONTEND_URL env can be a single URL or comma-separated list
 _frontend_url = os.getenv("FRONTEND_URL", "")
