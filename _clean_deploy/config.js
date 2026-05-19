@@ -9,4 +9,4 @@
 
 // Production: point to the Render backend
 // Development: falls back to localhost in api.js
-window.EVENTFY_API_BASE = 'https://eventfy-backend-exhu.onrender.com';
+window.EVENTFY_API_BASE = 'http://127.0.0.1:3000';

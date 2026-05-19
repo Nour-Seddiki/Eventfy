@@ -54,6 +54,7 @@ _local_origins = [
     "http://127.0.0.1:8081",
     # Production Netlify frontend
     "https://eventfy-app.netlify.app",
+    "https://eventfy-pro.netlify.app",
     # Production Vercel frontend
     "https://eventfy-rust.vercel.app",
     "https://eventfy.vercel.app",

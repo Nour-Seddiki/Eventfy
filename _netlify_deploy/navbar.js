@@ -423,15 +423,58 @@
   ───────────────────────────────────────────────────────────────── */
   const POPUP_IDS = ['userPopup', 'userPopupMob', 'notifPopupDesktop', 'notifPopupMob'];
 
+  /* ── Mobile popup overlay (bottom-sheet backdrop) ── */
+  let _popupOverlay = null;
+  function getPopupOverlay() {
+    if (!_popupOverlay) {
+      _popupOverlay = document.createElement('div');
+      _popupOverlay.id = 'mobilePopupOverlay';
+      Object.assign(_popupOverlay.style, {
+        position: 'fixed', inset: '0',
+        zIndex: '2050',
+        background: 'rgba(0,0,0,.35)',
+        backdropFilter: 'blur(2px)',
+        opacity: '0', pointerEvents: 'none',
+        transition: 'opacity .25s ease'
+      });
+      document.body.appendChild(_popupOverlay);
+      _popupOverlay.addEventListener('click', () => closeAllPopups());
+    }
+    return _popupOverlay;
+  }
+  function isMobile() { return window.innerWidth <= 900; }
+
+  function showPopupOverlay() {
+    if (!isMobile()) return;
+    const ov = getPopupOverlay();
+    ov.style.opacity = '1';
+    ov.style.pointerEvents = 'auto';
+    document.body.style.overflow = 'hidden';
+  }
+  function hidePopupOverlay() {
+    if (_popupOverlay) {
+      _popupOverlay.style.opacity = '0';
+      _popupOverlay.style.pointerEvents = 'none';
+    }
+    // Only restore scroll if drawer isn't also open
+    if (!drawer?.classList.contains('open')) {
+      document.body.style.overflow = '';
+    }
+  }
+
   function closeAllPopups() {
     POPUP_IDS.forEach(id => document.getElementById(id)?.classList.remove('open'));
+    hidePopupOverlay();
   }
   function togglePopup(id) {
     const el = document.getElementById(id);
     if (!el) return;
     const wasOpen = el.classList.contains('open');
     closeAllPopups();
-    if (!wasOpen) el.classList.add('open');
+    if (!wasOpen) {
+      el.classList.add('open');
+      showPopupOverlay();
+    }
   }
 
   document.getElementById('desktopAvatarBtn')?.addEventListener('click', e => { e.stopPropagation(); togglePopup('userPopup'); });
