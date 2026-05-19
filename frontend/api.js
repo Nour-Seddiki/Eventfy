@@ -3,11 +3,134 @@
  * api.js — Shared Eventfy API Helper
  * Single source of truth for backend communication,
  * JWT token management, and auth state.
+ *
+ * Includes:
+ *  • Event Bus  — cross-component reactivity
+ *  • Smart Cache — stale-while-revalidate pattern
+ *  • Progress Bar — visual loading feedback
  * ═══════════════════════════════════════════
  */
 'use strict';
 
 const API_BASE = window.EVENTFY_API_BASE || 'http://127.0.0.1:3000';
+
+/* ══════════════════════════════════════════
+   EVENT BUS — lightweight pub/sub
+   Usage:  eventfy.on('user:updated', fn)
+           eventfy.emit('user:updated', data)
+           eventfy.off('user:updated', fn)
+══════════════════════════════════════════ */
+const eventfy = (() => {
+  const _listeners = {};
+  return {
+    on(event, fn)  { (_listeners[event] ||= []).push(fn); },
+    off(event, fn) { _listeners[event] = (_listeners[event] || []).filter(f => f !== fn); },
+    emit(event, data) { (_listeners[event] || []).forEach(fn => { try { fn(data); } catch(e) { console.error(`[eventfy] ${event}:`, e); } }); },
+  };
+})();
+
+/* ══════════════════════════════════════════
+   SMART CACHE — stale-while-revalidate
+   Returns cached data instantly, refreshes
+   in the background after TTL expires.
+══════════════════════════════════════════ */
+const _apiCache = new Map();
+
+/**
+ * Wrap an async fetcher with stale-while-revalidate caching.
+ * @param {string} key       - Cache key
+ * @param {Function} fetcher - Async function that returns data
+ * @param {number} ttlMs     - Time-to-live in ms before background refresh
+ * @returns {Promise<any>}
+ */
+async function cachedFetch(key, fetcher, ttlMs = 60000) {
+  const entry = _apiCache.get(key);
+  const now = Date.now();
+
+  if (entry) {
+    // If still fresh, return cached
+    if (now - entry.ts < ttlMs) return entry.data;
+
+    // Stale: return cached immediately, refresh in background
+    fetcher().then(fresh => {
+      _apiCache.set(key, { data: fresh, ts: Date.now() });
+    }).catch(() => { /* keep stale data */ });
+    return entry.data;
+  }
+
+  // No cache — fetch fresh
+  const data = await fetcher();
+  _apiCache.set(key, { data, ts: Date.now() });
+  return data;
+}
+
+/** Invalidate a specific cache entry or all entries */
+function invalidateCache(key) {
+  if (key) { _apiCache.delete(key); } else { _apiCache.clear(); }
+}
+
+/* ══════════════════════════════════════════
+   PROGRESS BAR — thin animated bar at top
+   Auto-shows during API calls, hides when done
+══════════════════════════════════════════ */
+let _pendingRequests = 0;
+let _progressBar = null;
+
+function _ensureProgressBar() {
+  if (_progressBar) return _progressBar;
+  // Inject CSS once
+  if (!document.getElementById('eventfy-progress-css')) {
+    const style = document.createElement('style');
+    style.id = 'eventfy-progress-css';
+    style.textContent = `
+      #eventfy-progress-bar {
+        position: fixed; top: 0; left: 0; width: 0; height: 3px;
+        background: linear-gradient(90deg, #7f0df2, #a855f7, #7f0df2);
+        background-size: 200% 100%;
+        z-index: 99999; pointer-events: none;
+        transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s;
+        animation: eventfy-progress-shimmer 1.5s ease-in-out infinite;
+        box-shadow: 0 0 8px rgba(127, 13, 242, 0.4);
+        border-radius: 0 2px 2px 0;
+      }
+      @keyframes eventfy-progress-shimmer {
+        0% { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  _progressBar = document.createElement('div');
+  _progressBar.id = 'eventfy-progress-bar';
+  document.body.appendChild(_progressBar);
+  return _progressBar;
+}
+
+function _progressStart() {
+  _pendingRequests++;
+  if (_pendingRequests === 1) {
+    const bar = _ensureProgressBar();
+    bar.style.opacity = '1';
+    bar.style.width = '0';
+    // Animate to 70% fast, then slow crawl
+    requestAnimationFrame(() => {
+      bar.style.width = '70%';
+    });
+  }
+}
+
+function _progressEnd() {
+  _pendingRequests = Math.max(0, _pendingRequests - 1);
+  if (_pendingRequests === 0 && _progressBar) {
+    _progressBar.style.width = '100%';
+    setTimeout(() => {
+      if (_pendingRequests === 0 && _progressBar) {
+        _progressBar.style.opacity = '0';
+        setTimeout(() => { if (_progressBar) _progressBar.style.width = '0'; }, 300);
+      }
+    }, 200);
+  }
+}
 
 /* ── Token Management ────────────────────── */
 
@@ -40,9 +163,13 @@ function getCachedUser() {
   }
 }
 
-/** @param {object} user */
+/** @param {object} user — also emits 'user:updated' for cross-component reactivity */
 function setCachedUser(user) {
   localStorage.setItem('eventfy_user', JSON.stringify(user));
+  // Invalidate profile cache so next fetch gets fresh data
+  invalidateCache('profile:me');
+  // Notify all listening components (navbar, popups, settings…)
+  eventfy.emit('user:updated', user);
 }
 
 /**
@@ -84,10 +211,18 @@ async function apiFetch(path, options = {}) {
     headers['Content-Type'] = 'application/json';
   }
 
-  const response = await fetch(`${API_BASE}${path}`, {
-    ...options,
-    headers,
-  });
+  // Progress bar feedback
+  _progressStart();
+
+  let response;
+  try {
+    response = await fetch(`${API_BASE}${path}`, {
+      ...options,
+      headers,
+    });
+  } finally {
+    _progressEnd();
+  }
 
   // Auto-logout on 401
   if (response.status === 401) {
@@ -186,11 +321,13 @@ async function apiGoogleLogin(idToken) {
 
 /* ── User API Calls ──────────────────────── */
 
-/** @returns {Promise<object>} User profile */
+/** @returns {Promise<object>} User profile (cached, refreshes in background) */
 async function fetchMyProfile() {
-  const res = await apiFetch('/users/my_profile');
-  if (!res.ok) throw new Error('Failed to fetch profile');
-  return await res.json();
+  return cachedFetch('profile:me', async () => {
+    const res = await apiFetch('/users/my_profile');
+    if (!res.ok) throw new Error('Failed to fetch profile');
+    return await res.json();
+  }, 60000); // 60s TTL
 }
 
 /** @returns {Promise<object>} User activity (tickets + events) */
@@ -217,16 +354,30 @@ async function updateMyProfile(data) {
 
 /** Fetch public events (no login needed) */
 async function fetchPublicEvents(limit = 20) {
-  const res = await fetch(`${API_BASE}/events/public?limit=${limit}`);
-  if (!res.ok) throw new Error('Failed to fetch events');
-  return await res.json();
+  return cachedFetch(`events:public:${limit}`, async () => {
+    _progressStart();
+    try {
+      const res = await fetch(`${API_BASE}/events/public?limit=${limit}`);
+      if (!res.ok) throw new Error('Failed to fetch events');
+      return await res.json();
+    } finally {
+      _progressEnd();
+    }
+  }, 120000); // 2min TTL
 }
 
 /** Fetch trending events (no login needed) */
 async function fetchTrendingEvents(limit = 5) {
-  const res = await fetch(`${API_BASE}/events/trending?limit=${limit}`);
-  if (!res.ok) throw new Error('Failed to fetch trending events');
-  return await res.json();
+  return cachedFetch(`events:trending:${limit}`, async () => {
+    _progressStart();
+    try {
+      const res = await fetch(`${API_BASE}/events/trending?limit=${limit}`);
+      if (!res.ok) throw new Error('Failed to fetch trending events');
+      return await res.json();
+    } finally {
+      _progressEnd();
+    }
+  }, 120000); // 2min TTL
 }
 
 /** Search events (no login needed) */
@@ -288,24 +439,35 @@ async function uploadEventImage(eventId, file) {
   return await res.json();
 }
 
-/** Upload user avatar */
+/** Upload user avatar — auto-updates cache + emits event for instant UI sync */
 async function uploadAvatar(file) {
   const formData = new FormData();
   formData.append('image', file);
 
   const token = localStorage.getItem('eventfy_token');
-  const res = await fetch(`${API_BASE}/users/avatar`, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${token}`
-    },
-    body: formData
-  });
+  _progressStart();
+  let res;
+  try {
+    res = await fetch(`${API_BASE}/users/avatar`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      },
+      body: formData
+    });
+  } finally {
+    _progressEnd();
+  }
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     throw new Error(err.detail || 'Failed to upload avatar');
   }
-  return await res.json();
+  const updated = await res.json();
+
+  // Optimistic propagation — update cache + notify all components
+  setCachedUser(updated); // This also emits 'user:updated'
+
+  return updated;
 }
 
 /** Update an event (requires auth, organizer role) */

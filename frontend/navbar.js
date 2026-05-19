@@ -266,6 +266,81 @@
   }
 
   /* ─────────────────────────────────────────────────────────────────
+     5b. REACTIVE SYNC — listen for 'user:updated' events
+     Updates all avatar/name/role elements instantly without reload
+  ───────────────────────────────────────────────────────────────── */
+  if (typeof eventfy !== 'undefined' && loggedIn) {
+    eventfy.on('user:updated', function _onUserUpdated(updatedUser) {
+      if (!updatedUser) return;
+
+      // Recompute user state from the new data
+      const fullName = updatedUser.full_name || updatedUser.user_name || updatedUser.username || updatedUser.name || 'User';
+      const role = updatedUser.role ? (updatedUser.role.charAt(0).toUpperCase() + updatedUser.role.slice(1)) : 'Member';
+      const parts = fullName.trim().split(/\s+/);
+      const initials = parts.length >= 2
+        ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+        : fullName.charAt(0).toUpperCase();
+      const avatarUrl = updatedUser.avatar_url || '';
+
+      // Update the module-scoped user object
+      user = { name: fullName, initials, role, avatarUrl };
+
+      // ── Update ALL text elements ──
+      document.querySelectorAll('.user-initials-text').forEach(el => el.textContent = initials || 'U');
+      document.querySelectorAll('.user-name-text,.drawer-user-name').forEach(el => el.textContent = fullName);
+      document.querySelectorAll('.user-role-text,.drawer-user-role').forEach(el => el.textContent = role);
+      document.querySelectorAll('.drawer-avatar-text').forEach(el => el.textContent = initials || 'U');
+
+      // ── Update ALL avatar images (or create them) ──
+      if (avatarUrl) {
+        // Desktop nav buttons
+        document.querySelectorAll('.nav-user-avatar-btn').forEach(btn => {
+          const initSpan = btn.querySelector('.user-initials-text');
+          if (initSpan) initSpan.style.display = 'none';
+          let img = btn.querySelector('.nav-avatar-img');
+          if (!img) {
+            img = document.createElement('img');
+            img.className = 'nav-avatar-img';
+            img.style.cssText = 'width:100%;height:100%;border-radius:50%;object-fit:cover;';
+            img.alt = 'Avatar';
+            btn.appendChild(img);
+          }
+          img.src = avatarUrl + '?t=' + Date.now(); // Cache-bust
+        });
+        // Mobile drawer
+        document.querySelectorAll('.drawer-user-avatar').forEach(el => {
+          const initSpan = el.querySelector('.user-initials-text');
+          if (initSpan) initSpan.style.display = 'none';
+          let img = el.querySelector('.drawer-avatar-img');
+          if (!img) {
+            img = document.createElement('img');
+            img.className = 'drawer-avatar-img';
+            img.style.cssText = 'width:100%;height:100%;border-radius:50%;object-fit:cover;';
+            img.alt = 'Avatar';
+            el.appendChild(img);
+          }
+          img.src = avatarUrl + '?t=' + Date.now();
+        });
+      }
+
+      // ── Rebuild popup HTML with new avatar ──
+      ['userPopup', 'userPopupMob'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = buildUserPopupHTML();
+      });
+
+      // Re-attach logout handlers inside rebuilt popups
+      document.querySelectorAll('.btn-do-logout').forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (typeof apiLogout === 'function') apiLogout();
+        });
+      });
+
+      console.log('[navbar] ✨ UI synced with updated profile');
+    });
+  }
+
+  /* ─────────────────────────────────────────────────────────────────
      6. BUILD NOTIFICATION POPUP (with "View All" link)
   ───────────────────────────────────────────────────────────────── */
   function buildNotifPopupHTML() {

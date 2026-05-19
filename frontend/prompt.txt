@@ -1,0 +1,1009 @@
+Project: Build a complete multi-page React web application called "Saha·Event" — a premium Algerian wedding hall (salle des fêtes) booking platform. Use Next.js App Router, Tailwind CSS, shadcn/ui. The app has two user roles: Client and Owner (Locateur).
+
+🎨 DESIGN SYSTEM — READ THIS FIRST
+
+Aesthetic direction: "Classic Modern Luxury" — NOT generic AI SaaS. Think: a high-end Parisian atelier meets Algerian architectural heritage. The design must feel handcrafted, editorial, and physically tangible.
+
+3D & Depth effects (critical, use throughout):
+
+Cards must have real CSS transform-style: preserve-3d hover tilt effect (mouse-tracking 3D card tilt on venue cards)
+
+Hero section has a layered parallax depth with floating 3D geometric shapes (gold wireframe octahedron, rotating slowly)
+
+Buttons have a pressed/emboss effect using layered box-shadows that simulate physical depth
+
+Section transitions use perspective transforms — content slides in with a 3D rotate on scroll
+
+Venue gallery uses a 3D carousel (CSS 3D transform rotateY) not a flat slider
+
+The booking widget card has a thick cast shadow making it look physically elevated off the page
+
+Use backdrop-filter: blur + layered rgba backgrounds to create true glass depth (not flat glassmorphism)
+
+Color palette (strict — no purple, no generic blue):
+
+--gold: #B8953F (muted antique gold, NOT bright yellow)
+
+--gold-light: #D4AF6A
+
+--cream: #F7F2EA
+
+--parchment: #EDE4D3
+
+--espresso: #18120E
+
+--bark: #2E2218
+
+--stone: #6B5B45
+
+--sage: #4A6741 (success states)
+
+--terracotta: #B54A38 (error/cancel states)
+
+--ink: #1C1712
+
+Typography (import from Google Fonts):
+
+Display/Headings: "Cormorant" weight 300–700, italic variants
+
+UI/Body: "Jost" weight 300–600
+
+Monospace accents (prices, dates, codes): "DM Mono"
+
+NEVER use Inter, Roboto, or system fonts
+
+Texture & detail:
+
+Subtle noise grain overlay on all dark sections (SVG feTurbulence filter, 3% opacity)
+
+Thin 1px gold rule lines used as section dividers (not full-width, 60px centered)
+
+Arabesque corner ornaments (SVG) on hero and modal headers
+
+All rounded corners: border-radius: 2px for inputs/buttons (sharp, architectural), 12px for cards, 0 for nav
+
+📄 PAGE 1 — LANDING PAGE (/)
+
+Navbar (fixed, 68px height):
+
+Left: Logo "Saha·Event" — "Saha" in Cormorant italic gold, "·Event" in Jost light espresso. A tiny SVG star-pattern between words.
+
+Center: Nav links in Jost 13px uppercase tracked: PARCOURIR · COMMENT ÇA MARCHE · PROPRIÉTAIRES
+
+Right: "Connexion" ghost button (gold border, transparent bg) + "Inscription" solid gold button
+
+On scroll: navbar background switches from transparent to rgba(24,18,14,0.96) with blur, links turn cream
+
+Hero section (100vh, dark espresso bg):
+
+Background: deep #18120E with a radial warm glow center-right rgba(184,149,63,0.08)
+
+Floating 3D element: a slowly rotating wireframe geometric diamond shape (gold stroke, CSS 3D animation, top-right quadrant, large ~400px, semi-transparent)
+
+Left column (60% width):
+
+Tiny gold uppercase eyebrow: "● PLATEFORME N°1 EN ALGÉRIE" with a pulsing dot
+
+Giant headline in Cormorant, 5 lines, mix of weights:
+
+Trouvez la Salle
+
+de Vos [italic gold]Rêves[/italic]
+
+Font-size: clamp(52px, 7vw, 96px), line-height 0.95
+
+Subtitle in Jost 300, 18px, stone color: "Des salles des fêtes vérifiées dans 48 wilayas. Réservez en toute confiance."
+
+Two CTAs side by side:
+
+Primary: "Explorer les Salles →" — gold bg, espresso text, 3D pressed shadow effect
+
+Secondary: "Proposer ma Salle" — transparent, cream border, cream text
+
+Below CTAs: 3 animated counters separated by vertical rules: 240+ Salles · 48 Wilayas · 1 200+ Fêtes
+
+Right column: floating search card (see below)
+
+Hero search card (right side, floating with thick 3D shadow):
+
+Background: rgba(232,220,196,0.06) with heavy blur, gold border 1px
+
+Title: "Recherche rapide" in Cormorant italic
+
+Fields stacked:
+
+Wilaya — select dropdown (all 58 wilayas of Algeria)
+
+Date de l'événement — date picker (flat, gold accent)
+
+Nombre d'invités — number input with ± stepper buttons
+
+Budget max (DZD) — range slider with live value display in DM Mono
+
+"Rechercher" full-width gold button at bottom
+
+Below button: small text "Pas besoin de compte pour parcourir"
+
+Featured Venues strip:
+
+Section label: small gold "─── EN VEDETTE ───" centered
+
+Title: "Salles Sélectionnées" in Cormorant 48px
+
+3D carousel: 5 cards displayed in CSS 3D perspective. Center card is full-size, side cards are rotated ~25deg on Y axis and scaled 0.85. Arrow buttons rotate the carousel. Each card:
+
+Full-bleed gradient image placeholder (warm dark gradient with venue emoji)
+
+Overlay gradient bottom: espresso to transparent
+
+Venue name in Cormorant white at bottom
+
+City · Capacity · Price in Jost small
+
+Gold star rating
+
+"Voir la salle" pill button on hover
+
+How it works (cream bg):
+
+3 steps in a row. Each step is a tall card with: large 3D number (Cormorant, 120px, gold, slight drop-shadow giving Z-depth), icon line-art (SVG), bold title, description. Cards have the mouse-tilt 3D effect.
+
+Step 1: Parcourez — "Filtrez par wilaya, capacité, options et budget."
+
+Step 2: Vérifiez & Réservez — "Créez votre compte, passez la vérification KYC, choisissez vos dates et payez l'acompte par CCP."
+
+Step 3: Célébrez — "Le propriétaire confirme. Votre salle est bloquée. Il ne reste qu'à fêter."
+
+Owner recruitment banner (full-width, dark):
+
+Background: espresso with a large Arabesque SVG pattern watermark at 6% opacity
+
+Left: headline "Vous êtes propriétaire d'une salle des fêtes ?" + sub "Publiez gratuitement. Recevez des réservations directement dans votre tableau de bord." + "Commencer →" gold button
+
+Right: 3 benefit pills stacked: "✓ Vérification sécurisée" · "✓ Calendrier intégré" · "✓ Paiement CCP tracé"
+
+Footer:
+
+4-column grid: Logo + tagline / Plateforme links / Support / Légal
+
+Bottom bar: copyright in DM Mono · Social icons (Instagram, Facebook, WhatsApp)
+
+📄 PAGE 2 — BROWSE PAGE (/parcourir)
+
+Layout: Fixed left filter sidebar (300px) + scrollable right content area
+
+Filter sidebar (sticky, cream bg, gold top border 3px):
+
+Title "Filtres" + "Réinitialiser" link
+
+Wilaya multi-select searchable dropdown
+
+Date range picker (start + end date)
+
+Capacité slider: 50 → 2000 guests, dual handle
+
+Budget slider: 10 000 → 500 000 DZD
+
+Options checkboxes (with count badges):
+
+🍽️ Restauration incluse
+
+🅿️ Parking
+
+❄️ Climatisation
+
+🎵 Sonorisation
+
+💡 Décoration incluse
+
+🛏️ Hébergement
+
+🎥 Vidéo-projection
+
+Note minimale: star selector (1–5)
+
+Disponibilité: toggle "Afficher seulement les disponibles"
+
+Apply button: "Appliquer les filtres" gold
+
+Results area:
+
+Top bar: "240 salles trouvées" + Sort dropdown: Pertinence / Prix croissant / Prix décroissant / Mieux notées / Plus récentes
+
+View toggle: Grid | List (icon buttons)
+
+Grid view: 3 columns of venue cards. Each card:
+
+Photo area (16:9) with 3D hover tilt + heart icon top-right + badge top-left (VÉRIFIÉ in sage / NOUVEAU in gold)
+
+Card body: venue name Cormorant 20px, city + wilaya Jost stone, capacity pill, price in DM Mono gold bold "45 000 DA/jour", star rating + review count
+
+Tags row: max 3 options shown as tiny pills
+
+"Voir la salle" ghost button appears on card hover
+
+List view: horizontal cards showing same info in a row layout with bigger photo left
+
+Infinite scroll or "Charger plus" button
+
+📄 PAGE 3 — VENUE DETAIL PAGE (/salle/[id])
+
+Photo gallery (full-width, top of page, below navbar):
+
+Main photo 60% width, 2 stacked thumbs right 40%, below a filmstrip of remaining thumbs
+
+"Voir toutes les photos (12) →" button opens full-screen lightbox gallery
+
+Lightbox is a 3D flip carousel (cards flip in 3D on next/prev)
+
+Content below gallery (max-width 1200px, centered):
+
+Left column (65%):
+
+Breadcrumb: Accueil > Alger > Salle name
+
+Verified badge: green pill "✓ Identité & Documents vérifiés par Saha·Event"
+
+Title: Cormorant 52px
+
+Location with map pin icon, Wilaya
+
+Star rating + "(34 avis)"
+
+Horizontal specs bar (4 items with icons, dividers between): 👥 500 invités max · 📐 1200 m² · 🍽️ Restauration · 🅿️ Parking 100 voitures
+
+Gold rule divider
+
+Description in Cormorant Garamond, 3 paragraphs, italic style
+
+"Prestations incluses" section: icon grid of all options (included = gold icon, not included = stone faded)
+
+Availability Calendar:
+
+Month grid, 2 months side by side
+
+Color code: cream = available, espresso bg = booked/blocked, gold border = today
+
+Navigation arrows previous/next month
+
+Legend: Disponible · Réservé · Bloqué par propriétaire
+
+Clicking available date pre-fills the booking widget
+
+Reviews section:
+
+Overall rating breakdown: big number + bar graph per star level
+
+Review cards: avatar initials, name, date (DM Mono), star rating, comment text, event type tag
+
+Right column (35%, sticky on scroll):
+
+Booking widget card (3D elevated with thick multi-layer shadow):
+
+Price display: "45 000 DA" in DM Mono 32px gold + "/jour" small
+
+Acompte required: "Acompte requis: 15 000 DA (33%)" in terracotta pill
+
+Date selector (start date, synced with calendar)
+
+Duration: number of days stepper
+
+Live total calculation: "Total estimé: 90 000 DA" in DM Mono
+
+CTA: "Réserver maintenant →" gold button full-width
+
+Below: "🔒 Réservation sécurisée · KYC requis"
+
+Owner mini-card: avatar, name, "Membre depuis 2024", "Répond en < 2h"
+
+📄 PAGE 4 — AUTH PAGE (/auth)
+
+Split screen layout:
+
+Left half: full dark espresso, large venue photo with gold overlay, quote in Cormorant italic: "Chaque fête mérite un cadre d'exception.", logo at top
+
+Right half: clean cream, centered form
+
+Tabs: "Connexion" | "Inscription" (animated underline slider tab)
+
+Inscription form:
+
+Role selector FIRST (two large cards side by side):
+
+💍 "Je suis Client" — I want to reserve a venue
+
+🏛️ "Je suis Propriétaire" — I want to list my venue
+
+Selected card gets gold border + gold bg tint
+
+Full name, Email, Phone number (Algerian format +213), Password, Confirm password
+
+Checkbox: terms + conditions
+
+"Créer mon compte →" gold button
+
+"Ou continuer avec Google" ghost button
+
+Connexion form:
+
+Email, Password, "Mot de passe oublié?" link
+
+"Se connecter →" gold button
+
+📄 PAGE 5 — KYC VERIFICATION FLOW (/verification)
+
+Step wizard with progress bar (gold fill animation)
+
+Step 1/3 — Identité (all users):
+
+Title: "Vérification d'identité"
+
+Sub: "Requis pour la sécurité de tous les utilisateurs. Fourni par Stripe Identity."
+
+Document type selector: "CIN Algérienne" | "Passeport" (card toggle)
+
+Upload zone 1: "Recto du document" — large dashed border zone, drag & drop, camera icon, "Parcourir" link. Preview thumbnail on upload.
+
+Upload zone 2: "Verso du document" — same style
+
+Upload zone 3: "Selfie avec le document" — slightly different style with circular preview (mimics face detection)
+
+Info box: "🔒 Vos documents sont chiffrés et traités par Stripe. Saha·Event ne les stocke pas."
+
+"Continuer →" button
+
+Step 2/3 — Preuve de propriété (Owners only, skipped for Clients):
+
+Title: "Preuve d'autorisation"
+
+Sub: "Prouvez que vous êtes autorisé à louer cette salle."
+
+Document type selector: Acte de propriété / Contrat de gérance / Autorisation communale / Autre
+
+Large upload zone for document (PDF or image)
+
+Text area: "Note complémentaire (optionnel)"
+
+"Soumettre →" button
+
+Step 3/3 — En attente de validation:
+
+Centered layout
+
+Animated hourglass or spinning ornament (CSS, gold)
+
+Title: "Vos documents sont en cours de vérification"
+
+Sub: "Délai estimé: 24–48 heures. Vous recevrez un email dès validation."
+
+Status card with 3 checkpoints: ✅ Documents reçus · ⏳ Vérification en cours · ○ Compte validé
+
+"Retour à l'accueil" link
+
+If rejected (state): red banner with reason + "Soumettre à nouveau" button
+
+📄 PAGE 6 — BOOKING FLOW (/reservation/[id])
+
+3-step wizard, full page, dark sidebar left + content right
+
+Left sidebar (dark, sticky):
+
+Venue name, photo, city
+
+Live booking summary that updates: dates, nights, price/night, total, acompte
+
+All in DM Mono font for prices
+
+Step 1 — Sélection des dates:
+
+Large 2-month calendar (same style as detail page)
+
+Selected dates highlighted in gold range
+
+Duration auto-calculated: "3 jours sélectionnés"
+
+"Continuer →"
+
+Step 2 — Paiement de l'acompte:
+
+Title: "Confirmer la réservation"
+
+Summary box: dates, total, acompte amount in large DM Mono
+
+CCP payment instructions block (card with gold left border):
+
+"Versez exactement XX 000 DA au compte CCP suivant:"
+
+CCP number in large DM Mono with copy button
+
+Name of account holder
+
+Reference to write: [booking reference code auto-generated]
+
+Upload receipt zone: "Téléversez votre reçu CCP" (image or PDF)
+
+Optional message to owner textarea
+
+"Envoyer la demande →" gold button
+
+Small disclaimer: "La réservation n'est confirmée qu'après validation du reçu par le propriétaire."
+
+Step 3 — Confirmation:
+
+Large centered checkmark animation (CSS, gold stroke)
+
+"Demande envoyée !" in Cormorant 52px
+
+Booking reference in DM Mono pill
+
+Status: "En attente de confirmation du propriétaire"
+
+"Voir mes réservations →" button
+
+📄 PAGE 7 — CLIENT DASHBOARD (/espace-client)
+
+Layout: Left nav sidebar (dark, 240px) + main content
+
+Sidebar:
+
+Avatar initials circle (gold bg)
+
+Name + KYC badge: "✓ Vérifié" green or "⚠ Non vérifié" amber
+
+Nav items: 🗓️ Mes Réservations · ❤️ Favoris · 👤 Mon Profil · 🚪 Déconnexion
+
+Mes Réservations (default tab):
+
+Filter tabs: Toutes · En attente · Confirmées · Annulées · Passées
+
+Reservation cards (list layout):
+
+Left: venue photo thumb
+
+Middle: venue name (Cormorant), dates (DM Mono), wilaya
+
+Right: amount in DM Mono gold, status badge (color coded), "Voir détails" button
+
+Status badges: 🟡 En attente · 🟢 Confirmée · 🔴 Annulée · ⬜ Terminée
+
+Expanding detail panel on click: shows uploaded CCP receipt preview + owner message
+
+Favoris tab: 3-column grid of saved venue cards (same as browse cards)
+
+Mon Profil tab: Edit name, phone, email. KYC status section with re-submission option.
+
+📄 PAGE 8 — OWNER DASHBOARD (/espace-proprietaire)
+
+Same sidebar layout as client but with:
+
+Nav items: 🏛️ Ma Salle · 🗓️ Calendrier · 📋 Réservations · 💬 Messages · 👤 Mon Profil
+
+Stats bar at top (4 cards with 3D depth):
+
+Total réservations (this month) · Revenus estimés (DM Mono, gold) · Taux d'occupation % · Note moyenne ★
+
+Ma Salle tab:
+
+Venue status toggle: "Publiée ✓" | "Dépubliée" with big toggle switch
+
+Edit sections (accordion style):
+
+Informations générales: name, wilaya, address, description textarea
+
+Capacité & Tarif: max guests stepper, price per day input (DM Mono), acompte % slider
+
+Options & Services: toggle switches for each option
+
+Photos & Vidéos: drag-and-drop upload grid (minimum 5 photos note), reorderable, deletable
+
+"Sauvegarder" gold button fixed at bottom
+
+Calendrier tab:
+
+Full month calendar (large, full width)
+
+Existing confirmed reservations shown in gold
+
+Owner can click any free date range and "Bloquer ces dates" (mark unavailable/maintenance)
+
+Blocked dates in bark/dark
+
+Side panel shows list of events for selected month
+
+Réservations tab:
+
+Incoming requests list (newest first)
+
+Each card: client name (partial masked until confirmed), event date, duration, acompte amount
+
+Expandable: shows CCP receipt image/PDF preview in lightbox
+
+Action buttons: "✓ Confirmer la réservation" (sage green) · "✗ Refuser" (terracotta)
+
+Refusal: modal with required reason field + optional message
+
+Confirmed reservations show client full name + contact
+
+📄 PAGE 9 — ADD/EDIT VENUE (/espace-proprietaire/salle/modifier)
+
+Full-page multi-section form (not a wizard, all visible with scroll):
+
+Left: live preview card (sticky) showing how the listing looks as owner fills it
+
+Right: form sections with bold numbered headers:
+
+Informations de base — Nom de la salle, Wilaya (select), Adresse complète, Description (rich text min 100 chars)
+
+Capacité & Tarification — Capacité max (stepper), Surface en m², Prix par jour (DZD), Acompte requis (% slider with live DZD calculation)
+
+Prestations proposées — Toggle cards for each option (Restauration, Parking, Clim, Sono, Déco, Hébergement, Vidéo)
+
+Médias — Drag & drop upload zone. Grid preview of uploaded images with reorder handles and delete. Minimum 5 photos required badge.
+
+Coordonnées CCP — Nom du titulaire, Numéro CCP, Clé CCP (for payment instructions to clients)
+
+Two buttons: "Enregistrer comme brouillon" (ghost) + "Publier la salle →" (gold) ADMIN PANEL (/admin) — NEW PAGE
+
+Access: Separate login at /admin/login — email + password only, no public registration. Admin accounts created manually in Supabase.
+
+Admin layout: Full dark sidebar (espresso) + content area. Completely different visual feel from client/owner — more utilitarian dashboard, still uses the same font system but denser information layout.
+
+Sidebar nav items:
+
+📊 Vue d'ensemble
+
+🏛️ Vérification Propriétaires
+
+👥 Utilisateurs
+
+🗓️ Réservations
+
+🚨 Signalements
+
+⚙️ Paramètres
+
+Admin — Vue d'ensemble (Home)
+
+4 KPI cards top row (3D elevated): Propriétaires en attente de validation · Réservations ce mois · Utilisateurs actifs · Revenus plateforme
+
+Activity feed: real-time list of latest actions (new owner submitted docs / new booking / new user registered)
+
+Quick action buttons: "Voir les demandes en attente →"
+
+Admin — Vérification Propriétaires ⭐ (most important)
+
+This is the core admin workflow.
+
+Filter tabs: En attente (badge count) · Approuvés · Refusés · Suspendus
+
+Owner verification cards (list layout):
+
+Each card shows:
+
+Owner name + email + phone
+
+Submitted date (DM Mono)
+
+Venue name they want to list
+
+Wilaya
+
+Status badge
+
+"Examiner →" button
+
+Clicking "Examiner" opens a full detail review panel (right side panel or full page):
+
+Layout has two columns:
+
+Left column — Owner identity documents:
+
+KYC section: CIN/Passport recto + verso images (zoomable lightbox on click), Selfie image
+
+Stripe Identity result: "✓ Identity Verified by Stripe" green pill OR status
+
+Right column — Venue ownership documents:
+
+Document type label (Acte de propriété / Contrat de gérance / Autorisation communale / Registre du commerce)
+
+Document preview (PDF embed or image, full height)
+
+Document viewer with zoom + rotate controls
+
+Owner's optional note
+
+Venue preview card: name, wilaya, photos uploaded, description, capacity, price
+
+Admin action bar (fixed at bottom of review panel):
+
+"✓ Approuver la salle" — sage green button → immediately sets owner status to verified, venue becomes publishable, owner receives email notification
+
+"✗ Refuser" — terracotta button → opens modal:
+
+Required: reason selector (Document illisible / Document invalide / Informations incohérentes / Doublon / Autre)
+
+Optional: message to owner textarea
+
+"Envoyer le refus" button → owner receives email with reason + can resubmit
+
+"⚠ Suspendre le compte" — amber button → blocks owner from platform entirely with reason
+
+Owner can resubmit after refusal:
+
+In their dashboard they see refusal reason + "Soumettre de nouveaux documents" button
+
+Resubmission creates a new review request in admin panel marked "RESOUMISSION" badge
+
+Admin — Réservations
+
+Full list of all reservations across all venues
+
+Filters: date range, wilaya, status, venue name
+
+Each row: booking ref (DM Mono) · venue name · client name · dates · amount · status · CCP receipt preview icon
+
+Can view CCP receipt in lightbox
+
+Can manually mark as confirmed/cancelled if dispute
+
+Admin — Utilisateurs
+
+List of all clients + owners
+
+Search by name/email
+
+Each user: name, role badge (CLIENT/PROPRIÉTAIRE), KYC status, join date, reservation count
+
+Actions: View profile · Suspend account · Reset KYC
+
+💰 OWNER DEPOSIT SYSTEM — UPDATE OWNER DASHBOARD & ADD VENUE PAGE
+
+In the Add/Edit Venue page, section "Capacité & Tarification", replace the simple acompte field with:
+
+Acompte (deposit) selector:
+
+Label: "Acompte requis à la réservation"
+
+Visual: a row of selectable pill buttons: 10% · 15% · 20% · 25% · 30% · 50%
+
+Selected pill gets gold bg + espresso text
+
+Below the pills: live calculation card showing:
+
+Prix journalier:        45 000 DA
+
+Acompte sélectionné:       20%
+
+─────────────────────────────
+
+Montant acompte:        9 000 DA
+
+Reste à payer le jour J: 36 000 DA
+
+All numbers in DM Mono, right-aligned
+
+Tooltip info icon: "L'acompte est versé via CCP avant confirmation. Le reste est réglé directement avec le client."
+
+This deposit % is then displayed everywhere:
+
+On venue detail page booking widget: "Acompte: 9 000 DA (20% du total)"
+
+On booking flow step 2: exact amount to transfer via CCP
+
+On client dashboard reservation card: acompte paid vs remaining
+
+On owner dashboard reservation card: acompte received, remaining expected
+
+🗓️ REAL BOOKING SYSTEM — UPDATE ALL CALENDAR COMPONENTS
+
+This is the core availability engine. Apply to ALL calendar instances across the app.
+
+Availability Rules:
+
+A date becomes unavailable when:
+
+A client has a confirmed reservation on that date (auto-blocked by system)
+
+A client has a pending reservation on that date (shown as "En attente" — soft block, different color)
+
+The owner manually blocks that date
+
+A date becomes available again when:
+
+A reservation is cancelled by owner or client
+
+The owner unblocks a manually blocked date
+
+Calendar Color Legend (apply consistently everywhere):
+
+⬜ Cream/white = Available — clickable
+
+🟡 Gold tint bg = Pending (reservation awaiting owner confirmation) — not clickable, shows tooltip "En attente de confirmation"
+
+▪️ Espresso dark bg = Confirmed booking — not clickable, shows tooltip "Réservé"
+
+🔲 Dark bark bg + lock icon = Blocked by owner — not clickable, shows tooltip "Indisponible"
+
+⬛ Light stone bg = Past date — not clickable
+
+🟦 Gold border = Today
+
+🟨 Gold bg = Selected date (client picking)
+
+Calendar interactions on Venue Detail Page (client view):
+
+Hovering an available date shows tooltip: "Disponible — Cliquez pour sélectionner"
+
+Clicking a date selects it and auto-fills the booking widget start date
+
+If client tries to click unavailable date: gentle shake animation + tooltip explaining why
+
+Multi-day selection: click start date then end date, range highlights in gold
+
+If selected range includes any unavailable day: show error "Ces dates incluent un jour déjà réservé. Veuillez ajuster votre sélection."
+
+Owner Calendar (in Owner Dashboard — Calendrier tab):
+
+Full-width month calendar with 3 modes (toggle buttons top right):
+
+Mode 1 — Vue réservations:
+
+All confirmed reservations shown as gold bars spanning their date range
+
+Hovering a bar shows: client first name (masked last name), total duration, acompte status
+
+Clicking a bar opens side panel with full reservation details
+
+Mode 2 — Bloquer des dates:
+
+Calendar enters "selection mode" (border turns amber)
+
+Owner clicks and drags to select a date range
+
+Selected range highlighted in amber
+
+Panel appears: "Bloquer du [date] au [date]" + reason field (optional: Maintenance / Événement personnel / Travaux / Autre) + "Confirmer le blocage" button
+
+Blocked dates immediately appear dark with lock icon
+
+Blocked dates are visible to clients as unavailable (no reason shown to clients)
+
+Mode 3 — Débloquer:
+
+Owner clicks any manually blocked date → confirmation modal: "Débloquer le [date] ?" → "Oui, débloquer" button → date returns to available
+
+Note: Owner CANNOT unblock a date that has a confirmed reservation (system prevents it)
+
+Mini calendar widget (shown in owner sidebar always): small 1-month view showing occupation at a glance
+
+🔄 COMPLETE APP WORKFLOW — IMPLEMENT ALL THESE STATES
+
+Owner Full Journey:
+
+Register (role: Owner)
+
+  → Email verification
+
+  → KYC Step 1: CIN/Passport + Selfie (Stripe Identity)
+
+  → KYC Step 2: Ownership document upload
+
+     (Registre du commerce / Acte propriété / Autorisation)
+
+  → Status: "En attente de validation admin" [PENDING STATE]
+
+     Dashboard shows waiting screen with progress tracker
+
+  → Admin reviews in admin panel
+
+  → IF REFUSED:
+
+     Owner gets email + dashboard shows refusal reason
+
+     Owner can resubmit documents → back to pending
+
+  → IF APPROVED:
+
+     Owner gets email "Félicitations, votre compte est validé"
+
+     Owner can now access full dashboard
+
+  → Create venue listing (form + photos + CCP coordinates + deposit %)
+
+  → Publish venue → appears in browse
+
+  → Manage calendar (block dates)
+
+  → Receive booking requests
+
+     → View CCP receipt uploaded by client
+
+     → Confirm OR Refuse (with reason)
+
+  → Confirmed booking → date auto-blocked in calendar
+
+  → After event date passes → reservation moves to "Terminée"
+
+Client Full Journey:
+
+Browse freely without account
+
+  → Clicks "Réserver" on a venue
+
+  → Prompted to login/register
+
+  → Register (role: Client)
+
+  → Email verification
+
+  → KYC: CIN/Passport + Selfie (Stripe Identity)
+
+  → Wait for KYC approval (usually fast, Stripe automated)
+
+  → Once verified: can access booking flow
+
+  → Select available dates from venue calendar
+
+  → See deposit amount required (set by owner)
+
+  → Upload CCP receipt proving payment
+
+  → Write optional message to owner
+
+  → Submit booking request [PENDING]
+
+  → Owner confirms or refuses
+
+  → IF CONFIRMED:
+
+     Client gets email notification
+
+     Date is now hard-blocked in calendar
+
+     Booking appears as "Confirmée" in dashboard
+
+  → IF REFUSED:
+
+     Client gets email + refusal reason
+
+     Date is freed up again
+
+     Client can rebook or choose another venue
+
+  → Event day approaches → status shows countdown
+
+  → After event: client can leave a review
+
+📬 NOTIFICATION SYSTEM — SHOW IN UI
+
+Bell icon in navbar (for logged-in users) with unread count badge:
+
+Dropdown shows notification feed:
+
+🟢 "Votre réservation au [Venue] a été confirmée" — with date
+
+🔴 "Votre demande au [Venue] a été refusée" — with reason preview
+
+📄 "Nouvelle demande de réservation" (owner) — client name + dates
+
+✅ "Votre compte propriétaire a été approuvé" (owner)
+
+❌ "Votre dossier a été refusé" (owner) — reason
+
+📤 "Nouveau document soumis" (admin)
+
+Each notification: icon · message · relative time (DM Mono) · unread dot · clickable → navigates to relevant page
+
+🚨 EDGE CASES & VALIDATION — IMPLEMENT THESE STATES
+
+Double-booking prevention:
+
+When client submits a booking request for dates that just got confirmed by another client simultaneously → system detects conflict → shows error: "Ces dates viennent d'être réservées. Veuillez choisir d'autres dates." → calendar refreshes
+
+Pending soft-block:
+
+When a pending request exists for a date → that date shows as "En attente" (gold tint) on calendar
+
+Other clients can still request the same dates (first confirmed wins) — show warning: "⚠ Une demande est en cours pour ces dates. Votre réservation sera confirmée si la précédente est refusée."
+
+Owner deletes venue:
+
+All pending reservations auto-cancelled with client notification
+
+Confirmed future reservations: owner must cancel individually with mandatory reason + client notification
+
+KYC expired / rejected after previous approval:
+
+User sees banner: "⚠ Votre vérification a expiré. Veuillez soumettre à nouveau vos documents."
+
+Booking capabilities suspended until re-verified
+
+CCP Receipt validation:
+
+Client uploads receipt → owner sees it in dashboard
+
+If owner marks receipt as "invalide" → booking goes to "Reçu invalide" status → client notified to reupload
+
+New upload zone appears in client dashboard for that specific reservation
+
+🎨 ADDITIONAL UI COMPONENTS TO ADD
+
+Status timeline component (used in booking detail views):
+
+Vertical stepper showing the life of a reservation:
+
+✅ Demande envoyée          [date + time, DM Mono]
+
+✅ Reçu CCP reçu            [date + time]
+
+⏳ En attente de confirmation
+
+○  Réservation confirmée
+
+○  Événement
+
+○  Terminée
+
+Completed steps: gold icon + gold line. Current step: pulsing gold dot. Future steps: stone color.
+
+Document viewer modal:
+
+Used in admin panel and owner dashboard when viewing CCP receipts or ownership docs:
+
+Full-screen dark overlay
+
+PDF: embedded iframe with page navigation
+
+Image: zoomable with pinch/scroll, rotate button
+
+Download button + "Marquer comme valide / invalide" buttons
+
+Venue status badge system (owner dashboard):
+
+🟡 "Brouillon" — saved but not published
+
+🟢 "Publiée" — visible in browse
+
+🔴 "Suspendue" — admin suspended
+
+⏳ "En attente d'approbation" — pending admin review
+
+❌ "Refusée" — admin refused, needs resubmission
+
+How to use this in v0
+
+Paste the original full prompt first, then immediately after paste this one labeled clearly:
+
+"Now add and integrate all of the following features into the same design system and app:"
+
+generate in this order:
+
+Landing + Browse + Detail (public pages)
+
+Booking flow
+
+Auth + KYC flow
+
+Client Dashboard
+
+Owner Dashboard + Calendar system
+
+Admin Panel (new)
+
+Notification system + edge case states
+
+⚙️ GLOBAL COMPONENTS
+
+Toast notifications (top-right, slide-in with 3D translateZ): success sage green, error terracotta, info gold
+
+Loading states: gold shimmer skeleton screens (not spinners)
+
+Empty states: Cormorant italic message + SVG illustration + action button
+
+Modals: enter with 3D scale + rotateX from slightly above (like a card falling into place), dark overlay
+
+All forms: no <form> tags, use onClick handlers. Inputs have 2px bottom border only (not full box), gold focus state.
+
+Mobile: hamburger nav → full-screen dark overlay menu. Browse page filters collapse to bottom sheet drawer. All 3D effects scale down gracefully.
+
+ Generate all pages as separate route components in Next.js App Router. Use "use client" where needed for interactivity. Implement all UI states: loading, empty, error, and success. Apply the 3D card tilt as a reusable <TiltCard> component using onMouseMove to track cursor and apply rotateX/rotateY CSS transforms. Use Tailwind CSS for all styling. Import Cormorant and Jost from next/font/google. Make it feel like a real production app, not a prototype

@@ -325,33 +325,78 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ── Activate default tab ── */
   switchTab('account');
 
-  /* ── Photo upload ── */
+  /* ── Photo upload — with loading spinner & error rollback ── */
   const photoInput = document.getElementById('photoInput');
   if (photoInput) {
     photoInput.addEventListener('change', async (e) => {
       const file = e.target.files[0];
       if (!file) return;
 
-      // Instant preview
+      const img = document.getElementById('profileAvatarImg');
+      const initials = document.getElementById('profileAvatarInitials');
+      const avatarWrapper = img ? img.closest('.profile-avatar-wrapper, .avatar-wrapper, .account-avatar') : null;
+
+      // Save previous state for rollback
+      const prevSrc = img ? img.src : '';
+      const prevDisplay = img ? img.style.display : '';
+      const prevInitialsDisplay = initials ? initials.style.display : '';
+
+      // Instant local preview
       const reader = new FileReader();
       reader.onload = evt => {
-        const img = document.getElementById('profileAvatarImg');
-        const initials = document.getElementById('profileAvatarInitials');
         if (img) { img.src = evt.target.result; img.style.display = 'block'; }
         if (initials) initials.style.display = 'none';
       };
       reader.readAsDataURL(file);
 
-      // Upload to backend
+      // Show loading spinner overlay on avatar
+      let spinner = null;
+      if (avatarWrapper) {
+        spinner = document.createElement('div');
+        spinner.className = 'avatar-upload-spinner';
+        spinner.innerHTML = `<div class="spinner-ring"></div>`;
+        avatarWrapper.style.position = 'relative';
+        avatarWrapper.appendChild(spinner);
+
+        // Inject spinner CSS if not already present
+        if (!document.getElementById('avatar-spinner-css')) {
+          const style = document.createElement('style');
+          style.id = 'avatar-spinner-css';
+          style.textContent = `
+            .avatar-upload-spinner {
+              position: absolute; inset: 0;
+              display: flex; align-items: center; justify-content: center;
+              background: rgba(0,0,0,0.45); border-radius: 50%;
+              z-index: 5;
+            }
+            .spinner-ring {
+              width: 30px; height: 30px;
+              border: 3px solid rgba(255,255,255,0.3);
+              border-top-color: #a855f7;
+              border-radius: 50%;
+              animation: avatar-spin 0.7s linear infinite;
+            }
+            @keyframes avatar-spin { to { transform: rotate(360deg); } }
+          `;
+          document.head.appendChild(style);
+        }
+      }
+
+      // Upload to backend — uploadAvatar() now handles setCachedUser + event emission
       try {
         if (typeof uploadAvatar === 'function') {
-          const updated = await uploadAvatar(file);
-          setCachedUser(updated);
-          showSettingsToast('✅ Photo uploaded successfully!');
+          await uploadAvatar(file);
+          showSettingsToast('✅ Photo updated! Changes synced across all pages.');
         }
       } catch (err) {
         console.error('Avatar upload failed:', err);
         showSettingsToast('❌ Photo upload failed. Please try again.');
+        // Rollback to previous avatar state
+        if (img) { img.src = prevSrc; img.style.display = prevDisplay; }
+        if (initials) initials.style.display = prevInitialsDisplay;
+      } finally {
+        // Remove spinner
+        if (spinner && spinner.parentNode) spinner.parentNode.removeChild(spinner);
       }
     });
   }

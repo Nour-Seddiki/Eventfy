@@ -216,8 +216,62 @@ document.addEventListener('DOMContentLoaded', () => {
     const grid = document.getElementById('featuredEventsGrid');
     if (!grid) return;
 
+    // ── Inject skeleton CSS once ──
+    if (!document.getElementById('skeleton-css')) {
+      const style = document.createElement('style');
+      style.id = 'skeleton-css';
+      style.textContent = `
+        .skeleton-card {
+          border-radius: 18px;
+          overflow: hidden;
+          background: rgba(255,255,255,0.03);
+          border: 1px solid rgba(255,255,255,0.06);
+        }
+        .skeleton-img {
+          width: 100%; height: 200px;
+          background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 75%);
+          background-size: 200% 100%;
+          animation: skeleton-shimmer 1.5s ease-in-out infinite;
+        }
+        .skeleton-body { padding: 16px; }
+        .skeleton-line {
+          height: 14px; border-radius: 7px;
+          background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 75%);
+          background-size: 200% 100%;
+          animation: skeleton-shimmer 1.5s ease-in-out infinite;
+          margin-bottom: 10px;
+        }
+        .skeleton-line.short { width: 60%; }
+        .skeleton-line.xs { width: 40%; height: 12px; }
+        @keyframes skeleton-shimmer {
+          0% { background-position: 200% 0; }
+          100% { background-position: -200% 0; }
+        }
+        .event-fade-in {
+          animation: eventCardFadeIn 0.4s ease-out both;
+        }
+        @keyframes eventCardFadeIn {
+          from { opacity: 0; transform: translateY(16px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+
+    // ── Show 3 skeleton cards while loading ──
+    grid.innerHTML = Array.from({length: 3}, () => `
+      <div class="skeleton-card">
+        <div class="skeleton-img"></div>
+        <div class="skeleton-body">
+          <div class="skeleton-line" style="width:80%"></div>
+          <div class="skeleton-line short"></div>
+          <div class="skeleton-line xs"></div>
+        </div>
+      </div>
+    `).join('');
+
     try {
-      // Use api.js function
+      // Use api.js function (cached + progress bar)
       const events = await fetchTrendingEvents(3);
       
       if (!events || events.length === 0) {
@@ -225,7 +279,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      grid.innerHTML = events.map(ev => {
+      grid.innerHTML = events.map((ev, idx) => {
         const dateObj = ev.date ? new Date(ev.date) : new Date();
         const month = dateObj.toLocaleString('en-US', { month: 'short' });
         const day = dateObj.getDate();
@@ -236,7 +290,7 @@ document.addEventListener('DOMContentLoaded', () => {
           : 'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=600&q=80';
 
         return `
-          <div class="event reveal-scale" onclick="window.location.href='../event Description/event-detail.html?id=${ev.id}'" style="cursor:pointer">
+          <div class="event reveal-scale event-fade-in" style="animation-delay:${idx * 120}ms" onclick="window.location.href='../event Description/event-detail.html?id=${ev.id}'" style="cursor:pointer">
             <div class="event-up" style="background-image:url(${imgUrl})">
               <div class="event-type">${ev.category || 'General'}</div>
               <button class="like-btn" aria-label="Like" onclick="event.stopPropagation();">❤</button>
