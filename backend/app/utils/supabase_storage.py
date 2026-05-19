@@ -10,7 +10,7 @@ import httpx
 from uuid import uuid4
 from pathlib import Path
 
-SUPABASE_URL = os.getenv("SUPABASE_URL", "https://axpgoderxxcvbxqaigmo.supabase.co")
+SUPABASE_URL = os.getenv("SUPABASE_URL", "https://lokbyexvugoctnliwmcy.supabase.co")
 SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_KEY", "")
 
 

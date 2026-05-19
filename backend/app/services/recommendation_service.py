@@ -30,7 +30,7 @@ class Recommendation_Servies:
             db.query(Event)
             .filter(
                 Event.available_tickets > 0,
-                Event.start_date >= current_time,
+                Event.date >= current_time,
                 ~Event.id.in_(list(purchased_event_ids)),
             )
             .all()
@@ -54,7 +54,7 @@ class Recommendation_Servies:
         scored_events.sort(
             key=lambda item: (
                 -item[0],
-                item[1].start_date,
+                item[1].date,
                 -item[1].available_tickets,
             )
         )
@@ -67,7 +67,7 @@ class Recommendation_Servies:
                 "category": event.category,
                 "location": event.location,
                 "price": event.price,
-                "date": event.start_date,
+                "date": event.date,
                 "available_tickets": event.available_tickets,
                 "score": score,
             }
