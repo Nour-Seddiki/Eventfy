@@ -518,3 +518,92 @@ document.addEventListener('keydown', e => {
     document.body.style.overflow = '';
   }
 });
+
+/* ══════════════════════════════════════════
+   DELETE ACCOUNT — Danger Zone handler
+   Validates 'DELETE' input, calls API, clears
+   session, and redirects to homepage.
+══════════════════════════════════════════ */
+(function initDeleteAccount() {
+  const input      = document.getElementById('deleteConfirmInput');
+  const confirmBtn = document.getElementById('confirmDeleteBtn');
+  const cancelBtn  = document.getElementById('cancelDeleteBtn');
+
+  if (!input || !confirmBtn) return;
+
+  /* Enable the red button only when user types "DELETE" exactly */
+  input.addEventListener('input', () => {
+    const isValid = input.value.trim() === 'DELETE';
+    confirmBtn.disabled = !isValid;
+    confirmBtn.style.opacity = isValid ? '1' : '0.5';
+    confirmBtn.style.cursor  = isValid ? 'pointer' : 'not-allowed';
+  });
+
+  /* Cancel — clear the input */
+  if (cancelBtn) {
+    cancelBtn.addEventListener('click', () => {
+      input.value = '';
+      confirmBtn.disabled = true;
+      confirmBtn.style.opacity = '0.5';
+      confirmBtn.style.cursor  = 'not-allowed';
+    });
+  }
+
+  /* Confirm — call DELETE /users/delete_me */
+  confirmBtn.addEventListener('click', async () => {
+    if (input.value.trim() !== 'DELETE') return;
+
+    /* Double-confirm with native dialog */
+    const sure = confirm(
+      'This will permanently delete your account and all associated data.\n\n' +
+      'Are you absolutely sure?'
+    );
+    if (!sure) return;
+
+    /* Disable button & show loading */
+    confirmBtn.disabled = true;
+    const origText = confirmBtn.textContent;
+    confirmBtn.textContent = 'Deleting…';
+    confirmBtn.style.opacity = '0.6';
+
+    try {
+      const token = localStorage.getItem('eventfy_token');
+      const res = await fetch(`${API_BASE}/users/delete_me`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!res.ok) {
+        const errBody = await res.json().catch(() => ({}));
+        throw new Error(errBody.detail || `Server returned ${res.status}`);
+      }
+
+      /* Clean up all local session data */
+      localStorage.removeItem('eventfy_token');
+      localStorage.removeItem('eventfy_user');
+      localStorage.removeItem('eventfy_refresh_token');
+      _apiCache?.clear?.();
+
+      showSettingsToast('✅ Account deleted. Redirecting…');
+
+      /* Redirect to home page after brief pause */
+      setTimeout(() => {
+        window.location.href = '../Home/index.html';
+      }, 1500);
+
+    } catch (err) {
+      console.error('Account deletion failed:', err);
+      showSettingsToast(`❌ Deletion failed: ${err.message}`);
+      confirmBtn.disabled = false;
+      confirmBtn.textContent = origText;
+      confirmBtn.style.opacity = '1';
+    }
+  });
+
+  /* Set initial disabled styling */
+  confirmBtn.style.opacity = '0.5';
+  confirmBtn.style.cursor  = 'not-allowed';
+})();
