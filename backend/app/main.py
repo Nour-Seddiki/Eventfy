@@ -53,7 +53,7 @@ _local_origins = [
     "http://localhost:8081",
     "http://127.0.0.1:8081",
     # Production Netlify frontend
-    "https://eventfy-app.netlify.app",
+    "https://eventfy-pro.netlify.app",
 ]
 # FRONTEND_URL env can be a single URL or comma-separated list
 _frontend_url = os.getenv("FRONTEND_URL", "")
